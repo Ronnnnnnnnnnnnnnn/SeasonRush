@@ -1,0 +1,163 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c718fb6e48a954a87aef34c814427c, type: 3}
+  m_Name: WinterTheme
+  m_EditorClassIdentifier: Assembly-CSharp::SeasonRush.SeasonTheme
+  season: 2
+  displayName: Winter
+  mood: Cold and slippery - keep moving.
+  skyColor: {r: 0.8, g: 0.9, b: 0.97, a: 1}
+  groundMaterial: {fileID: 2100000, guid: f49b0e85751839c4f9ddd7616d8a2cb2, type: 2}
+  sideMaterial: {fileID: 2100000, guid: e4d34e89eeb1a444c925597ddfc0a807, type: 2}
+  cliffMaterial: {fileID: 2100000, guid: b31652132a4aa864fb49d22307b08901, type: 2}
+  patchMaterial: {fileID: 2100000, guid: e3b8c65fda450484e80abb2d35f53792, type: 2}
+  hasPatch: 1
+  patchCenter: {x: 6, y: 6}
+  patchRadius: 2.3
+  cliffHeight: 2
+  props:
+  - name: Pine
+    sprite: {fileID: 21300000, guid: ac0ee8b1170136b4b9ac2ef99c138613, type: 3}
+    scale: 1
+    colliderRadius: 0.35
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock1
+    sprite: {fileID: 21300000, guid: a8abbaaf037865b41b9d540e28971e80, type: 3}
+    scale: 0.9
+    colliderRadius: 0.5
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock2
+    sprite: {fileID: 21300000, guid: 470b12e22d4f98f46994273588194e4a, type: 3}
+    scale: 1.8
+    colliderRadius: 0.3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock3
+    sprite: {fileID: 21300000, guid: 634ff4f631a8fcc4c90e406fc142399b, type: 3}
+    scale: 1.4
+    colliderRadius: 0.3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Bush
+    sprite: {fileID: 21300000, guid: 09d9bc2f362e98f4d8b16bfc4603ff5f, type: 3}
+    scale: 1.2
+    colliderRadius: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Bush2
+    sprite: {fileID: 21300000, guid: 785cd7525e6955141998eaaea1d0982f, type: 3}
+    scale: 1.2
+    colliderRadius: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  placements:
+  - prop: 0
+    position: {x: 3.2, y: 3.2}
+    flipX: 0
+  - prop: 0
+    position: {x: 9.2, y: 9.2}
+    flipX: 0
+  - prop: 0
+    position: {x: 2, y: 5.6}
+    flipX: 0
+  - prop: 0
+    position: {x: 5.6, y: 2}
+    flipX: 1
+  - prop: 0
+    position: {x: 10.4, y: 7}
+    flipX: 0
+  - prop: 0
+    position: {x: 7, y: 10.4}
+    flipX: 1
+  - prop: 0
+    position: {x: 5, y: 9.8}
+    flipX: 0
+  - prop: 0
+    position: {x: 9.8, y: 5}
+    flipX: 1
+  - prop: 1
+    position: {x: 4.4, y: 8.2}
+    flipX: 0
+  - prop: 1
+    position: {x: 8.2, y: 4.4}
+    flipX: 1
+  - prop: 2
+    position: {x: 8, y: 3.6}
+    flipX: 0
+  - prop: 2
+    position: {x: 3.6, y: 8}
+    flipX: 1
+  - prop: 3
+    position: {x: 4, y: 4.8}
+    flipX: 0
+  - prop: 3
+    position: {x: 4.8, y: 4}
+    flipX: 1
+  - prop: 4
+    position: {x: 1.2, y: 3.4}
+    flipX: 0
+  - prop: 4
+    position: {x: 3.4, y: 1.2}
+    flipX: 1
+  - prop: 5
+    position: {x: 11, y: 3.6}
+    flipX: 0
+  - prop: 5
+    position: {x: 3.6, y: 11}
+    flipX: 1
+  playerSpawns:
+  - {x: 1.8, y: 10.2}
+  - {x: 10.2, y: 1.8}
+  enemySpawns:
+  - {x: 1.8, y: 1.8}
+  - {x: 10.2, y: 10.2}
+  - {x: 10.6, y: 6}
+  - {x: 6, y: 10.6}
+  enemies:
+  - displayName: Snowling
+    tier: 0
+    sprite: {fileID: 21300000, guid: 0686d24df60c669469f8276273565640, type: 3}
+    frames: []
+    frameRate: 2.5
+    headHeight: 0
+    scale: 0.8
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    maxHealth: 22
+    speed: 2.3
+    contactDamage: 6
+    points: 10
+    spawnWeight: 6
+    radius: 0.35
+  - displayName: Snowman
+    tier: 1
+    sprite: {fileID: 21300000, guid: 0686d24df60c669469f8276273565640, type: 3}
+    frames: []
+    frameRate: 2.5
+    headHeight: 0
+    scale: 1.05
+    tint: {r: 0.82, g: 0.92, b: 1, a: 1}
+    maxHealth: 50
+    speed: 2.7
+    contactDamage: 11
+    points: 25
+    spawnWeight: 3
+    radius: 0.45
+  - displayName: Frost Golem
+    tier: 2
+    sprite: {fileID: 21300000, guid: 0686d24df60c669469f8276273565640, type: 3}
+    frames: []
+    frameRate: 2.5
+    headHeight: 0
+    scale: 1.4
+    tint: {r: 0.62, g: 0.78, b: 1, a: 1}
+    maxHealth: 115
+    speed: 3
+    contactDamage: 18
+    points: 65
+    spawnWeight: 1
+    radius: 0.6

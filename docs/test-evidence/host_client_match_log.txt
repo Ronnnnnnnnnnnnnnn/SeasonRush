@@ -1,0 +1,341 @@
+# Host + Client full match (FINAL build, with joystick + matchmaking code). Lines copied from the two game logs; nothing edited.
+# Seasons shortened to 20 s with -seasonSeconds 20. Both copies ran on one PC over 127.0.0.1.
+
+## HOST log
+[TEST] driver active tag=host quitAfter=78 bot=True simkeys=False simjoystick=False
+[Net] MatchManager spawned
+[Net] Client connected: id=0 (this peer: Host, players=1)
+[Net] Host started on port 7777
+[TEST] t=3.5 role=Host connected=True phase=Lobby season=0 remaining=0.0 players=1 enemies=0 | slot0(me) pos=(1.80,10.20) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=7.1 role=Host connected=True phase=Lobby season=0 remaining=0.0 players=1 enemies=0 | slot0(me) pos=(2.59,9.41) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=9.1 role=Host connected=True phase=Lobby season=0 remaining=0.0 players=1 enemies=0 | slot0(me) pos=(5.30,6.67) hp=100 score=0 kills=0 deaths=0 dead=False 
+[Net] Client connected: id=1 (this peer: Host, players=2)
+[TEST] t=11.1 role=Host connected=True phase=Countdown season=0 remaining=1.1 players=2 enemies=0 | slot0(me) pos=(5.30,6.67) hp=100 score=0 kills=0 deaths=0 dead=False | slot1 pos=(8.51,3.62) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=13.1 role=Host connected=True phase=Playing season=0 remaining=19.1 players=2 enemies=0 | slot0(me) pos=(3.76,8.29) hp=100 score=0 kills=0 deaths=0 dead=False | slot1 pos=(8.58,3.57) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (-0.33,-0.95)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.33,-0.95)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] t=15.1 role=Host connected=True phase=Playing season=0 remaining=17.1 players=2 enemies=1 | slot0(me) pos=(3.37,4.81) hp=100 score=0 kills=0 deaths=0 dead=False | slot1 pos=(4.71,3.49) hp=100 score=25 kills=1 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.99,0.15)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.67,0.74)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] t=17.1 role=Host connected=True phase=Playing season=0 remaining=15.1 players=2 enemies=1 | slot0(me) pos=(8.99,8.66) hp=100 score=10 kills=1 deaths=0 dead=False | slot1 pos=(8.71,8.36) hp=100 score=25 kills=1 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.89,0.45)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.89,0.45)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.86,-0.51)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.99,-0.15)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=19.1 role=Host connected=True phase=Playing season=0 remaining=13.1 players=2 enemies=1 | slot0(me) pos=(9.62,10.29) hp=84 score=10 kills=1 deaths=0 dead=False | slot1 pos=(10.15,9.01) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (-0.99,-0.15)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.64,-0.77)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (-0.64,-0.77)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=21.1 role=Host connected=True phase=Playing season=0 remaining=11.1 players=2 enemies=0 | slot0(me) pos=(3.30,4.24) hp=84 score=30 kills=3 deaths=0 dead=False | slot1 pos=(3.98,4.19) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.32,0.95)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (0.32,0.95)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] t=23.1 role=Host connected=True phase=Playing season=0 remaining=9.0 players=2 enemies=1 | slot0(me) pos=(6.69,7.74) hp=84 score=40 kills=4 deaths=0 dead=False | slot1 pos=(6.75,7.89) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (0.63,0.78)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.57,0.82)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=25.2 role=Host connected=True phase=Playing season=0 remaining=7.0 players=2 enemies=1 | slot0(me) pos=(5.33,6.05) hp=84 score=65 kills=5 deaths=0 dead=False | slot1 pos=(6.81,7.83) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (-0.74,-0.67)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.74,-0.67)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (-0.74,-0.67)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.43,0.90)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (0.10,0.99)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=27.2 role=Host connected=True phase=Playing season=0 remaining=5.0 players=2 enemies=0 | slot0(me) pos=(5.89,9.32) hp=84 score=100 kills=7 deaths=0 dead=False | slot1 pos=(5.37,8.24) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.96,-0.28)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (0.64,-0.77)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=29.2 role=Host connected=True phase=Playing season=0 remaining=3.0 players=2 enemies=0 | slot0(me) pos=(8.42,6.20) hp=84 score=110 kills=8 deaths=0 dead=False | slot1 pos=(7.90,6.21) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.42,0.91)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (0.42,0.91)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.42,0.91)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=31.2 role=Host connected=True phase=Playing season=0 remaining=1.0 players=2 enemies=1 | slot0(me) pos=(6.98,6.63) hp=84 score=135 kills=9 deaths=0 dead=False | slot1 pos=(7.20,7.06) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (-0.73,-0.68)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.73,-0.68)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=33.2 role=Host connected=True phase=Playing season=1 remaining=19.0 players=2 enemies=0 | slot0(me) pos=(3.50,8.22) hp=84 score=135 kills=9 deaths=0 dead=False | slot1 pos=(8.30,3.47) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] t=35.2 role=Host connected=True phase=Playing season=1 remaining=17.0 players=2 enemies=2 | slot0(me) pos=(3.50,8.17) hp=84 score=135 kills=9 deaths=0 dead=False | slot1 pos=(8.07,3.51) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.94,0.34)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.94,0.34)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.31,-0.95)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (-0.23,-0.97)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.47,-0.88)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=37.2 role=Host connected=True phase=Playing season=1 remaining=15.0 players=2 enemies=2 | slot0(me) pos=(2.64,6.40) hp=84 score=145 kills=10 deaths=0 dead=False | slot1 pos=(2.36,3.95) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.88,0.47)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.88,0.47)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.88,0.47)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=39.2 role=Host connected=True phase=Playing season=1 remaining=13.0 players=2 enemies=2 | slot0(me) pos=(5.95,8.12) hp=84 score=145 kills=10 deaths=0 dead=False | slot1 pos=(2.55,5.06) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (-0.41,0.91)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.96,0.27)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.54,0.84)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.95,0.32)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.95,0.32)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.95,0.32)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=41.2 role=Host connected=True phase=Playing season=1 remaining=11.0 players=2 enemies=1 | slot0(me) pos=(9.49,9.79) hp=84 score=180 kills=12 deaths=0 dead=False | slot1 pos=(2.55,5.06) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.95,0.32)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.18,-0.98)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.40,-0.91)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.32,0.95)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=43.2 role=Host connected=True phase=Playing season=1 remaining=9.0 players=2 enemies=1 | slot0(me) pos=(6.81,7.92) hp=84 score=215 kills=14 deaths=0 dead=False | slot1 pos=(6.71,6.82) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (-0.30,0.96)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.78,0.63)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] t=45.2 role=Host connected=True phase=Playing season=1 remaining=7.0 players=2 enemies=1 | slot0(me) pos=(8.22,9.27) hp=84 score=225 kills=15 deaths=0 dead=False | slot1 pos=(8.04,8.60) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.92,0.40)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (1.00,-0.07)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] t=47.2 role=Host connected=True phase=Playing season=1 remaining=5.0 players=2 enemies=1 | slot0(me) pos=(9.15,9.46) hp=84 score=250 kills=16 deaths=0 dead=False | slot1 pos=(3.90,4.13) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.48,-0.88)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.54,-0.84)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] t=49.2 role=Host connected=True phase=Playing season=1 remaining=3.0 players=2 enemies=0 | slot0(me) pos=(8.67,6.84) hp=84 score=260 kills=17 deaths=0 dead=False | slot1 pos=(3.65,4.48) hp=100 score=175 kills=4 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (-0.55,0.83)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.55,0.83)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] t=51.2 role=Host connected=True phase=Playing season=1 remaining=1.0 players=2 enemies=1 | slot0(me) pos=(5.29,6.22) hp=84 score=270 kills=18 deaths=0 dead=False | slot1 pos=(5.24,6.15) hp=100 score=175 kills=4 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (-0.59,-0.81)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] t=53.2 role=Host connected=True phase=Playing season=2 remaining=19.0 players=2 enemies=0 | slot0(me) pos=(3.45,8.68) hp=84 score=270 kills=18 deaths=0 dead=False | slot1 pos=(8.68,3.39) hp=100 score=185 kills=5 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 0
+[TEST] attack input on owner, slot 0, facing (0.95,-0.31)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] t=55.2 role=Host connected=True phase=Playing season=2 remaining=17.0 players=2 enemies=1 | slot0(me) pos=(6.13,6.67) hp=84 score=270 kills=18 deaths=0 dead=False | slot1 pos=(7.29,5.87) hp=100 score=195 kills=6 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 2
+[TEST] t=57.2 role=Host connected=True phase=Playing season=2 remaining=15.0 players=2 enemies=2 | slot0(me) pos=(4.69,4.69) hp=84 score=270 kills=18 deaths=0 dead=False | slot1 pos=(4.88,2.51) hp=100 score=195 kills=6 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 2
+[TEST] server received swing from client 1: enemies hit = 2
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.98,0.22)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=59.2 role=Host connected=True phase=Playing season=2 remaining=13.0 players=2 enemies=2 | slot0(me) pos=(7.48,5.32) hp=84 score=270 kills=18 deaths=0 dead=False | slot1 pos=(2.82,0.89) hp=100 score=220 kills=7 deaths=0 dead=False 
+[TEST] server received swing from client 1: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.98,0.22)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.17,0.98)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.17,0.98)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=61.2 role=Host connected=True phase=Playing season=2 remaining=11.0 players=2 enemies=0 | slot0(me) pos=(6.15,6.92) hp=84 score=290 kills=20 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.99,-0.17)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.99,-0.17)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=63.2 role=Host connected=True phase=Playing season=2 remaining=9.0 players=2 enemies=1 | slot0(me) pos=(8.06,7.59) hp=84 score=300 kills=21 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.60,0.80)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.60,0.80)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.71,0.70)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.71,0.70)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=65.2 role=Host connected=True phase=Playing season=2 remaining=7.0 players=2 enemies=0 | slot0(me) pos=(8.73,8.62) hp=84 score=320 kills=23 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.67,0.75)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.67,0.75)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.67,0.75)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=67.2 role=Host connected=True phase=Playing season=2 remaining=5.0 players=2 enemies=1 | slot0(me) pos=(8.58,8.79) hp=84 score=320 kills=23 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.67,0.75)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.67,0.75)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.52,-0.85)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.52,-0.85)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.16,0.99)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=69.2 role=Host connected=True phase=Playing season=2 remaining=3.0 players=2 enemies=1 | slot0(me) pos=(9.92,8.60) hp=84 score=330 kills=24 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (0.16,0.99)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (0.16,0.99)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.82,0.57)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.90,0.43)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] attack input on owner, slot 0, facing (-0.96,0.27)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=71.2 role=Host connected=True phase=Playing season=2 remaining=1.0 players=2 enemies=2 | slot0(me) pos=(6.32,11.54) hp=66 score=395 kills=25 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] attack input on owner, slot 0, facing (-0.99,0.12)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=73.2 role=Host connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0(me) pos=(6.15,8.65) hp=66 score=420 kills=26 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=75.2 role=Host connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0(me) pos=(6.05,6.93) hp=66 score=420 kills=26 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=77.2 role=Host connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0(me) pos=(6.05,6.93) hp=66 score=420 kills=26 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=78.0 role=Host connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0(me) pos=(6.05,6.93) hp=66 score=420 kills=26 deaths=0 dead=False | slot1 pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] done, quitting
+[Net] Client disconnected: id=1
+[Net] Client disconnected: id=0
+
+## CLIENT log
+[TEST] driver active tag=client quitAfter=78 bot=True simkeys=False simjoystick=False
+[Net] Connecting to 127.0.0.1:7777
+[TEST] t=3.3 role=Client connected=False phase=none players=0 enemies=0 
+[TEST] t=6.2 role=Client connected=False phase=none players=0 enemies=0 
+[Net] Client connected: id=1 (this peer: Client, players=2)
+[TEST] t=8.2 role=Client connected=True phase=Countdown season=0 remaining=1.2 players=2 enemies=0 | slot0 pos=(5.27,6.71) hp=100 score=0 kills=0 deaths=0 dead=False | slot1(me) pos=(7.45,4.50) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=10.2 role=Client connected=True phase=Playing season=0 remaining=19.2 players=2 enemies=0 | slot0 pos=(3.35,8.80) hp=100 score=0 kills=0 deaths=0 dead=False | slot1(me) pos=(8.34,3.75) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.92,-0.40)
+[TEST] t=12.2 role=Client connected=True phase=Playing season=0 remaining=17.1 players=2 enemies=1 | slot0 pos=(2.86,4.85) hp=100 score=0 kills=0 deaths=0 dead=False | slot1(me) pos=(5.15,3.67) hp=100 score=25 kills=1 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.92,0.38)
+[TEST] attack input on owner, slot 1, facing (0.54,0.84)
+[TEST] t=14.2 role=Client connected=True phase=Playing season=0 remaining=15.1 players=2 enemies=1 | slot0 pos=(8.35,7.85) hp=100 score=10 kills=1 deaths=0 dead=False | slot1(me) pos=(8.94,8.69) hp=100 score=25 kills=1 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.89,0.46)
+[TEST] attack input on owner, slot 1, facing (0.85,0.52)
+[TEST] attack input on owner, slot 1, facing (0.85,0.52)
+[TEST] t=16.2 role=Client connected=True phase=Playing season=0 remaining=13.1 players=2 enemies=1 | slot0 pos=(10.84,10.46) hp=84 score=10 kills=1 deaths=0 dead=False | slot1(me) pos=(10.15,9.01) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.81,-0.59)
+[TEST] t=18.2 role=Client connected=True phase=Playing season=0 remaining=11.1 players=2 enemies=0 | slot0 pos=(3.49,4.38) hp=84 score=30 kills=3 deaths=0 dead=False | slot1(me) pos=(3.86,4.11) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.22,0.98)
+[TEST] attack input on owner, slot 1, facing (0.07,1.00)
+[TEST] t=20.2 role=Client connected=True phase=Playing season=0 remaining=9.1 players=2 enemies=1 | slot0 pos=(5.74,7.03) hp=84 score=40 kills=4 deaths=0 dead=False | slot1(me) pos=(7.12,8.14) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.81,0.58)
+[TEST] attack input on owner, slot 1, facing (0.77,0.64)
+[TEST] t=22.2 role=Client connected=True phase=Playing season=0 remaining=7.1 players=2 enemies=1 | slot0 pos=(6.21,6.97) hp=84 score=65 kills=5 deaths=0 dead=False | slot1(me) pos=(6.43,7.41) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.68,-0.74)
+[TEST] attack input on owner, slot 1, facing (0.43,0.90)
+[TEST] t=24.2 role=Client connected=True phase=Playing season=0 remaining=5.1 players=2 enemies=0 | slot0 pos=(5.43,8.42) hp=84 score=90 kills=6 deaths=0 dead=False | slot1(me) pos=(5.56,8.67) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.99,-0.15)
+[TEST] t=26.3 role=Client connected=True phase=Playing season=0 remaining=3.1 players=2 enemies=0 | slot0 pos=(9.19,6.27) hp=84 score=110 kills=8 deaths=0 dead=False | slot1(me) pos=(7.52,6.17) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.56,0.83)
+[TEST] t=28.3 role=Client connected=True phase=Playing season=0 remaining=1.1 players=2 enemies=1 | slot0 pos=(7.87,7.45) hp=84 score=135 kills=9 deaths=0 dead=False | slot1(me) pos=(6.81,6.68) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.74,-0.67)
+[TEST] t=30.3 role=Client connected=True phase=Playing season=1 remaining=19.1 players=2 enemies=0 | slot0 pos=(3.43,8.52) hp=84 score=135 kills=9 deaths=0 dead=False | slot1(me) pos=(8.14,3.51) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] t=32.3 role=Client connected=True phase=Playing season=1 remaining=17.1 players=2 enemies=2 | slot0 pos=(3.50,8.18) hp=84 score=135 kills=9 deaths=0 dead=False | slot1(me) pos=(8.01,3.52) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.99,-0.17)
+[TEST] attack input on owner, slot 1, facing (-0.73,0.68)
+[TEST] attack input on owner, slot 1, facing (-0.67,0.74)
+[TEST] t=34.3 role=Client connected=True phase=Playing season=1 remaining=15.1 players=2 enemies=2 | slot0 pos=(2.65,6.40) hp=84 score=145 kills=10 deaths=0 dead=False | slot1(me) pos=(2.29,4.02) hp=100 score=85 kills=2 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-1.00,0.08)
+[TEST] attack input on owner, slot 1, facing (-1.00,-0.07)
+[TEST] attack input on owner, slot 1, facing (-1.00,-0.07)
+[TEST] t=36.3 role=Client connected=True phase=Playing season=1 remaining=13.1 players=2 enemies=2 | slot0 pos=(5.93,8.01) hp=84 score=145 kills=10 deaths=0 dead=False | slot1(me) pos=(2.56,5.07) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] t=38.3 role=Client connected=True phase=Playing season=1 remaining=11.1 players=2 enemies=1 | slot0 pos=(9.19,9.69) hp=84 score=180 kills=12 deaths=0 dead=False | slot1(me) pos=(2.56,5.07) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] t=40.3 role=Client connected=True phase=Playing season=1 remaining=9.1 players=2 enemies=1 | slot0 pos=(7.25,6.78) hp=84 score=215 kills=14 deaths=0 dead=False | slot1(me) pos=(6.57,7.54) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.20,0.98)
+[TEST] attack input on owner, slot 1, facing (0.78,0.63)
+[TEST] t=42.3 role=Client connected=True phase=Playing season=1 remaining=7.1 players=2 enemies=1 | slot0 pos=(7.96,8.61) hp=84 score=225 kills=15 deaths=0 dead=False | slot1(me) pos=(8.07,8.68) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.78,0.63)
+[TEST] attack input on owner, slot 1, facing (-0.66,-0.75)
+[TEST] t=44.3 role=Client connected=True phase=Playing season=1 remaining=5.1 players=2 enemies=1 | slot0 pos=(9.16,9.46) hp=84 score=250 kills=16 deaths=0 dead=False | slot1(me) pos=(3.81,4.02) hp=100 score=150 kills=3 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.72,-0.70)
+[TEST] attack input on owner, slot 1, facing (-0.81,-0.58)
+[TEST] attack input on owner, slot 1, facing (-0.81,-0.58)
+[TEST] attack input on owner, slot 1, facing (-0.81,-0.58)
+[TEST] t=46.3 role=Client connected=True phase=Playing season=1 remaining=3.1 players=2 enemies=0 | slot0 pos=(9.38,7.06) hp=84 score=260 kills=17 deaths=0 dead=False | slot1(me) pos=(4.01,4.71) hp=100 score=175 kills=4 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.26,0.97)
+[TEST] t=48.3 role=Client connected=True phase=Playing season=1 remaining=1.1 players=2 enemies=1 | slot0 pos=(5.96,7.17) hp=84 score=270 kills=18 deaths=0 dead=False | slot1(me) pos=(4.84,5.60) hp=100 score=175 kills=4 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.59,-0.81)
+[TEST] attack input on owner, slot 1, facing (-0.59,-0.81)
+[TEST] t=50.3 role=Client connected=True phase=Playing season=2 remaining=19.1 players=2 enemies=0 | slot0 pos=(3.34,8.69) hp=84 score=270 kills=18 deaths=0 dead=False | slot1(me) pos=(8.68,3.45) hp=100 score=185 kills=5 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (0.22,0.98)
+[TEST] attack input on owner, slot 1, facing (-0.07,1.00)
+[TEST] t=52.3 role=Client connected=True phase=Playing season=2 remaining=17.1 players=2 enemies=1 | slot0 pos=(6.83,7.57) hp=84 score=270 kills=18 deaths=0 dead=False | slot1(me) pos=(6.78,5.46) hp=100 score=195 kills=6 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.48,-0.88)
+[TEST] attack input on owner, slot 1, facing (-0.42,-0.91)
+[TEST] t=54.3 role=Client connected=True phase=Playing season=2 remaining=15.1 players=2 enemies=2 | slot0 pos=(4.69,4.69) hp=84 score=270 kills=18 deaths=0 dead=False | slot1(me) pos=(4.81,2.36) hp=100 score=195 kills=6 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.42,-0.91)
+[TEST] attack input on owner, slot 1, facing (-0.42,-0.91)
+[TEST] attack input on owner, slot 1, facing (-0.77,-0.64)
+[TEST] attack input on owner, slot 1, facing (-0.72,-0.69)
+[TEST] attack input on owner, slot 1, facing (-0.81,-0.58)
+[TEST] attack input on owner, slot 1, facing (-0.92,-0.40)
+[TEST] t=56.3 role=Client connected=True phase=Playing season=2 remaining=13.1 players=2 enemies=2 | slot0 pos=(6.33,5.06) hp=84 score=270 kills=18 deaths=0 dead=False | slot1(me) pos=(2.74,0.85) hp=100 score=220 kills=7 deaths=0 dead=False 
+[TEST] attack input on owner, slot 1, facing (-0.97,-0.26)
+[TEST] t=58.3 role=Client connected=True phase=Playing season=2 remaining=11.1 players=2 enemies=0 | slot0 pos=(6.25,7.57) hp=84 score=290 kills=20 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=60.3 role=Client connected=True phase=Playing season=2 remaining=9.1 players=2 enemies=1 | slot0 pos=(7.41,6.71) hp=84 score=300 kills=21 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=62.3 role=Client connected=True phase=Playing season=2 remaining=7.1 players=2 enemies=1 | slot0 pos=(8.66,8.56) hp=84 score=310 kills=22 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=64.3 role=Client connected=True phase=Playing season=2 remaining=5.1 players=2 enemies=1 | slot0 pos=(8.58,8.78) hp=84 score=320 kills=23 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=66.3 role=Client connected=True phase=Playing season=2 remaining=3.1 players=2 enemies=1 | slot0 pos=(9.80,7.98) hp=84 score=330 kills=24 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=68.3 role=Client connected=True phase=Playing season=2 remaining=1.0 players=2 enemies=2 | slot0 pos=(6.63,11.50) hp=66 score=395 kills=25 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=70.3 role=Client connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0 pos=(6.19,9.38) hp=66 score=420 kills=26 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=72.3 role=Client connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0 pos=(6.05,6.94) hp=66 score=420 kills=26 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[TEST] t=74.3 role=Client connected=True phase=Finished season=2 remaining=0.0 players=2 enemies=0 | slot0 pos=(6.05,6.94) hp=66 score=420 kills=26 deaths=0 dead=False | slot1(me) pos=(4.11,4.11) hp=100 score=285 kills=8 deaths=0 dead=False 
+[Net] Client disconnected: id=1
+[TEST] t=76.4 role=Client connected=False phase=none players=0 enemies=0 
+[TEST] t=78.0 role=Client connected=False phase=none players=0 enemies=0 
+[TEST] done, quitting

@@ -1,0 +1,5 @@
+﻿{
+  "module-path": "./spacetimedb",
+  "native-aot": true,
+  "server": "maincloud"
+}

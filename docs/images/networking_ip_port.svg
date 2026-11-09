@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="1040" viewBox="0 0 680 520" role="img">
+<title>How two Season Rush players connect</title>
+<desc>A host player listens on an IP address and port 7777, a client connects to it, and the SpacetimeDB database only helps them find each other.</desc>
+<style>
+text { font-family: "Segoe UI", Arial, sans-serif; }
+.t { font-size: 14px; fill: #2c2c2a; }
+.ts { font-size: 12px; fill: #5f5e5a; }
+.th { font-size: 14px; font-weight: 500; fill: #2c2c2a; }
+.purple rect { fill: #EEEDFE; stroke: #534AB7; }
+.purple .th { fill: #3C3489; } .purple .ts { fill: #534AB7; }
+.teal rect { fill: #E1F5EE; stroke: #0F6E56; }
+.teal .th { fill: #085041; } .teal .ts { fill: #0F6E56; }
+.coral rect { fill: #FAECE7; stroke: #993C1D; }
+.coral .th { fill: #712B13; } .coral .ts { fill: #993C1D; }
+.gray rect { fill: #F1EFE8; stroke: #5F5E5A; }
+.gray .th { fill: #444441; } .gray .ts { fill: #5F5E5A; }
+.arr { stroke: #5f5e5a; stroke-width: 1.5; fill: none; }
+.leader { stroke: #888780; stroke-width: 1; fill: none; }
+</style>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5f5e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="680" height="520" fill="#ffffff"/>
+<g class="purple">
+<rect x="190" y="30" width="300" height="56" rx="8" stroke-width="0.5"/>
+<text class="th" x="340" y="50" text-anchor="middle" dominant-baseline="central">SpacetimeDB database</text>
+<text class="ts" x="340" y="70" text-anchor="middle" dominant-baseline="central">Matchmaking only, no gameplay</text>
+</g>
+<line class="leader" x1="250" y1="86" x2="155" y2="190" stroke-dasharray="5 4"/>
+<line class="leader" x1="430" y1="86" x2="525" y2="190" stroke-dasharray="5 4"/>
+<g class="teal">
+<rect x="40" y="190" width="230" height="96" rx="8" stroke-width="0.5"/>
+<text class="th" x="155" y="214" text-anchor="middle" dominant-baseline="central">Host (player 1)</text>
+<text class="ts" x="155" y="240" text-anchor="middle" dominant-baseline="central">IP address 192.168.0.104</text>
+<text class="ts" x="155" y="262" text-anchor="middle" dominant-baseline="central">listens on port 7777</text>
+</g>
+<g class="coral">
+<rect x="410" y="190" width="230" height="96" rx="8" stroke-width="0.5"/>
+<text class="th" x="525" y="214" text-anchor="middle" dominant-baseline="central">Client (player 2)</text>
+<text class="ts" x="525" y="240" text-anchor="middle" dominant-baseline="central">connects to that IP address</text>
+<text class="ts" x="525" y="262" text-anchor="middle" dominant-baseline="central">and port 7777</text>
+</g>
+<line class="arr" x1="276" y1="244" x2="404" y2="244" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+<text class="ts" x="340" y="226" text-anchor="middle">game data</text>
+<text class="ts" x="340" y="266" text-anchor="middle">(UDP)</text>
+<g class="gray">
+<rect x="40" y="330" width="290" height="64" rx="8" stroke-width="0.5"/>
+<text class="th" x="185" y="352" text-anchor="middle" dominant-baseline="central">Same Wi-Fi or same PC</text>
+<text class="ts" x="185" y="374" text-anchor="middle" dominant-baseline="central">Direct: IP address + port 7777</text>
+</g>
+<g class="gray">
+<rect x="350" y="330" width="290" height="64" rx="8" stroke-width="0.5"/>
+<text class="th" x="495" y="352" text-anchor="middle" dominant-baseline="central">Different networks</text>
+<text class="ts" x="495" y="374" text-anchor="middle" dominant-baseline="central">Both connect out to Unity Relay</text>
+</g>
+<line class="leader" x1="40" y1="438" x2="84" y2="438" stroke-dasharray="5 4"/>
+<text class="ts" x="96" y="438" dominant-baseline="central">Who plays whom, and the host's address</text>
+<line class="arr" x1="40" y1="468" x2="84" y2="468" marker-end="url(#arrow)"/>
+<text class="ts" x="96" y="468" dominant-baseline="central">Movement, hits and score, 30 times a second</text>
+</svg>

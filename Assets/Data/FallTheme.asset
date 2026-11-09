@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c718fb6e48a954a87aef34c814427c, type: 3}
+  m_Name: FallTheme
+  m_EditorClassIdentifier: Assembly-CSharp::SeasonRush.SeasonTheme
+  season: 1
+  displayName: Fall
+  mood: Cozy but eerie - something moves in the fog.
+  skyColor: {r: 0.71, g: 0.72, b: 0.87, a: 1}
+  groundMaterial: {fileID: 2100000, guid: e20f8a170c82fb14883a135f9eeed792, type: 2}
+  sideMaterial: {fileID: 2100000, guid: 2e319098827d67c47bd2b77122e98e40, type: 2}
+  cliffMaterial: {fileID: 2100000, guid: 8991b8df81f78d1449d60f795759dced, type: 2}
+  patchMaterial: {fileID: 2100000, guid: 353a34d82be6a974c9b9fe4001fcc957, type: 2}
+  hasPatch: 1
+  patchCenter: {x: 6, y: 6}
+  patchRadius: 2.3
+  cliffHeight: 2
+  props:
+  - name: DeadTree
+    sprite: {fileID: 21300000, guid: 017269d22e7cf1f41b989d4efc9ef26a, type: 3}
+    scale: 1.5
+    colliderRadius: 0.35
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: OrangeTree1
+    sprite: {fileID: 21300000, guid: 2d144e132e3d2b7498cb57c212aec628, type: 3}
+    scale: 1.2
+    colliderRadius: 0.35
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: OrangeTree2
+    sprite: {fileID: 21300000, guid: 39f9f467a849f42478ccf98a19b2cf12, type: 3}
+    scale: 1.2
+    colliderRadius: 0.35
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock1
+    sprite: {fileID: 21300000, guid: 88687dabe21aa5648856ff19d9a78bd4, type: 3}
+    scale: 0.9
+    colliderRadius: 0.5
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock2
+    sprite: {fileID: 21300000, guid: dd7258b8d4d369848841b477a152cec5, type: 3}
+    scale: 1.8
+    colliderRadius: 0.3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock3
+    sprite: {fileID: 21300000, guid: 4a16e8de2bcb0a14985358024cf0e67e, type: 3}
+    scale: 1.4
+    colliderRadius: 0.3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  placements:
+  - prop: 0
+    position: {x: 3.4, y: 3.4}
+    flipX: 0
+  - prop: 0
+    position: {x: 8.8, y: 8.8}
+    flipX: 0
+  - prop: 1
+    position: {x: 2.2, y: 5.8}
+    flipX: 0
+  - prop: 1
+    position: {x: 5.8, y: 2.2}
+    flipX: 1
+  - prop: 2
+    position: {x: 4.6, y: 9.2}
+    flipX: 0
+  - prop: 2
+    position: {x: 9.2, y: 4.6}
+    flipX: 1
+  - prop: 0
+    position: {x: 7, y: 2.2}
+    flipX: 0
+  - prop: 0
+    position: {x: 2.2, y: 7}
+    flipX: 1
+  - prop: 2
+    position: {x: 10.4, y: 6.6}
+    flipX: 0
+  - prop: 2
+    position: {x: 6.6, y: 10.4}
+    flipX: 1
+  - prop: 3
+    position: {x: 4.4, y: 8.2}
+    flipX: 0
+  - prop: 3
+    position: {x: 8.2, y: 4.4}
+    flipX: 1
+  - prop: 4
+    position: {x: 8.4, y: 4.2}
+    flipX: 0
+  - prop: 4
+    position: {x: 4.2, y: 8.4}
+    flipX: 1
+  - prop: 5
+    position: {x: 5.6, y: 3}
+    flipX: 0
+  - prop: 5
+    position: {x: 3, y: 5.6}
+    flipX: 1
+  playerSpawns:
+  - {x: 1.8, y: 10.2}
+  - {x: 10.2, y: 1.8}
+  enemySpawns:
+  - {x: 1.8, y: 1.8}
+  - {x: 10.2, y: 10.2}
+  - {x: 10.6, y: 6}
+  - {x: 6, y: 10.6}
+  enemies:
+  - displayName: Sapling
+    tier: 0
+    sprite: {fileID: 21300000, guid: 6b23abf6549c9d74797abd04bd97b847, type: 3}
+    scale: 0.8
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    maxHealth: 20
+    speed: 2.4
+    contactDamage: 6
+    points: 10
+    spawnWeight: 6
+    radius: 0.35
+  - displayName: Stump Guard
+    tier: 1
+    sprite: {fileID: 21300000, guid: 6b23abf6549c9d74797abd04bd97b847, type: 3}
+    scale: 1.05
+    tint: {r: 0.85, g: 0.75, b: 0.9, a: 1}
+    maxHealth: 50
+    speed: 2.6
+    contactDamage: 10
+    points: 25
+    spawnWeight: 3
+    radius: 0.45
+  - displayName: Elder Treant
+    tier: 2
+    sprite: {fileID: 21300000, guid: 6b23abf6549c9d74797abd04bd97b847, type: 3}
+    scale: 1.4
+    tint: {r: 0.7, g: 0.6, b: 0.75, a: 1}
+    maxHealth: 110
+    speed: 2.8
+    contactDamage: 18
+    points: 65
+    spawnWeight: 1
+    radius: 0.6

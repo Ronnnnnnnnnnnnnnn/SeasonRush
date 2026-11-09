@@ -1,0 +1,949 @@
+fileFormatVersion: 2
+guid: 576395295c977b34284f9899a8648aea
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5909212731969958939
+    second: flowers_spring_0
+  - first:
+      213: 3213355774209053925
+    second: flowers_spring_1
+  - first:
+      213: 7136163984313136435
+    second: flowers_spring_2
+  - first:
+      213: 7394586726022016487
+    second: flowers_spring_3
+  - first:
+      213: -3156725746406275110
+    second: flowers_spring_4
+  - first:
+      213: 7029542441371515866
+    second: flowers_spring_5
+  - first:
+      213: -6249941254600486706
+    second: flowers_spring_6
+  - first:
+      213: -3506179801806253993
+    second: flowers_spring_7
+  - first:
+      213: -5822964790941157502
+    second: flowers_spring_8
+  - first:
+      213: 1439027571873948506
+    second: flowers_spring_9
+  - first:
+      213: -2102098079511045857
+    second: flowers_spring_10
+  - first:
+      213: -6616073313427823435
+    second: flowers_spring_11
+  - first:
+      213: -7847518361271250297
+    second: flowers_spring_12
+  - first:
+      213: 2798897112501397810
+    second: flowers_spring_13
+  - first:
+      213: 6891112419372535727
+    second: flowers_spring_14
+  - first:
+      213: -2221922065059846423
+    second: flowers_spring_15
+  - first:
+      213: -1217595829238113512
+    second: flowers_spring_16
+  - first:
+      213: -1001511233754760988
+    second: flowers_spring_17
+  - first:
+      213: 158363858863058599
+    second: flowers_spring_18
+  - first:
+      213: -4382891217084748320
+    second: flowers_spring_19
+  - first:
+      213: -121937117710601015
+    second: flowers_spring_20
+  - first:
+      213: -8077033318527868366
+    second: flowers_spring_21
+  - first:
+      213: -5465274349846548525
+    second: flowers_spring_22
+  - first:
+      213: -7167355848092216627
+    second: flowers_spring_23
+  - first:
+      213: -2485360594595003001
+    second: flowers_spring_24
+  - first:
+      213: 7914300856858934889
+    second: flowers_spring_25
+  - first:
+      213: 160591600996256636
+    second: flowers_spring_26
+  - first:
+      213: 1481900525909200523
+    second: flowers_spring_27
+  - first:
+      213: 903957766292456931
+    second: flowers_spring_28
+  - first:
+      213: 2705768099047753191
+    second: flowers_spring_29
+  - first:
+      213: 9068670711903340612
+    second: flowers_spring_30
+  - first:
+      213: 2711440098097033341
+    second: flowers_spring_31
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 9
+  spritePivot: {x: 0.49738094, y: 0.27571428}
+  spritePixelsToUnits: 500
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 1024
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: flowers_spring_0
+      rect:
+        serializedVersion: 2
+        x: 779
+        y: 1429
+        width: 36
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b14f84fdbadb10250800000000000000
+      internalID: 5909212731969958939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_1
+      rect:
+        serializedVersion: 2
+        x: 887
+        y: 1360
+        width: 92
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e45ea23d02289c20800000000000000
+      internalID: 3213355774209053925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_2
+      rect:
+        serializedVersion: 2
+        x: 1255
+        y: 1429
+        width: 27
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 335bbefa55fb80360800000000000000
+      internalID: 7136163984313136435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_3
+      rect:
+        serializedVersion: 2
+        x: 1290
+        y: 1442
+        width: 25
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ed6c59f279de9660800000000000000
+      internalID: 7394586726022016487
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_4
+      rect:
+        serializedVersion: 2
+        x: 1349
+        y: 1429
+        width: 83
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad7cf10a8ae0134d0800000000000000
+      internalID: -3156725746406275110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_5
+      rect:
+        serializedVersion: 2
+        x: 825
+        y: 1312
+        width: 28
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adb3b773b93fd8160800000000000000
+      internalID: 7029542441371515866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_6
+      rect:
+        serializedVersion: 2
+        x: 1437
+        y: 1351
+        width: 36
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec09a74ea8fb349a0800000000000000
+      internalID: -6249941254600486706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_7
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 1221
+        width: 91
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75050bafb0c875fc0800000000000000
+      internalID: -3506179801806253993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_8
+      rect:
+        serializedVersion: 2
+        x: 799
+        y: 1299
+        width: 15
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2877850cf5ca03fa0800000000000000
+      internalID: -5822964790941157502
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_9
+      rect:
+        serializedVersion: 2
+        x: 1345
+        y: 1247
+        width: 39
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a532a8bc3f378f310800000000000000
+      internalID: 1439027571873948506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_10
+      rect:
+        serializedVersion: 2
+        x: 887
+        y: 1104
+        width: 92
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1996bf1fe8d3d2e0800000000000000
+      internalID: -2102098079511045857
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_11
+      rect:
+        serializedVersion: 2
+        x: 1070
+        y: 1190
+        width: 45
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b46139ff5cfe24a0800000000000000
+      internalID: -6616073313427823435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_12
+      rect:
+        serializedVersion: 2
+        x: 567
+        y: 1117
+        width: 36
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 782521cd0a3081390800000000000000
+      internalID: -7847518361271250297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_13
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 1120
+        width: 46
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2392389381ea7d620800000000000000
+      internalID: 2798897112501397810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_14
+      rect:
+        serializedVersion: 2
+        x: 1137
+        y: 1117
+        width: 15
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: faf8bf71c3622af50800000000000000
+      internalID: 6891112419372535727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_15
+      rect:
+        serializedVersion: 2
+        x: 1163
+        y: 1117
+        width: 15
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e6618177a52a21e0800000000000000
+      internalID: -2221922065059846423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_16
+      rect:
+        serializedVersion: 2
+        x: 1527
+        y: 1130
+        width: 15
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81bd34e5b0b3a1fe0800000000000000
+      internalID: -1217595829238113512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_17
+      rect:
+        serializedVersion: 2
+        x: 1553
+        y: 1130
+        width: 15
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e8fb71d6dae912f0800000000000000
+      internalID: -1001511233754760988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_18
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 1065
+        width: 37
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7aeeac0371f923200800000000000000
+      internalID: 158363858863058599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_19
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 1036
+        width: 45
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0edeb7cd8a7dc23c0800000000000000
+      internalID: -4382891217084748320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_20
+      rect:
+        serializedVersion: 2
+        x: 1018
+        y: 990
+        width: 25
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c4bce566dace4ef0800000000000000
+      internalID: -121937117710601015
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_21
+      rect:
+        serializedVersion: 2
+        x: 1455
+        y: 975
+        width: 83
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 232e622adfc98ef80800000000000000
+      internalID: -8077033318527868366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_22
+      rect:
+        serializedVersion: 2
+        x: 829
+        y: 831
+        width: 91
+        height: 122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3dfa7516fe17724b0800000000000000
+      internalID: -5465274349846548525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_23
+      rect:
+        serializedVersion: 2
+        x: 1137
+        y: 869
+        width: 83
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc215a794df688c90800000000000000
+      internalID: -7167355848092216627
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_24
+      rect:
+        serializedVersion: 2
+        x: 653
+        y: 745
+        width: 91
+        height: 91
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 785496c05b9328dd0800000000000000
+      internalID: -2485360594595003001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_25
+      rect:
+        serializedVersion: 2
+        x: 1423
+        y: 818
+        width: 39
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96e75a292be35dd60800000000000000
+      internalID: 7914300856858934889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_26
+      rect:
+        serializedVersion: 2
+        x: 1347
+        y: 736
+        width: 39
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7b0b43d5398a3200800000000000000
+      internalID: 160591600996256636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_27
+      rect:
+        serializedVersion: 2
+        x: 745
+        y: 692
+        width: 37
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8e48474da4c09410800000000000000
+      internalID: 1481900525909200523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_28
+      rect:
+        serializedVersion: 2
+        x: 942
+        y: 636
+        width: 24
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e541df8cc08b8c00800000000000000
+      internalID: 903957766292456931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_29
+      rect:
+        serializedVersion: 2
+        x: 1072
+        y: 636
+        width: 15
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e5435410c1dc8520800000000000000
+      internalID: 2705768099047753191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_30
+      rect:
+        serializedVersion: 2
+        x: 1111
+        y: 649
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 448ccffe6f36add70800000000000000
+      internalID: 9068670711903340612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: flowers_spring_31
+      rect:
+        serializedVersion: 2
+        x: 1243
+        y: 578
+        width: 83
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d70f2d44768f0a520800000000000000
+      internalID: 2711440098097033341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      flowers_spring_0: 5909212731969958939
+      flowers_spring_1: 3213355774209053925
+      flowers_spring_10: -2102098079511045857
+      flowers_spring_11: -6616073313427823435
+      flowers_spring_12: -7847518361271250297
+      flowers_spring_13: 2798897112501397810
+      flowers_spring_14: 6891112419372535727
+      flowers_spring_15: -2221922065059846423
+      flowers_spring_16: -1217595829238113512
+      flowers_spring_17: -1001511233754760988
+      flowers_spring_18: 158363858863058599
+      flowers_spring_19: -4382891217084748320
+      flowers_spring_2: 7136163984313136435
+      flowers_spring_20: -121937117710601015
+      flowers_spring_21: -8077033318527868366
+      flowers_spring_22: -5465274349846548525
+      flowers_spring_23: -7167355848092216627
+      flowers_spring_24: -2485360594595003001
+      flowers_spring_25: 7914300856858934889
+      flowers_spring_26: 160591600996256636
+      flowers_spring_27: 1481900525909200523
+      flowers_spring_28: 903957766292456931
+      flowers_spring_29: 2705768099047753191
+      flowers_spring_3: 7394586726022016487
+      flowers_spring_30: 9068670711903340612
+      flowers_spring_31: 2711440098097033341
+      flowers_spring_4: -3156725746406275110
+      flowers_spring_5: 7029542441371515866
+      flowers_spring_6: -6249941254600486706
+      flowers_spring_7: -3506179801806253993
+      flowers_spring_8: -5822964790941157502
+      flowers_spring_9: 1439027571873948506
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

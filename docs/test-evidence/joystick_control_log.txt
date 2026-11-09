@@ -1,0 +1,103 @@
+# On-screen joystick + ATTACK button check on the FINAL build. A simulated pointer presses and drags on the left side, then holds the ATTACK button.
+# Note: each 'simjoystick' line prints the Move value of the previous frame, so read the value one line later.
+
+[TEST] driver active tag=stick quitAfter=24 bot=False simkeys=False simjoystick=True
+[Net] MatchManager spawned
+[Net] Client connected: id=0 (this peer: Host, players=1)
+[Net] Host started on port 7777
+[TEST] host starts solo practice
+[TEST] t=3.3 role=Host connected=True phase=Countdown season=0 remaining=2.0 players=1 enemies=0 | slot0(me) pos=(1.80,10.20) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=5.8 role=Host connected=True phase=Countdown season=0 remaining=0.0 players=1 enemies=0 | slot0(me) pos=(1.80,10.20) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+0.0: released  (Move=(0.00,0.00) attackHeld=False)
+[TEST] t=6.8 role=Host connected=True phase=Playing season=0 remaining=59.0 players=1 enemies=0 | slot0(me) pos=(1.80,10.20) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+1.0: press stick  (Move=(0.00,0.00) attackHeld=False)
+[TEST] simjoystick t+1.1: drag RIGHT  (Move=(0.00,0.00) attackHeld=False)
+[TEST] t=7.8 role=Host connected=True phase=Playing season=0 remaining=58.0 players=1 enemies=1 | slot0(me) pos=(4.79,7.15) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=8.8 role=Host connected=True phase=Playing season=0 remaining=57.0 players=1 enemies=2 | slot0(me) pos=(8.61,3.47) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+3.0: released  (Move=(1.00,0.00) attackHeld=False)
+[TEST] simjoystick t+3.3: press stick  (Move=(0.00,0.00) attackHeld=False)
+[TEST] simjoystick t+3.4: drag UP  (Move=(0.00,0.00) attackHeld=False)
+[TEST] t=9.8 role=Host connected=True phase=Playing season=0 remaining=56.0 players=1 enemies=2 | slot0(me) pos=(11.03,5.52) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=10.8 role=Host connected=True phase=Playing season=0 remaining=54.9 players=1 enemies=3 | slot0(me) pos=(11.60,7.93) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+5.0: released  (Move=(0.00,1.00) attackHeld=False)
+[TEST] simjoystick t+5.6: press stick  (Move=(0.00,0.00) attackHeld=False)
+[TEST] simjoystick t+5.7: drag LEFT (small push)  (Move=(0.00,0.00) attackHeld=False)
+[TEST] t=11.8 role=Host connected=True phase=Playing season=0 remaining=53.9 players=1 enemies=4 | slot0(me) pos=(11.18,8.43) hp=100 score=0 kills=0 deaths=0 dead=False 
+[TEST] t=12.8 role=Host connected=True phase=Playing season=0 remaining=52.9 players=1 enemies=4 | slot0(me) pos=(10.15,9.80) hp=94 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+7.0: released  (Move=(-0.38,0.00) attackHeld=False)
+[TEST] t=13.8 role=Host connected=True phase=Playing season=0 remaining=51.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=82 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+8.0: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+8.3: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+8.6: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+8.9: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] t=14.8 role=Host connected=True phase=Playing season=0 remaining=50.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=70 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+9.2: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+9.5: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+9.8: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] t=15.9 role=Host connected=True phase=Playing season=0 remaining=49.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=58 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+10.1: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+10.4: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+10.7: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+11.0: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] t=16.9 role=Host connected=True phase=Playing season=0 remaining=48.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=46 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+11.3: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+11.6: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+11.9: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] t=17.9 role=Host connected=True phase=Playing season=0 remaining=47.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=40 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+12.2: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+12.5: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+12.8: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] t=18.9 role=Host connected=True phase=Playing season=0 remaining=46.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=34 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+13.1: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+13.4: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+13.7: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+14.0: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] t=19.9 role=Host connected=True phase=Playing season=0 remaining=45.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=22 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+14.3: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+14.6: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] simjoystick t+14.9: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] t=20.9 role=Host connected=True phase=Playing season=0 remaining=44.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=16 score=0 kills=0 deaths=0 dead=False 
+[TEST] simjoystick t+15.2: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 1
+[TEST] simjoystick t+15.5: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+15.8: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] attack input on owner, slot 0, facing (-0.71,0.71)
+[TEST] server received swing from client 0: enemies hit = 0
+[TEST] simjoystick t+16.1: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] t=21.9 role=Host connected=True phase=Playing season=0 remaining=43.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=0 score=25 kills=1 deaths=1 dead=True 
+[TEST] simjoystick t+16.4: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] simjoystick t+16.7: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+17.0: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] t=22.9 role=Host connected=True phase=Playing season=0 remaining=42.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=0 score=25 kills=1 deaths=1 dead=True 
+[TEST] simjoystick t+17.3: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] simjoystick t+17.6: hold ATTACK button  (Move=(0.00,0.00) attackHeld=False)
+[TEST] simjoystick t+17.9: released  (Move=(0.00,0.00) attackHeld=True)
+[TEST] t=23.9 role=Host connected=True phase=Playing season=0 remaining=41.9 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=0 score=25 kills=1 deaths=1 dead=True 
+[TEST] t=24.0 role=Host connected=True phase=Playing season=0 remaining=41.8 players=1 enemies=5 | slot0(me) pos=(10.13,9.83) hp=0 score=25 kills=1 deaths=1 dead=True 
+[TEST] done, quitting
+[Net] Client disconnected: id=0

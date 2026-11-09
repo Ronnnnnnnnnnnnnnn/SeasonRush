@@ -1,0 +1,193 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c718fb6e48a954a87aef34c814427c, type: 3}
+  m_Name: SpringTheme
+  m_EditorClassIdentifier: Assembly-CSharp::SeasonRush.SeasonTheme
+  season: 0
+  displayName: Spring
+  mood: Fresh and colourful - the clouds are rolling in.
+  skyColor: {r: 0.8, g: 0.86, b: 1, a: 1}
+  groundMaterial: {fileID: 2100000, guid: c474566636e06c24faeda5d0f988f65e, type: 2}
+  sideMaterial: {fileID: 2100000, guid: 2479203d06d146f498e05345c759c760, type: 2}
+  cliffMaterial: {fileID: 2100000, guid: 13b4643d1e542f848842ec1fd3542a9c, type: 2}
+  patchMaterial: {fileID: 2100000, guid: 353a34d82be6a974c9b9fe4001fcc957, type: 2}
+  hasPatch: 1
+  patchCenter: {x: 6, y: 6}
+  patchRadius: 2.3
+  cliffHeight: 2
+  props:
+  - name: BigTree
+    sprite: {fileID: 21300000, guid: 2d9c26826aae4ae4fb42d13e9ed3a821, type: 3}
+    scale: 0.85
+    colliderRadius: 0.45
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: SmallTree
+    sprite: {fileID: 21300000, guid: 9a106b93bde1b4b4cbf1212e62f3b372, type: 3}
+    scale: 1.2
+    colliderRadius: 0.35
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Sakura
+    sprite: {fileID: 21300000, guid: 00d8d368ccc44bd44bc6f740524ec084, type: 3}
+    scale: 0.85
+    colliderRadius: 0.45
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Sakura2
+    sprite: {fileID: 21300000, guid: 058478323a9eaa14e86e50847f83b0af, type: 3}
+    scale: 0.9
+    colliderRadius: 0.4
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Bush
+    sprite: {fileID: 21300000, guid: cce6b575475751f44ac2e547561c4e80, type: 3}
+    scale: 1.2
+    colliderRadius: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Flowers
+    sprite: {fileID: 21300000, guid: 576395295c977b34284f9899a8648aea, type: 3}
+    scale: 0.8
+    colliderRadius: 0
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock1
+    sprite: {fileID: 21300000, guid: 0abd2d1362ca3864a8f97929858e2393, type: 3}
+    scale: 0.9
+    colliderRadius: 0.5
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock2
+    sprite: {fileID: 21300000, guid: 939e100bc9dd49e49b64f93a718996ce, type: 3}
+    scale: 1.8
+    colliderRadius: 0.3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Rock3
+    sprite: {fileID: 21300000, guid: 02ada7377f9252f4b94f6122dc9a8a12, type: 3}
+    scale: 1.4
+    colliderRadius: 0.3
+    tint: {r: 1, g: 1, b: 1, a: 1}
+  placements:
+  - prop: 0
+    position: {x: 3.4, y: 3.4}
+    flipX: 0
+  - prop: 2
+    position: {x: 9.4, y: 9.4}
+    flipX: 0
+  - prop: 1
+    position: {x: 2.2, y: 6.6}
+    flipX: 0
+  - prop: 1
+    position: {x: 6.6, y: 2.2}
+    flipX: 1
+  - prop: 3
+    position: {x: 10.8, y: 7.4}
+    flipX: 0
+  - prop: 3
+    position: {x: 7.4, y: 10.8}
+    flipX: 1
+  - prop: 6
+    position: {x: 4.6, y: 8.6}
+    flipX: 0
+  - prop: 6
+    position: {x: 8.6, y: 4.6}
+    flipX: 1
+  - prop: 7
+    position: {x: 2.6, y: 4.2}
+    flipX: 0
+  - prop: 7
+    position: {x: 4.2, y: 2.6}
+    flipX: 1
+  - prop: 8
+    position: {x: 8.4, y: 2.8}
+    flipX: 0
+  - prop: 8
+    position: {x: 2.8, y: 8.4}
+    flipX: 1
+  - prop: 4
+    position: {x: 1.6, y: 5.4}
+    flipX: 0
+  - prop: 4
+    position: {x: 5.4, y: 1.6}
+    flipX: 1
+  - prop: 4
+    position: {x: 9.8, y: 5.2}
+    flipX: 0
+  - prop: 4
+    position: {x: 5.2, y: 9.8}
+    flipX: 1
+  - prop: 5
+    position: {x: 4.4, y: 6.9}
+    flipX: 0
+  - prop: 5
+    position: {x: 6.9, y: 4.4}
+    flipX: 1
+  - prop: 5
+    position: {x: 7.9, y: 8.6}
+    flipX: 0
+  - prop: 5
+    position: {x: 8.6, y: 7.9}
+    flipX: 1
+  - prop: 5
+    position: {x: 6, y: 6}
+    flipX: 0
+  playerSpawns:
+  - {x: 1.8, y: 10.2}
+  - {x: 10.2, y: 1.8}
+  enemySpawns:
+  - {x: 1.8, y: 1.8}
+  - {x: 10.2, y: 10.2}
+  - {x: 10.6, y: 6}
+  - {x: 6, y: 10.6}
+  enemies:
+  - displayName: Puff Cloud
+    tier: 0
+    sprite: {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
+    frames:
+    - {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
+    - {fileID: 21300000, guid: af58945e9582a4c4dbe72957c4c04457, type: 3}
+    frameRate: 2.5
+    headHeight: 0.8127273
+    scale: 0.8
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    maxHealth: 20
+    speed: 2.2
+    contactDamage: 6
+    points: 10
+    spawnWeight: 6
+    radius: 0.35
+  - displayName: Rain Cloud
+    tier: 1
+    sprite: {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
+    frames:
+    - {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
+    - {fileID: 21300000, guid: af58945e9582a4c4dbe72957c4c04457, type: 3}
+    frameRate: 2.5
+    headHeight: 0.8127273
+    scale: 1.05
+    tint: {r: 0.72, g: 0.82, b: 1, a: 1}
+    maxHealth: 45
+    speed: 2.6
+    contactDamage: 10
+    points: 25
+    spawnWeight: 3
+    radius: 0.45
+  - displayName: Storm Cloud
+    tier: 2
+    sprite: {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
+    frames:
+    - {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
+    - {fileID: 21300000, guid: af58945e9582a4c4dbe72957c4c04457, type: 3}
+    frameRate: 2.5
+    headHeight: 0.8127273
+    scale: 1.35
+    tint: {r: 0.52, g: 0.52, b: 0.72, a: 1}
+    maxHealth: 105
+    speed: 3
+    contactDamage: 16
+    points: 60
+    spawnWeight: 1
+    radius: 0.6
