@@ -1,0 +1,58 @@
+{
+  "version": 2,
+  "dgSpecHash": "SmT4fmCNehg=",
+  "success": false,
+  "projectFilePath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ANGEL\\.nuget\\packages\\microsoft.net.illink.tasks\\10.0.9\\microsoft.net.illink.tasks.10.0.9.nupkg.sha512",
+    "C:\\Users\\ANGEL\\.nuget\\packages\\runtime.linux-x64.microsoft.dotnet.ilcompiler.llvm\\10.0.0-rc.1.26357.1\\runtime.linux-x64.microsoft.dotnet.ilcompiler.llvm.10.0.0-rc.1.26357.1.nupkg.sha512",
+    "C:\\Users\\ANGEL\\.nuget\\packages\\spacetimedb.bsatn.runtime\\2.14.1\\spacetimedb.bsatn.runtime.2.14.1.nupkg.sha512",
+    "C:\\Users\\ANGEL\\.nuget\\packages\\spacetimedb.runtime\\2.14.1\\spacetimedb.runtime.2.14.1.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1100",
+      "level": "Error",
+      "message": "Unable to resolve 'Microsoft.DotNet.ILCompiler.LLVM (>= 10.0.0)' for 'net10.0'. PackageSourceMapping is enabled, the following source(s) were not considered: C:\\Program Files\\dotnet\\library-packs, https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json, nuget.org.",
+      "projectPath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "filePath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "libraryId": "Microsoft.DotNet.ILCompiler.LLVM",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1100",
+      "level": "Error",
+      "message": "Unable to resolve 'runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM (>= 10.0.0)' for 'net10.0'. PackageSourceMapping is enabled, the following source(s) were not considered: C:\\Program Files\\dotnet\\library-packs, https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json, nuget.org.",
+      "projectPath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "filePath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "libraryId": "runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1100",
+      "level": "Error",
+      "message": "Unable to resolve 'Microsoft.DotNet.ILCompiler.LLVM (>= 10.0.0)' for 'net10.0/wasi-wasm'. PackageSourceMapping is enabled, the following source(s) were not considered: C:\\Program Files\\dotnet\\library-packs, https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json, nuget.org.",
+      "projectPath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "filePath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "libraryId": "Microsoft.DotNet.ILCompiler.LLVM",
+      "targetGraphs": [
+        "net10.0/wasi-wasm"
+      ]
+    },
+    {
+      "code": "NU1100",
+      "level": "Error",
+      "message": "Unable to resolve 'runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM (>= 10.0.0)' for 'net10.0/wasi-wasm'. PackageSourceMapping is enabled, the following source(s) were not considered: C:\\Program Files\\dotnet\\library-packs, https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-experimental/nuget/v3/index.json, nuget.org.",
+      "projectPath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "filePath": "C:\\Users\\ANGEL\\Desktop\\Season Rush_GameNetworking_Project\\SeasonRush_2D Isometric Game\\spacetimedb\\StdbModule.csproj",
+      "libraryId": "runtime.win-x64.Microsoft.DotNet.ILCompiler.LLVM",
+      "targetGraphs": [
+        "net10.0/wasi-wasm"
+      ]
+    }
+  ]
+}
