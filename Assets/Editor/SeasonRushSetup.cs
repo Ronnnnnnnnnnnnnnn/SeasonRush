@@ -617,6 +617,7 @@ namespace SeasonRush.EditorTools
             nm.NetworkConfig.NetworkTransport = transport;
             nm.NetworkConfig.PlayerPrefab = playerPrefab;
             nm.NetworkConfig.ConnectionApproval = true;           // used to cap the match at two players
+            nm.NetworkConfig.Prefabs.NetworkPrefabsLists.Clear();      // Netcode adds its own "DefaultNetworkPrefabs" list: it would register Enemy / MatchManager twice
             nm.NetworkConfig.Prefabs.NetworkPrefabsLists.Add(prefabList);
             nm.NetworkConfig.TickRate = 30;
             nm.RunInBackground = true;
