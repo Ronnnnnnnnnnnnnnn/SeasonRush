@@ -3,13 +3,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Builds the isometric floating island for one season from its <see cref="SeasonTheme"/>.
-    /// The ground, the ragged grass edge and the two dirt cliff faces are real meshes that are
-    /// projected into isometric space from the flat tile textures, so the art pack's square
-    /// tiles can be used as they are. Props are sprites placed at their projected position,
-    /// with a blocking collider (on the flat plane) where the theme asks for one.
-    /// </summary>
+   
     public static class IsoMapBuilder
     {
         public const string ObstacleLayerName = "Obstacle";
@@ -52,8 +46,7 @@ namespace SeasonRush
             }
         }
 
-        /// <param name="withColliders">False for the editor preview: the blocking circles are then only drawn as guides.</param>
-        public static GameObject Build(SeasonTheme theme, Transform parent, bool withColliders = true)
+        public static GameObject Build(SeasonTheme theme, Transform parent, bool withColliders = true, bool withProps = true)
         {
             var root = new GameObject("Map_" + theme.displayName);
             root.transform.SetParent(parent, false);
@@ -137,14 +130,10 @@ namespace SeasonRush
                 AddMesh(root.transform, "Cliff", cliff, theme.cliffMaterial, Iso.GroundSortOrder + 3);
             }
 
-            BuildProps(theme, root.transform, withColliders);
+            if (withProps) BuildProps(theme, root.transform, withColliders);      // the map baker builds the props itself, as prefabs
             return root;
         }
 
-        /// <summary>
-        /// Builds the trees, rocks and bushes of a theme as a child called "Props" of <paramref name="mapRoot"/>.
-        /// Separate from <see cref="Build"/> so the map editor can rebuild only the props while you drag them.
-        /// </summary>
         public static Transform BuildProps(SeasonTheme theme, Transform mapRoot, bool withColliders = true)
         {
             // ---------- props ----------

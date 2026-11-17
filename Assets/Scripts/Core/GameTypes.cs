@@ -9,24 +9,17 @@ namespace SeasonRush
 
     public enum MatchPhase { Lobby = 0, Countdown = 1, Playing = 2, Finished = 3 }
 
-    /// <summary>
-    /// Central tuning values from the concept document. Everything the designers may want to
-    /// balance lives here. A few values can be overridden on the command line, which is used
-    /// for fast automated testing (for example: -seasonSeconds 20).
-    /// </summary>
     public static class GameConfig
     {
-        // --- Match structure (concept doc: 6 minute match, three 2 minute seasons) ---
         public const int SeasonCount = 3;
         public const int MaxPlayers = 2;
-        public static float SeasonSeconds = 120f;
+        public static float SeasonSeconds = 60f;
         public static float CountdownSeconds = 3f;
-        public static float RespawnSeconds = 5f;            // concept doc: 5 second respawn penalty
+        public static float RespawnSeconds = 5f;
 
         // --- Arena ---
-        public const float ArenaSize = 12f;                 // plane units per side
+        public const float ArenaSize = 12f;
 
-        // --- Warrior (identical for both players, concept doc "one warrior, two colors") ---
         public const int PlayerMaxHealth = 100;
         public const float PlayerSpeed = 5.5f;
         public const int AttackDamage = 15;
@@ -36,18 +29,14 @@ namespace SeasonRush
         public const float KnockbackSpeed = 9f;
         public const float EnemyKnockbackSpeed = 6f;
 
-        /// <summary>Hitting the rival shoves them back (no damage). Score still comes only from enemies.</summary>
         public static bool AttackShovesRival = true;
 
-        /// <summary>Show the on-screen joystick and ATTACK button. Start the game with -nocontrols to hide them.</summary>
         public static bool ShowOnScreenControls = true;
 
-        // --- Enemy spawning ---
         public static int MaxEnemiesAlive = 8;
         public static float EnemySpawnInterval = 1.6f;
         public const float MinSpawnDistanceFromPlayers = 4f;
 
-        // --- Networking ---
         public const ushort DefaultPort = 7777;
         public const string DefaultAddress = "127.0.0.1";
 
@@ -60,7 +49,6 @@ namespace SeasonRush
             if (HasFlag("-nocontrols")) ShowOnScreenControls = false;
         }
 
-        /// <summary>Forces the static constructor to run so command line overrides are applied early.</summary>
         public static void Touch() { }
 
         static int _verbose = -1;

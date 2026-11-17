@@ -115,7 +115,11 @@ MonoBehaviour:
   enemies:
   - displayName: Sapling
     tier: 0
-    sprite: {fileID: 21300000, guid: 6b23abf6549c9d74797abd04bd97b847, type: 3}
+    sprite: {fileID: 21300000, guid: 2505db46bd776284e8aae4e528e20910, type: 3}
+    visualPrefab: {fileID: 8536609200756730228, guid: c5b11b2727783a0419c6c7010f00c8a9, type: 3}
+    frames: []
+    frameRate: 2.5
+    headHeight: 1.1088889
     scale: 0.8
     tint: {r: 1, g: 1, b: 1, a: 1}
     maxHealth: 20
@@ -126,7 +130,11 @@ MonoBehaviour:
     radius: 0.35
   - displayName: Stump Guard
     tier: 1
-    sprite: {fileID: 21300000, guid: 6b23abf6549c9d74797abd04bd97b847, type: 3}
+    sprite: {fileID: 21300000, guid: 2505db46bd776284e8aae4e528e20910, type: 3}
+    visualPrefab: {fileID: 8536609200756730228, guid: c5b11b2727783a0419c6c7010f00c8a9, type: 3}
+    frames: []
+    frameRate: 2.5
+    headHeight: 1.1088889
     scale: 1.05
     tint: {r: 0.85, g: 0.75, b: 0.9, a: 1}
     maxHealth: 50
@@ -137,7 +145,11 @@ MonoBehaviour:
     radius: 0.45
   - displayName: Elder Treant
     tier: 2
-    sprite: {fileID: 21300000, guid: 6b23abf6549c9d74797abd04bd97b847, type: 3}
+    sprite: {fileID: 21300000, guid: 2505db46bd776284e8aae4e528e20910, type: 3}
+    visualPrefab: {fileID: 8536609200756730228, guid: c5b11b2727783a0419c6c7010f00c8a9, type: 3}
+    frames: []
+    frameRate: 2.5
+    headHeight: 1.1088889
     scale: 1.4
     tint: {r: 0.7, g: 0.6, b: 0.75, a: 1}
     maxHealth: 110

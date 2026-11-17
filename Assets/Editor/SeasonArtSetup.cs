@@ -8,7 +8,7 @@ namespace SeasonRush.EditorTools
 {
     /// <summary>
     /// Puts the artist's own pictures in place of the generated placeholders:
-    ///  * Winter: Assets/2D Asset/Winter (ground, side, cliff, ice patch, rocks, bushes),
+    ///  * Winter: Assets/2D Asset/Winter (ground, side, cliff, ice patch, rocks, bushes, pine_tree.png + pine_tree2.png),
     ///  * the Spring cloud enemies: cloud1.png + cloud2.png (two pictures of a floating cloud; the game shows them one
     ///    after the other).
     /// It runs by itself when Unity loads the project (and when "Rebuild Project Setup" / "Reset Maps" build the defaults), changes
@@ -68,6 +68,9 @@ namespace SeasonRush.EditorTools
             Exists(WinterDir + "/rock1_winter.png") && Exists(WinterDir + "/rock2_winter.png") && Exists(WinterDir + "/rock3_winter.png")
             && Exists(WinterDir + "/bush_winter.png") && Exists(WinterDir + "/bush_winter (1).png");
 
+        public static bool HasPine => Exists(WinterDir + "/pine_tree.png");
+        public static bool HasPine2 => Exists(WinterDir + "/pine_tree2.png");
+
         /// <summary>Finds a picture by file name anywhere under Assets/2D Asset (the artist may have put it in any folder).</summary>
         static string FindPicture(string fileName)
         {
@@ -84,9 +87,20 @@ namespace SeasonRush.EditorTools
         /// <summary>The Winter prop types with the artist's pictures: pine (placeholder), 3 rocks, 2 bushes.</summary>
         internal static PropDef[] WinterPropDefs(Sprite pine)
         {
+            var list = new List<PropDef>(WinterPropDefsWithoutPine2(pine));
+            if (HasPine && HasPine2) list.Add(SeasonRushSetup.Prop("Pine2", SeasonRushSetup.PropSprite(WinterDir + "/pine_tree2.png"), PineScale, 0.35f));
+            return list.ToArray();
+        }
+
+        /// <summary>Size of the artist's pine relative to the other props (the picture is about 2.9 map units tall at scale 1).</summary>
+        public const float PineScale = 0.8f;
+
+        static PropDef[] WinterPropDefsWithoutPine2(Sprite placeholderPine)
+        {
+            Sprite pine = HasPine ? SeasonRushSetup.PropSprite(WinterDir + "/pine_tree.png") : placeholderPine;
             return new[]
             {
-                SeasonRushSetup.Prop("Pine", pine, 1.0f, 0.35f),
+                SeasonRushSetup.Prop("Pine", pine, HasPine ? PineScale : 1.0f, 0.35f),
                 SeasonRushSetup.Prop("Rock1", SeasonRushSetup.PropSprite(WinterDir + "/rock1_winter.png"), 0.9f, 0.50f),
                 SeasonRushSetup.Prop("Rock2", SeasonRushSetup.PropSprite(WinterDir + "/rock2_winter.png"), 1.8f, 0.30f),
                 SeasonRushSetup.Prop("Rock3", SeasonRushSetup.PropSprite(WinterDir + "/rock3_winter.png"), 1.4f, 0.30f),
@@ -117,6 +131,7 @@ namespace SeasonRush.EditorTools
         {
             bool changed = false;
             if (HasWinterArt) changed |= ApplyWinter();
+            changed |= ApplyPines();
             changed |= ApplyClouds();
             if (changed)
             {
@@ -181,6 +196,71 @@ namespace SeasonRush.EditorTools
             return changed;
         }
 
+        /// <summary>
+        /// The Winter pine is a placeholder picture until pine_tree.png is there. Then "Pine" uses it, and a second type "Pine2" (pine_tree2.png)
+        /// is added; on a Winter map that was never edited by hand the trees at the back of the island use it, so the forest is not all the same.
+        /// </summary>
+        static bool ApplyPines()
+        {
+            if (!HasPine) return false;
+            var theme = AssetDatabase.LoadAssetAtPath<SeasonTheme>(ThemeDir + "/WinterTheme.asset");
+            if (theme == null || theme.props == null) return false;
+
+            bool changed = false;
+            int pine = -1, pine2 = -1;
+            for (int i = 0; i < theme.props.Length; i++)
+            {
+                if (theme.props[i].name == "Pine") pine = i;
+                if (theme.props[i].name == "Pine2") pine2 = i;
+            }
+            if (pine < 0) return false;
+
+            PropDef def = theme.props[pine];
+            string current = def.sprite != null ? AssetDatabase.GetAssetPath(def.sprite) : "";
+            if (current.Length == 0 || current.Contains("/Placeholders/"))
+            {
+                def.sprite = SeasonRushSetup.PropSprite(WinterDir + "/pine_tree.png");
+                def.scale = PineScale;
+                changed = true;
+            }
+
+            if (pine2 < 0 && HasPine2)
+            {
+                pine2 = theme.props.Length;
+                var list = new List<PropDef>(theme.props)
+                {
+                    SeasonRushSetup.Prop("Pine2", SeasonRushSetup.PropSprite(WinterDir + "/pine_tree2.png"), PineScale, def.colliderRadius)
+                };
+                theme.props = list.ToArray();
+                if (theme.placements != null && (theme.placements.Length == DefaultWinterPlacementCount || theme.placements.Length == DefaultWinterPlacementCount + 4))
+                {
+                    for (int i = 0; i < theme.placements.Length; i++)
+                    {
+                        PropPlacement pl = theme.placements[i];
+                        if (pl.prop == pine && pl.position.x + pl.position.y > 12f) { pl.prop = pine2; theme.placements[i] = pl; }     // mirror twins stay equal: same x + y
+                    }
+                }
+                changed = true;
+            }
+
+            if (changed)
+            {
+                EditorUtility.SetDirty(theme);
+                RebakeWinterMap(theme);
+            }
+            return changed;
+        }
+
+        /// <summary>The Winter map prefab in Assets/Prefabs/Maps is made from the theme: make it again so the scene shows the new pines.</summary>
+        static void RebakeWinterMap(SeasonTheme theme)
+        {
+            try
+            {
+                if (File.Exists(Path.GetFullPath(SceneBaker.MapDir + "/Map_Winter.prefab"))) SceneBaker.BakeMapPrefab(theme);
+            }
+            catch (Exception e) { Debug.LogWarning("[Setup] The Winter map prefab was not updated (run Season Rush > Update Maps In Scene): " + e.Message); }
+        }
+
         static void AddPair(List<PropPlacement> list, int prop, float x, float y)
         {
             list.Add(new PropPlacement { prop = prop, position = new Vector2(x, y), flipX = false });
@@ -224,7 +304,7 @@ namespace SeasonRush.EditorTools
         /// cloud1.png / cloud2.png are two pictures of the same floating cloud, each with its own shadow underneath. They
         /// get their pivot in the middle of the shadow, so the shadow stays on the cloud's ground position in both.
         /// </summary>
-        static bool PrepareCloudFrames(out Sprite[] frames, out float headHeight)
+        internal static bool PrepareCloudFrames(out Sprite[] frames, out float headHeight)
         {
             frames = null;
             headHeight = 0f;

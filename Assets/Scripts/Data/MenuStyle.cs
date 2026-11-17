@@ -2,13 +2,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Everything you may want to change about the look of the start menu: the font, the button texts, the colours
-    /// and the text sizes. The asset is Assets/Resources/MenuStyle.asset - select it and edit the values in the
-    /// Inspector. The change shows the next time the menu is drawn (also while the game is running in the Editor).
-    /// Delete the asset to get the default look back (it is created again automatically).
-    /// The default look is pastel, to go with the pastel art of the island.
-    /// </summary>
+   
     [CreateAssetMenu(menuName = "Season Rush/Menu Style", fileName = "MenuStyle")]
     public class MenuStyle : ScriptableObject
     {
@@ -67,6 +61,67 @@ namespace SeasonRush
         public int buttonSize = 28;
         public int smallButtonSize = 22;
         public int labelSize = 22;
+
+        [Header("Pixel skin (wooden buttons, beige panels, pixel fonts)")]
+        [Tooltip("On: the menu uses the pictures and fonts below (Assets/2D Asset/Buttonborder, Panelborder, Assets/Font) and the skin colours. " +
+                 "Off: the flat coloured look made from the colours above.")]
+        public bool usePixelSkin = true;
+        [Tooltip("Pixel font for titles and button words (Jersey 10).")] public Font headingFont;
+        [Tooltip("Pixel font for the small texts (VT323).")] public Font bodyFont;
+        [Tooltip("Pixel fonts look smaller than normal fonts of the same size: all menu texts are multiplied by this.")]
+        [Range(0.6f, 2.5f)] public float headingFontScale = 1.4f;
+        [Range(0.6f, 2.5f)] public float bodyFontScale = 1.45f;
+        public Color skinTextColor = new Color(0.169f, 0.102f, 0.055f);
+        public Color skinHintColor = new Color(0.478f, 0.306f, 0.149f);
+        public Color skinHighlightColor = new Color(0.78f, 0.44f, 0.12f);
+        public Color skinGoodColor = new Color(0.16f, 0.46f, 0.20f);
+        public Color skinPendingColor = new Color(0.65f, 0.45f, 0.08f);
+        public Color skinWarnColor = new Color(0.72f, 0.18f, 0.14f);
+
+        [Tooltip("The picture of the game's name at the top of the main menu. Empty = the plain title text above.")]
+        public Sprite titleImage;
+
+        [Header("Button pictures (Spring = green, Autumn = orange, Winter = blue)")]
+        public Sprite springLarge, springMedium, springSmall;
+        public Sprite autumnLarge, autumnMedium, autumnSmall;
+        public Sprite winterLarge, winterMedium, winterSmall;
+
+        [Header("Panel pictures")]
+        public Sprite panelMenu, panelProfile, panelLeaderboard, panelLocalNetwork;
+        public Sprite divider, inputField, checkboxOff, checkboxOn;
+
+        /// <summary>True when the pixel skin is switched on and its main pictures are assigned.</summary>
+        public bool SkinActive => usePixelSkin && springLarge != null && panelMenu != null;
+
+        // colours as the menu should show them now (the skin colours, or the flat-look colours above)
+        public Color Text => SkinActive ? skinTextColor : textColor;
+        public Color Hint => SkinActive ? skinHintColor : hintTextColor;
+        public Color Highlight => SkinActive ? skinHighlightColor : highlightColor;
+        public Color Good => SkinActive ? skinGoodColor : goodColor;
+        public Color Pending => SkinActive ? skinPendingColor : pendingColor;
+        public Color Warn => SkinActive ? skinWarnColor : warnColor;
+        public Color ButtonText => SkinActive ? skinTextColor : buttonTextColor;
+
+        public Sprite ButtonSprite(UiSkinColor colour, UiSkinSize size)
+        {
+            switch (colour)
+            {
+                case UiSkinColor.Autumn: return size == UiSkinSize.Large ? autumnLarge : size == UiSkinSize.Medium ? autumnMedium : autumnSmall;
+                case UiSkinColor.Winter: return size == UiSkinSize.Large ? winterLarge : size == UiSkinSize.Medium ? winterMedium : winterSmall;
+                default: return size == UiSkinSize.Large ? springLarge : size == UiSkinSize.Medium ? springMedium : springSmall;
+            }
+        }
+
+        public Sprite PanelSprite(UiPanelKind kind)
+        {
+            switch (kind)
+            {
+                case UiPanelKind.Profile: return panelProfile;
+                case UiPanelKind.Leaderboard: return panelLeaderboard;
+                case UiPanelKind.LocalNetwork: return panelLocalNetwork;
+                default: return panelMenu;
+            }
+        }
 
         /// <summary>Which set of default colours this asset was last updated to (used by the editor tool, not shown).</summary>
         [HideInInspector] public int defaultsVersion;

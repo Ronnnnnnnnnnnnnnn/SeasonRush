@@ -1,9 +1,9 @@
-# Season Rush
+﻿# Season Rush
 
 A fast, competitive **2.5D isometric** versus game for two players (Host + Client). Both players
-control the same warrior (blue or red) on a floating island that changes **every 2 minutes**:
+control the same warrior (blue or red) on a floating island that changes **every minute**:
 **Spring -> Fall -> Winter**. Each season has its own map and its own monsters. Points come only from
-killing monsters; the highest score after 6 minutes wins. If you die you wait 5 seconds to respawn,
+killing monsters; the highest score after 3 minutes wins. If you die you wait 5 seconds to respawn,
 and your rival can score freely while you are gone.
 
 * Engine: **Unity 6 (6000.3.22f1)**, Universal Render Pipeline 2D, new Input System
@@ -30,9 +30,52 @@ Your Winter pictures and the Spring cloud enemies are used automatically, see [`
 The two warriors use `Assets/2D Asset/Players/player1.png` (blue, host) and `player2.png` (red); Unity applies them by
 itself, see [`docs/Character_Sprites.md`](docs/Character_Sprites.md).
 
+### The "Season Rush" menu in Unity
+
+The menu in Unity's top bar is made with `[MenuItem("Season Rush/...")]` on a `public static` or `static` method in a script inside an
+`Editor` folder. It exists only in the Unity Editor (editor code is not part of the built game).
+
+| Menu item | What it does | Script |
+| --- | --- | --- |
+| Map Editor (move trees and rocks) | visual map editor in the Scene view | `Assets/Editor/MapEditor/SeasonRushMapEditor.cs` |
+| Build Windows Player (for a second game window) | builds `Builds/Windows/SeasonRush.exe` | `Assets/Editor/BuildScript.cs` |
+| Build Android APK (for a phone) | builds `Builds/Android/SeasonRush.apk` (needs the Android module) | `Assets/Editor/BuildScript.cs` |
+| Apply Pixel UI Skin | uses the wooden buttons, panels and pixel fonts (Buttonborder, Panelborder, Font folders) in the menu | `Assets/Editor/UiSkinSetup.cs` |
+| Apply Game Title And Icon | game name "Season Rush", app icon (Game logo.png), title picture on the menu (Game title.png) | `Assets/Editor/BrandingSetup.cs` |
+| Set Up Character Animations | fills your empty Idle / Walk / Attack clips and controllers and hooks the player and enemy prefabs into the game | `Assets/Editor/CharacterAnimSetup.cs` |
+| Update Maps In Scene | regenerates the map and prop prefabs after you edited a Season Theme | `Assets/Editor/SceneBaker.cs` |
+| Create UI Canvas In Scene | rebuilds the Canvas (menu, HUD, controls) in the open scene | `Assets/Editor/UiBuilder.cs` |
+| Rebuild Project Setup | recreates layers, materials, prefabs and the scene; keeps your maps | `Assets/Editor/SeasonRushSetup.cs` |
+| Reset Maps To Defaults (loses your map edits) | puts the three maps back to the generated layout | `Assets/Editor/SeasonRushSetup.cs` |
+| Prepare Selected Pictures As Map Props | imports the selected pictures as trees / rocks / bushes | `Assets/Editor/SeasonRushSetup.cs` |
+| Apply Winter And Cloud Art | uses the group's Winter and cloud pictures | `Assets/Editor/SeasonArtSetup.cs` |
+| Apply Player Sprites (player1.png + player2.png) | uses the two knight pictures | `Assets/Editor/PlayerSkinsSetup.cs` |
+| Select Menu Style (edit menu font, texts, colours) | opens the menu style asset | `Assets/Editor/MenuStyleSetup.cs` |
+
+To add your own button: create a script in `Assets/Editor`, add `using UnityEditor;`, and write
+`[MenuItem("Season Rush/My Button")] static void MyButton() { ... }`.
+
 To change a map, use **Season Rush > Map Editor**: drag trees and rocks in the Scene view (the mirror twin follows,
 so both players keep the same cover), place new ones, move the start points. Other changes (other art, the ground) are
 in [`docs/Map_Editing_Guide.md`](docs/Map_Editing_Guide.md).
+
+**What is in the scene (Hierarchy):** `Managers` (MapManager, SpacetimeManager, OnlineMatchmaker, ConnectionMenu, GameHud,
+VirtualControls, AutomatedTestDriver, each its own object) and `Environment` (ArenaWalls and `Maps`: Map_Spring, Map_Fall,
+Map_Winter). Every map is a prefab in `Assets/Prefabs/Maps`, and every tree / rock / bush on it is an instance of a prop prefab
+in `Assets/Prefabs/Props`. The Season Theme assets stay the source of truth: after you change one (Map Editor or Inspector) run
+**Season Rush > Update Maps In Scene** so the prefabs match. If you forget, the game notices the baked map is out of date and builds
+the map from the theme instead. The MatchManager is not in the scene on purpose: the server spawns it as a network prefab when a match starts.
+
+**Animated characters:** `Assets/Prefabs/Players/Player 1.prefab` / `Player 2.prefab` (Idle, Walk, Attack, Death) and `Assets/Prefabs/Enemy/Cloud` (Spring), `Dryleaves` (Fall),
+`Snowman` (Winter, with Attack and Death) are used by the game. Unity fills the empty clips and controllers by itself (menu: **Set Up Character Animations**),
+and only what is still empty, so your own changes stay. The player prefab needs a Bool `IsMoving`, a Bool `IsDead` and a Trigger `Attack`; an enemy may have Triggers `Attack` and `Die`.
+
+**The user interface is a Canvas in the Hierarchy** (`UI`): `MainMenu` (HomePanel, ProfilePanel, LeaderboardPanel, LocalPanel,
+SearchingPanel), `HUD` (top bar, player boxes, PAUSE, lobby, result, death and pause screens) and `Controls` (joystick + ATTACK).
+The menu buttons switch panels on and off with `SetActive` (select a button and look at its **On Click** list in the Inspector); the
+ConnectionMenu / GameHud scripts only fill in the texts and run the network logic. Colours, font and button words still come from
+`MenuStyle.asset` (untick **Use Menu Style** on the ConnectionMenu to style the canvas by hand instead). If the canvas is missing or
+broken run **Season Rush > Create UI Canvas In Scene**.
 
 ## Play online against a random player
 
@@ -76,10 +119,12 @@ SeasonRush.exe -client -ip 192.168.1.20 -port 7777
 | --- | --- | --- |
 | Move | `W A S D` or arrow keys | Press and drag anywhere on the **left** side: a floating **joystick** appears |
 | Attack | `Space`, `J` or `K` | Hold the **ATTACK** button on the right (it keeps swinging while held) |
-| Pause / quit | `Esc` | **PAUSE** button (top right): the pause screen has **RESUME** and **QUIT TO MENU** |
+| Pause / surrender | `Esc` | **PAUSE** button (top right): the pause screen has **RESUME** and **SURRENDER** |
 
-The match is online, so **pausing does not stop the clock for your rival**: your warrior just stands still while the pause
-screen is open. The waiting lobby and the result screen have a **BACK** button that returns to the main menu.
+**PAUSE freezes the whole game for both players** (match clock, enemies, warriors, respawn timers). Only the player who paused can resume,
+and a pause ends by itself after 60 seconds. **SURRENDER** gives the rival the win: both players get the result screen
+("YOU SURRENDERED" / "YOU WIN!") and press **BACK** to return to the main menu. Playing alone, SURRENDER just leaves.
+The waiting lobby and the result screen have a **BACK** button that returns to the main menu.
 
 Up moves up the screen along the isometric diagonal. The joystick is analog: a small push walks slowly.
 You can use the keyboard and the on-screen controls at the same time. On a touch screen you can move with one

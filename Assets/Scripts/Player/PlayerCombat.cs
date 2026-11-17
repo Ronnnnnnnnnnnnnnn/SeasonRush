@@ -4,11 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The warrior's melee attack. The owner presses the attack key and plays the slash immediately
-    /// (so it feels instant), then asks the SERVER to work out what was hit. The server is the only
-    /// one that damages enemies and awards points, so neither player can cheat their score.
-    /// </summary>
+   
     public class PlayerCombat : NetworkBehaviour
     {
         /// <summary>Automated tests set this to make the local player attack without a keyboard.</summary>
@@ -50,6 +46,7 @@ namespace SeasonRush
 
             Vector2 dir = _controller.Facing;
             SlashFx.Spawn(_controller.PlanePosition, dir, GameConfig.SlotColor(Mathf.Max(0, _stats.Slot.Value)));
+            _controller.PlayAttack();
             if (GameConfig.TestMode) Debug.Log($"[TEST] attack input on owner, slot {_stats.Slot.Value}, facing ({dir.x:0.00},{dir.y:0.00})");
             AttackServerRpc(dir);
         }
@@ -59,6 +56,7 @@ namespace SeasonRush
         void AttackServerRpc(Vector2 direction)
         {
             if (_stats.IsDead.Value) return;
+            if (MatchManager.Instance != null && MatchManager.Instance.Paused.Value) return;       // the game is paused
             if (Time.time < _nextServerAttack) return;           // ignore swings faster than the cooldown
             _nextServerAttack = Time.time + GameConfig.AttackCooldown * 0.8f;
 
@@ -104,6 +102,7 @@ namespace SeasonRush
         {
             if (IsOwner) return;
             SlashFx.Spawn(_controller.PlanePosition, direction, GameConfig.SlotColor(Mathf.Max(0, _stats.Slot.Value)));
+            _controller.PlayAttack();
         }
     }
 }

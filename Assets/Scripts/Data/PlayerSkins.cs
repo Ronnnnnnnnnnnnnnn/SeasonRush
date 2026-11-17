@@ -2,12 +2,6 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The pictures of the two warriors: slot 0 is player 1 (blue, the host), slot 1 is player 2 (red).
-    /// The asset lives at Assets/Resources/PlayerSkins.asset and is filled in by the editor tool from
-    /// Assets/2D Asset/Players/player1.png and player2.png (see docs/Character_Sprites.md).
-    /// A slot without a picture keeps the old placeholder warrior, so the game never breaks without art.
-    /// </summary>
     [CreateAssetMenu(menuName = "Season Rush/Player Skins", fileName = "PlayerSkins")]
     public class PlayerSkins : ScriptableObject
     {
@@ -17,6 +11,10 @@ namespace SeasonRush
         [Tooltip("Tick when the pictures show the character looking to the LEFT (the sword is on the left). The game then mirrors the " +
                  "picture while the player walks to the right. Untick it if you draw the character looking to the right.")]
         public bool artFacesLeft = true;
+
+        [Tooltip("Optional: a whole prefab per player (picture + Animator with idle / walk / attack). Element 0 = Player 1.prefab, element 1 = Player 2.prefab. " +
+                 "When set it is used instead of the single picture above. The Animator needs a Bool 'IsMoving' and a Trigger 'Attack'.")]
+        public GameObject[] slotPrefabs = new GameObject[2];
 
         static PlayerSkins _loaded;
         static bool _triedLoading;
@@ -40,6 +38,14 @@ namespace SeasonRush
             PlayerSkins skins = Instance;
             if (skins == null || skins.slotSprites == null || slot < 0 || slot >= skins.slotSprites.Length) return null;
             return skins.slotSprites[slot];
+        }
+
+        /// <summary>The animated character prefab for a player slot, or null when none is set.</summary>
+        public static GameObject PrefabFor(int slot)
+        {
+            PlayerSkins skins = Instance;
+            if (skins == null || skins.slotPrefabs == null || slot < 0 || slot >= skins.slotPrefabs.Length) return null;
+            return skins.slotPrefabs[slot];
         }
 
         /// <summary>Which way the pictures look when they are not mirrored (see <see cref="artFacesLeft"/>).</summary>

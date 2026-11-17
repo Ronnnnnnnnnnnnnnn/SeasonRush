@@ -26,8 +26,8 @@ MonoBehaviour:
   cliffHeight: 2
   props:
   - name: Pine
-    sprite: {fileID: 21300000, guid: ac0ee8b1170136b4b9ac2ef99c138613, type: 3}
-    scale: 1
+    sprite: {fileID: 21300000, guid: 0d12d5623d6677a4daf987f3328ee094, type: 3}
+    scale: 0.8
     colliderRadius: 0.35
     tint: {r: 1, g: 1, b: 1, a: 1}
   - name: Rock1
@@ -55,11 +55,16 @@ MonoBehaviour:
     scale: 1.2
     colliderRadius: 0
     tint: {r: 1, g: 1, b: 1, a: 1}
+  - name: Pine2
+    sprite: {fileID: 21300000, guid: 681676adf7d3c764abd7169b09682bf7, type: 3}
+    scale: 0.8
+    colliderRadius: 0.35
+    tint: {r: 1, g: 1, b: 1, a: 1}
   placements:
   - prop: 0
     position: {x: 3.2, y: 3.2}
     flipX: 0
-  - prop: 0
+  - prop: 6
     position: {x: 9.2, y: 9.2}
     flipX: 0
   - prop: 0
@@ -68,16 +73,16 @@ MonoBehaviour:
   - prop: 0
     position: {x: 5.6, y: 2}
     flipX: 1
-  - prop: 0
+  - prop: 6
     position: {x: 10.4, y: 7}
     flipX: 0
-  - prop: 0
+  - prop: 6
     position: {x: 7, y: 10.4}
     flipX: 1
-  - prop: 0
+  - prop: 6
     position: {x: 5, y: 9.8}
     flipX: 0
-  - prop: 0
+  - prop: 6
     position: {x: 9.8, y: 5}
     flipX: 1
   - prop: 1
@@ -121,10 +126,11 @@ MonoBehaviour:
   enemies:
   - displayName: Snowling
     tier: 0
-    sprite: {fileID: 21300000, guid: 0686d24df60c669469f8276273565640, type: 3}
+    sprite: {fileID: 21300000, guid: 013689baedfb66f4094f67d01c24fb6c, type: 3}
+    visualPrefab: {fileID: 5046358373799761830, guid: 7cf48d932d1f6f341882a5077f9c1cf6, type: 3}
     frames: []
     frameRate: 2.5
-    headHeight: 0
+    headHeight: 1.1063157
     scale: 0.8
     tint: {r: 1, g: 1, b: 1, a: 1}
     maxHealth: 22
@@ -135,10 +141,11 @@ MonoBehaviour:
     radius: 0.35
   - displayName: Snowman
     tier: 1
-    sprite: {fileID: 21300000, guid: 0686d24df60c669469f8276273565640, type: 3}
+    sprite: {fileID: 21300000, guid: 013689baedfb66f4094f67d01c24fb6c, type: 3}
+    visualPrefab: {fileID: 5046358373799761830, guid: 7cf48d932d1f6f341882a5077f9c1cf6, type: 3}
     frames: []
     frameRate: 2.5
-    headHeight: 0
+    headHeight: 1.1063157
     scale: 1.05
     tint: {r: 0.82, g: 0.92, b: 1, a: 1}
     maxHealth: 50
@@ -149,10 +156,11 @@ MonoBehaviour:
     radius: 0.45
   - displayName: Frost Golem
     tier: 2
-    sprite: {fileID: 21300000, guid: 0686d24df60c669469f8276273565640, type: 3}
+    sprite: {fileID: 21300000, guid: 013689baedfb66f4094f67d01c24fb6c, type: 3}
+    visualPrefab: {fileID: 5046358373799761830, guid: 7cf48d932d1f6f341882a5077f9c1cf6, type: 3}
     frames: []
     frameRate: 2.5
-    headHeight: 0
+    headHeight: 1.1063157
     scale: 1.4
     tint: {r: 0.62, g: 0.78, b: 1, a: 1}
     maxHealth: 115

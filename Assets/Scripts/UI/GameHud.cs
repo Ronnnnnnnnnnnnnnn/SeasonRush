@@ -3,31 +3,40 @@ using System.Net;
 using System.Net.Sockets;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SeasonRush
 {
     /// <summary>
-    /// On-screen information, drawn with Unity's immediate-mode GUI so it needs no scene setup:
-    /// both scores and health bars, the season + timer, season banners, the respawn countdown,
-    /// enemy health bars, floating "+points" popups and the final result.
-    /// Everything shown here is read from synchronized NetworkVariables, so both screens agree.
+    /// The heads-up display of a match. Everything is a real object of the UI canvas in the scene (Hierarchy: UI > HUD):
+    /// top bar, the two player boxes, PAUSE button, season banner, lobby, countdown, result screen, death screen and pause screen.
+    /// This script only switches those objects on and off (SetActive) and fills in their texts and bars.
     /// </summary>
     public class GameHud : MonoBehaviour
     {
         public static GameHud Instance { get; private set; }
 
-        /// <summary>
-        /// True while the pause screen is open. The match itself keeps running (it is a 2 player online game, so nobody can
-        /// stop the clock for the rival), but the local player's controls are switched off.
-        /// </summary>
-        public static bool Paused { get; private set; }
+        /// <summary>True while the game is frozen by a PAUSE (for both players). The state lives on the server (MatchManager.Paused).</summary>
+        public static bool Paused => MatchManager.Instance != null && MatchManager.Instance.Paused.Value;
 
+        /// <summary>Asks the server to freeze / unfreeze the game.</summary>
         public static void SetPaused(bool value)
         {
             MatchManager mm = MatchManager.Instance;
             bool inMatch = mm != null && (mm.Phase.Value == MatchPhase.Countdown || mm.Phase.Value == MatchPhase.Playing);
-            Paused = value && inMatch;
+            if (mm == null || (value && !inMatch)) return;
+            mm.RequestPause(value);
         }
+
+        /// <summary>Colour of the text on the boxes: dark brown with the wooden skin, white on the dark boxes of the flat look.</summary>
+        static Color Ink => MenuStyle.Current.SkinActive ? MenuStyle.Current.skinTextColor : Color.white;
+
+        static Color Alert => MenuStyle.Current.SkinActive ? MenuStyle.Current.skinWarnColor : new Color(1f, 0.45f, 0.4f);
+
+        static int LocalSlot => PlayerStats.Local != null ? PlayerStats.Local.Slot.Value : -1;
+
+        /// <summary>True when the pause was started by this player (only this player can resume it).</summary>
+        public static bool PausedByMe => Paused && MatchManager.Instance.PausedBySlot.Value == LocalSlot;
 
         /// <summary>Automated tests ignore the mouse so that a stray real click cannot press PAUSE / BACK / QUIT.</summary>
         static bool TestBlocksClicks => GameConfig.TestMode && !GameConfig.HasFlag("-allowclicks");
@@ -40,18 +49,76 @@ namespace SeasonRush
             public float born;
         }
 
+        [Header("Canvas (made by Season Rush > Create UI Canvas In Scene)")]
+        [Tooltip("Switched on while a match / lobby is running, off in the main menu.")]
+        public GameObject hudRoot;
+        [Tooltip("Containers that keep the HUD clear of notches and rounded corners on phones.")]
+        public RectTransform[] safeAreas;
+        public GameObject connectingText;
+        [Tooltip("Everything that needs the MatchManager (hidden while connecting).")]
+        public GameObject matchUi;
+
+        [Header("Top bar and player boxes")]
+        public Text topTitle;
+        public Text topTime;
+        public PlayerPanelUi[] playerPanels;       // slot 0 (left) and slot 1 (right)
+        public GameObject controlsHint;
+
+        [Header("PAUSE button and pause screen")]
+        public GameObject pauseButton;
+        public GameObject pausePanel;
+        public Text pauseSubtitle;
+        [Tooltip("Shown to the other player while a rival has the game paused.")]
+        public GameObject pausedByRival;
+        public Text pausedByRivalText;
+
+        [Header("Season banner")]
+        public CanvasGroup banner;
+        public Text bannerTitle;
+        public Text bannerSub;
+
+        [Header("Lobby")]
+        public GameObject lobbyPanel;
+        public Text lobbyTitle;
+        public Text lobbyLine1;                    // online / client lines
+        public Text lobbyLine2;
+        public Text lobbyHostLabel;                // "Tell your friend to join this address:"
+        public Text lobbyAddress;
+        public GameObject soloButton;
+
+        [Header("Countdown")]
+        public Text countdownText;
+
+        [Header("Result screen")]
+        public GameObject resultPanel;
+        public Text resultHeadline;
+        [Tooltip("A line under the headline: \"Your rival surrendered.\"")]
+        public Text resultNote;
+        public Text[] resultLines;                 // one per player
+        public Text resultRecord;
+        public RectTransform rematchButton;
+        public RectTransform resultBackButton;
+        public Text rematchWaiting;
+
+        [Header("Death screen")]
+        public GameObject deathPanel;
+        public Text deathSub;
+
+        [Header("World overlays (health bars, YOU, +points)")]
+        public RectTransform overlayRoot;
+        public WorldBarUi barTemplate;
+        public Text labelTemplate;
+
         readonly List<Popup> _popups = new List<Popup>();
+        readonly List<WorldBarUi> _bars = new List<WorldBarUi>();
+        readonly List<Text> _labels = new List<Text>();
+        int _barsUsed, _labelsUsed;
         MatchManager _subscribedTo;
         string _banner = "";
         string _bannerSub = "";
         Color _bannerColour = Color.white;
         float _bannerUntil;
         string _localAddresses;
-
-        Vector4 _ins;                      // safe-area insets in virtual units: left, top, right, bottom
-        GUIStyle _text;
-        GUIStyle _button;
-        Texture2D _white;
 
         void Awake() => Instance = this;
 
@@ -66,6 +133,60 @@ namespace SeasonRush
             _popups.Add(new Popup { plane = planePosition, text = text, colour = colour, born = Time.time });
         }
 
+        // ------------------------------------------------------------------ buttons (On Click lists in the canvas)
+
+        public void PauseGame() { if (!TestBlocksClicks) SetPaused(true); }
+
+        public void ResumeGame() { if (!TestBlocksClicks) SetPaused(false); }
+
+        /// <summary>SURRENDER (pause menu): the rival wins. Playing alone there is nobody to win, so it just goes back to the menu.</summary>
+        public void Surrender()
+        {
+            if (TestBlocksClicks) return;
+            MatchManager mm = MatchManager.Instance;
+            if (mm == null || PlayerStats.All.Count < 2) { LeaveToMenu(); return; }
+            mm.RequestSurrender();
+        }
+
+        public void StartSoloPractice()
+        {
+            if (TestBlocksClicks) return;
+            if (MatchManager.Instance != null) MatchManager.Instance.ServerBeginCountdown();
+        }
+
+        /// <summary>BACK in the lobby: leave and return to the main menu.</summary>
+        public void LobbyBack()
+        {
+            if (TestBlocksClicks) return;
+            Debug.Log("[UI] BACK clicked in the lobby");
+            LeaveToMenu();
+        }
+
+        /// <summary>REMATCH on the result screen (host only).</summary>
+        public void Rematch()
+        {
+            // automated test runs ignore the button (a stray mouse click must not start a second match)
+            bool blocked = GameConfig.TestMode && !GameConfig.HasFlag("-allowrematch");
+            var mouse = UnityEngine.InputSystem.Mouse.current;
+            Debug.Log($"[UI] REMATCH clicked at mouse {(mouse != null ? mouse.position.ReadValue().ToString() : "n/a")} focused={Application.isFocused}{(blocked ? " (ignored in test mode)" : "")}");
+            if (!blocked && MatchManager.Instance != null) MatchManager.Instance.ServerRematch();
+        }
+
+        /// <summary>BACK on the result screen: the player does not want another game.</summary>
+        public void ResultBack()
+        {
+            bool blocked = TestBlocksClicks;
+            Debug.Log("[UI] BACK clicked" + (blocked ? " (ignored in test mode)" : ""));
+            if (!blocked) LeaveToMenu();
+        }
+
+        /// <summary>Leaves the match (or lobby) and shows the main menu.</summary>
+        public static void LeaveToMenu()
+        {
+            if (ConnectionMenu.Instance != null) ConnectionMenu.Instance.LeaveToMenu();
+            else if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
+        }
+
         // ------------------------------------------------------------------ event hookup
 
         void Update()
@@ -74,11 +195,15 @@ namespace SeasonRush
 
             // Escape (or the Android back button) opens / closes the pause screen during a match; it closes by itself afterwards
             bool inMatch = current != null && (current.Phase.Value == MatchPhase.Countdown || current.Phase.Value == MatchPhase.Playing);
-            if (!inMatch) Paused = false;
-            else
+            if (inMatch)
             {
+                // Escape (or the Android back button) pauses; it resumes only for the player who paused
                 var keyboard = UnityEngine.InputSystem.Keyboard.current;
-                if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && (Application.isFocused || GameConfig.TestMode)) Paused = !Paused;
+                if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && (Application.isFocused || GameConfig.TestMode))
+                {
+                    if (!Paused) SetPaused(true);
+                    else if (PausedByMe) SetPaused(false);
+                }
             }
 
             if (current != _subscribedTo)
@@ -90,6 +215,8 @@ namespace SeasonRush
                     _subscribedTo = current;
                 }
             }
+
+            UpdateCanvas(current, inMatch);
         }
 
         void Unsubscribe()
@@ -107,87 +234,69 @@ namespace SeasonRush
             _bannerUntil = Time.time + 2.8f;
         }
 
-        // ------------------------------------------------------------------ drawing
+        // ------------------------------------------------------------------ canvas
 
-        void OnGUI()
+        static void Show(GameObject go, bool on)
         {
+            if (go != null && go.activeSelf != on) go.SetActive(on);
+        }
+
+        static void Show(Component c, bool on)
+        {
+            if (c != null) Show(c.gameObject, on);
+        }
+
+        void UpdateCanvas(MatchManager mm, bool inMatch)
+        {
+            if (hudRoot == null) return;
             NetworkManager nm = NetworkManager.Singleton;
-            if (nm == null || !nm.IsListening || (!nm.IsServer && !nm.IsConnectedClient)) return;
+            bool session = nm != null && nm.IsListening && (nm.IsServer || nm.IsConnectedClient);
+            Show(hudRoot, session);
+            if (!session) { ClearOverlays(); return; }
 
-            if (_text == null)
+            if (safeAreas != null && safeAreas.Length > 0)
             {
-                _text = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, richText = false, wordWrap = false };
-                _text.normal.textColor = Color.white;
-                _white = Texture2D.whiteTexture;
-            }
-            if (_button == null)
-            {
-                _button = new GUIStyle(GUI.skin.button) { fontSize = 28, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
-            }
-
-            float s = Screen.height / 1080f;
-            GUI.matrix = Matrix4x4.Scale(new Vector3(s, s, 1f));
-            float w = Screen.width / s;
-
-            MatchManager mm = MatchManager.Instance;
-            if (mm == null)
-            {
-                Label(new Rect(0, 480, w, 80), "Connecting...", 48, Color.white);
-                return;
+                Vector4 ins = MobileSupport.SafeInsets();                 // left, top, right, bottom in canvas units
+                foreach (RectTransform area in safeAreas)
+                {
+                    if (area == null) continue;
+                    area.offsetMin = new Vector2(ins.x, ins.w);
+                    area.offsetMax = new Vector2(-ins.z, -ins.y);
+                }
             }
 
-            _ins = MobileSupport.SafeInsets();                 // keep clear of notches and rounded corners on phones
-            DrawWorldOverlays(s);
-            DrawTopBar(mm, w);
-            DrawPlayerPanel(0, 24 + _ins.x, 14 + _ins.y, true);
-            DrawPlayerPanel(1, w - 24 - 380 - _ins.z, 14 + _ins.y, false);
-            DrawBanner(w);
-            DrawPhaseMessages(nm, mm, w);
-            DrawDeathOverlay(w);
-            DrawPauseUi(mm, w);
-            if (!MobileSupport.IsMobile)
-                Label(new Rect(24, 1044, 900, 28), "Move: joystick / WASD / Arrows     Attack: button / Space / J", 17, new Color(1, 1, 1, 0.75f), TextAnchor.MiddleLeft);
+            Show(connectingText, mm == null);
+            Show(matchUi, mm != null);
+            if (mm == null) return;
+            Show(controlsHint, !MobileSupport.IsMobile);
+
+            UpdateWorldOverlays();
+            UpdateTopBar(mm);
+            for (int slot = 0; slot < playerPanels.Length; slot++) UpdatePlayerPanel(playerPanels[slot], slot);
+            UpdateBanner();
+            UpdatePhaseScreens(nm, mm);
+            UpdateDeathScreen();
+
+            bool paused = inMatch && mm.Paused.Value;
+            bool byMe = paused && PausedByMe;
+            Show(pauseButton, inMatch && !paused);
+            Show(pausePanel, byMe);
+            Show(pausedByRival, paused && !byMe);
+            if (paused)
+            {
+                int left = Mathf.Max(0, Mathf.CeilToInt(MatchManager.MaxPauseSeconds - (float)(nm.ServerTime.Time - mm.PausedAt.Value)));
+                if (byMe && pauseSubtitle != null)
+                    pauseSubtitle.text = PlayerStats.All.Count >= 2 ? $"The game is frozen for both players.   Resumes by itself in {left}s." : "The game is frozen.";
+                if (!byMe && pausedByRivalText != null)
+                {
+                    PlayerStats rival = FindBySlot(mm.PausedBySlot.Value);
+                    pausedByRivalText.text = $"{(rival != null ? rival.DisplayName : "Your rival")} paused the game\nResumes by itself in {left}s";
+                }
+            }
         }
 
-        /// <summary>A button in the menu's look (falls back to the plain Unity button when the menu is missing).</summary>
-        bool MenuButton(Rect rect, string text, bool primary, bool danger = false)
+        void UpdateTopBar(MatchManager mm)
         {
-            ConnectionMenu menu = ConnectionMenu.Instance;
-            return menu != null ? menu.HudButton(rect, text, primary, danger) : GUI.Button(rect, text, _button);
-        }
-
-        /// <summary>The PAUSE button (top right, during a match) and the pause screen with RESUME and QUIT.</summary>
-        void DrawPauseUi(MatchManager mm, float w)
-        {
-            bool inMatch = mm.Phase.Value == MatchPhase.Countdown || mm.Phase.Value == MatchPhase.Playing;
-            if (!inMatch) return;
-
-            if (!Paused)
-            {
-                var pauseRect = new Rect(w - 24 - 170 - _ins.z, 130 + _ins.y, 170, 52);
-                if (MenuButton(pauseRect, "PAUSE", false) && !TestBlocksClicks) Paused = true;
-                return;
-            }
-
-            Fill(new Rect(0, 0, w, 1080), new Color(0, 0, 0, 0.62f));
-            Label(new Rect(0, 300, w, 110), "PAUSED", 96, Color.white);
-            bool twoPlayers = PlayerStats.All.Count >= 2;
-            Label(new Rect(0, 410, w, 40), twoPlayers ? "The match keeps running - your rival is still playing." : "The match keeps running.", 24, new Color(1, 1, 1, 0.8f));
-
-            if (MenuButton(new Rect(w * 0.5f - 200, 490, 400, 76), "RESUME", true) && !TestBlocksClicks) Paused = false;
-            if (MenuButton(new Rect(w * 0.5f - 200, 590, 400, 76), "QUIT TO MENU", false, true) && !TestBlocksClicks)
-            {
-                Paused = false;
-                LeaveToMenu();
-            }
-            Label(new Rect(0, 690, w, 32), "Esc: resume", 20, new Color(1, 1, 1, 0.55f));
-        }
-
-        void DrawTopBar(MatchManager mm, float w)
-        {
-            Rect box = new Rect(w * 0.5f - 190, 10 + _ins.y, 380, 104);
-            Fill(box, new Color(0, 0, 0, 0.55f));
-
             string title;
             string time;
             switch (mm.Phase.Value)
@@ -201,231 +310,259 @@ namespace SeasonRush
                     time = (sec / 60) + ":" + (sec % 60).ToString("00");
                     break;
             }
-            Label(new Rect(box.x, box.y + 6, box.width, 40), title, 30, Color.white);
-            Color timeColour = mm.Phase.Value == MatchPhase.Playing && mm.TimeRemaining <= 10f ? new Color(1f, 0.45f, 0.4f) : Color.white;
-            Label(new Rect(box.x, box.y + 40, box.width, 62), time, 58, timeColour);
+            topTitle.text = title;
+            topTime.text = time;
+            topTime.color = mm.Phase.Value == MatchPhase.Playing && mm.TimeRemaining <= 10f ? Alert : Ink;
         }
 
-        void DrawPlayerPanel(int slot, float x, float y, bool leftSide)
+        void UpdatePlayerPanel(PlayerPanelUi panel, int slot)
         {
-            Rect box = new Rect(x, y, 380, 104);
-            Fill(box, new Color(0, 0, 0, 0.55f));
             Color slotColour = GameConfig.SlotColor(slot);
-            Fill(new Rect(leftSide ? box.x : box.xMax - 8, box.y, 8, box.height), slotColour);
+            panel.strip.color = slotColour;
 
             PlayerStats p = FindBySlot(slot);
             bool isLocal = p != null && p.IsOwner;
-            string who = (p != null ? p.DisplayName : GameConfig.SlotName(slot)) + (isLocal ? "  (YOU)" : "");
-            Label(new Rect(box.x + 20, box.y + 6, 220, 32), who, 24, slotColour, TextAnchor.MiddleLeft);
+            panel.who.text = (p != null ? p.DisplayName : GameConfig.SlotName(slot)) + (isLocal ? "  (YOU)" : "");
+            panel.who.color = MenuStyle.Current.SkinActive ? Color.Lerp(slotColour, Color.black, 0.3f) : slotColour;   // darker on the light box
 
-            if (p == null)
-            {
-                Label(new Rect(box.x + 20, box.y + 44, 340, 40), "waiting for player...", 22, new Color(1, 1, 1, 0.6f), TextAnchor.MiddleLeft);
-                return;
-            }
+            Show(panel.waiting, p == null);
+            Show(panel.details, p != null);
+            if (p == null) return;
 
-            Label(new Rect(box.x + 200, box.y + 2, 160, 56), p.Score.Value.ToString(), 52, Color.white, TextAnchor.MiddleRight);
-
+            panel.score.text = p.Score.Value.ToString();
             float healthFraction = Mathf.Clamp01(p.Health.Value / (float)GameConfig.PlayerMaxHealth);
-            Rect bar = new Rect(box.x + 20, box.y + 62, 340, 16);
-            Fill(bar, new Color(0, 0, 0, 0.6f));
-            Fill(new Rect(bar.x, bar.y, bar.width * healthFraction, bar.height), Color.Lerp(new Color(0.9f, 0.2f, 0.2f), new Color(0.35f, 0.9f, 0.35f), healthFraction));
-            Label(new Rect(box.x + 20, box.y + 80, 340, 22), "Kills " + p.Kills.Value + "    Deaths " + p.Deaths.Value, 16, new Color(1, 1, 1, 0.8f), TextAnchor.MiddleLeft);
+            panel.healthFill.anchorMax = new Vector2(healthFraction, 1f);
+            panel.healthFillImage.color = Color.Lerp(new Color(0.9f, 0.2f, 0.2f), new Color(0.35f, 0.9f, 0.35f), healthFraction);
+            panel.kills.text = "Kills " + p.Kills.Value + "    Deaths " + p.Deaths.Value;
         }
 
-        void DrawBanner(float w)
+        void UpdateBanner()
         {
-            if (Time.time >= _bannerUntil) return;
+            if (banner == null) return;
+            if (Time.time >= _bannerUntil) { Show(banner.gameObject, false); return; }
+            Show(banner.gameObject, true);
             float left = _bannerUntil - Time.time;
             float alpha = Mathf.Clamp01(left / 0.7f);
             float slide = Mathf.Clamp01((2.8f - left) / 0.25f);
-            Fill(new Rect(0, 300, w, 170), new Color(0, 0, 0, 0.5f * alpha * slide));
-            Color c = _bannerColour; c.a = alpha * slide;
-            Label(new Rect(0, 300, w, 120), _banner, 110, c);
-            Color sub = Color.white; sub.a = alpha * slide;
-            Label(new Rect(0, 415, w, 44), _bannerSub, 26, sub);
+            banner.alpha = alpha * slide;
+            bannerTitle.text = _banner;
+            bannerTitle.color = _bannerColour;
+            bannerSub.text = _bannerSub;
         }
 
-        void DrawPhaseMessages(NetworkManager nm, MatchManager mm, float w)
+        void UpdatePhaseScreens(NetworkManager nm, MatchManager mm)
         {
-            switch (mm.Phase.Value)
-            {
-                case MatchPhase.Lobby:
-                {
-                    Fill(new Rect(w * 0.5f - 380, 380, 760, 270), new Color(0, 0, 0, 0.6f));
-                    bool online = OnlineMatchmaker.Instance != null && OnlineMatchmaker.Instance.InSession;
-                    Label(new Rect(0, 395, w, 60), online ? "SEARCHING FOR A RIVAL ONLINE..." : "WAITING FOR YOUR RIVAL...", 44, Color.white);
-                    if (online)
-                    {
-                        Label(new Rect(0, 470, w, 40), nm.IsServer ? "The match starts by itself as soon as a random player joins." : "Rival found! The match is about to start.", 26, Color.white);
-                        Label(new Rect(0, 520, w, 36), "Press Leave (bottom right) to cancel.", 20, new Color(1, 1, 1, 0.75f));
-                    }
-                    else if (nm.IsServer)
-                    {
-                        Label(new Rect(0, 460, w, 34), "Tell your friend to join this address:", 22, new Color(1, 1, 1, 0.85f));
-                        Label(new Rect(0, 496, w, 44), LocalAddresses(), 34, new Color(1f, 0.92f, 0.5f));
-                        if (MenuButton(new Rect(w * 0.5f - 230, 570, 460, 60), "START SOLO PRACTICE", true) && !TestBlocksClicks)
-                            mm.ServerBeginCountdown();
-                    }
-                    else
-                    {
-                        Label(new Rect(0, 470, w, 40), "Connected! Waiting for the host to start.", 26, Color.white);
-                    }
+            MatchPhase phase = mm.Phase.Value;
+            Show(lobbyPanel, phase == MatchPhase.Lobby);
+            Show(countdownText, phase == MatchPhase.Countdown);
+            Show(resultPanel, phase == MatchPhase.Finished);
 
-                    // BACK: leave the lobby and return to the main menu
-                    if (MenuButton(new Rect(w * 0.5f - 150, 672, 300, 60), MenuStyle.Current.backText, false) && !TestBlocksClicks)
-                    {
-                        Debug.Log("[UI] BACK clicked in the lobby");
-                        LeaveToMenu();
-                    }
-                    break;
-                }
+            switch (phase)
+            {
+                case MatchPhase.Lobby: UpdateLobby(nm); break;
                 case MatchPhase.Countdown:
-                {
-                    int n = Mathf.Max(1, Mathf.CeilToInt(mm.TimeRemaining));
-                    Label(new Rect(0, 330, w, 260), n.ToString(), 220, new Color(1f, 0.95f, 0.6f));
+                    countdownText.text = Mathf.Max(1, Mathf.CeilToInt(mm.TimeRemaining)).ToString();
                     break;
-                }
-                case MatchPhase.Finished:
-                    DrawResult(nm, mm, w);
-                    break;
+                case MatchPhase.Finished: UpdateResult(nm, mm); break;
             }
         }
 
-        void DrawResult(NetworkManager nm, MatchManager mm, float w)
+        void UpdateLobby(NetworkManager nm)
         {
-            Fill(new Rect(0, 0, w, 1080), new Color(0, 0, 0, 0.65f));
+            bool online = OnlineMatchmaker.Instance != null && OnlineMatchmaker.Instance.InSession;
+            bool host = nm.IsServer;
+            lobbyTitle.text = online ? "SEARCHING FOR A RIVAL ONLINE..." : "WAITING FOR YOUR RIVAL...";
 
+            Show(lobbyLine1, online || !host);
+            Show(lobbyLine2, online);
+            Show(lobbyHostLabel, !online && host);
+            Show(lobbyAddress, !online && host);
+            Show(soloButton, !online && host);
+
+            if (online)
+            {
+                lobbyLine1.text = host ? "The match starts by itself as soon as a random player joins." : "Rival found! The match is about to start.";
+                lobbyLine2.text = "Press BACK to cancel.";
+            }
+            else if (host)
+            {
+                lobbyAddress.text = LocalAddresses();
+            }
+            else
+            {
+                lobbyLine1.text = "Connected! Waiting for the host to start.";
+            }
+        }
+
+        void UpdateResult(NetworkManager nm, MatchManager mm)
+        {
             int winner = mm.WinnerSlot.Value;
             int mySlot = PlayerStats.Local != null ? PlayerStats.Local.Slot.Value : -1;
             bool solo = PlayerStats.All.Count < 2;
             string headline;
+            string note = "";
             Color colour;
-            if (solo) { headline = "TIME!"; colour = Color.white; }
+            int surrendered = mm.SurrenderSlot.Value;
+            if (surrendered >= 0 && !solo)
+            {
+                bool me = surrendered == mySlot;
+                headline = me ? "YOU SURRENDERED" : "YOU WIN!";
+                note = me ? "You gave up - your rival wins." : "Your rival surrendered.";
+                colour = me ? new Color(1f, 0.5f, 0.45f) : new Color(1f, 0.9f, 0.35f);
+            }
+            else if (solo) { headline = "TIME!"; colour = Color.white; }
             else if (winner < 0) { headline = "DRAW"; colour = Color.white; }
             else if (winner == mySlot) { headline = "YOU WIN!"; colour = new Color(1f, 0.9f, 0.35f); }
             else { headline = "YOU LOSE"; colour = new Color(1f, 0.5f, 0.45f); }
-
-            Label(new Rect(0, 200, w, 150), headline, 130, colour);
+            resultHeadline.text = headline;
+            resultHeadline.color = colour;
+            if (resultNote != null)
+            {
+                Show(resultNote, note.Length > 0);
+                resultNote.text = note;
+            }
 
             float y = 380;
-            for (int slot = 0; slot < GameConfig.MaxPlayers; slot++)
+            for (int i = 0; i < resultLines.Length; i++)
             {
-                PlayerStats p = FindBySlot(slot);
+                PlayerStats p = FindBySlot(i);
+                Show(resultLines[i], p != null);
                 if (p == null) continue;
-                string line = p.DisplayName + (p.IsOwner ? " (you)" : "") + "     " + p.Score.Value + " pts     " + p.Kills.Value + (p.Kills.Value == 1 ? " kill     " : " kills     ") + p.Deaths.Value + (p.Deaths.Value == 1 ? " death" : " deaths");
-                Label(new Rect(0, y, w, 52), line, 36, GameConfig.SlotColor(slot));
+                resultLines[i].text = p.DisplayName + (p.IsOwner ? " (you)" : "") + "     " + p.Score.Value + " pts     " + p.Kills.Value + (p.Kills.Value == 1 ? " kill     " : " kills     ") + p.Deaths.Value + (p.Deaths.Value == 1 ? " death" : " deaths");
+                resultLines[i].color = GameConfig.SlotColor(i);
+                PlaceFromTop(resultLines[i].rectTransform, 0f, y);
                 y += 62;
             }
 
             // lifetime record from the online database (updates a moment after the host reports the match)
             SpacetimeManager db = SpacetimeManager.Instance;
-            if (db != null && db.State == SpacetimeManager.ConnState.Connected && db.LocalProfile != null)
+            bool record = db != null && db.State == SpacetimeManager.ConnState.Connected && db.LocalProfile != null;
+            Show(resultRecord, record);
+            if (record)
             {
                 ProfileInfo me = db.LocalProfile;
-                Label(new Rect(0, y, w, 40), $"Your record: {me.Wins} W  -  {me.Losses} L  -  {me.Draws} D     {me.Score} points in {me.Matches} {(me.Matches == 1 ? "match" : "matches")}", 24, new Color(1f, 1f, 1f, 0.85f));
+                resultRecord.text = $"Your record: {me.Wins} W  -  {me.Losses} L  -  {me.Draws} D     {me.Score} points in {me.Matches} {(me.Matches == 1 ? "match" : "matches")}";
+                PlaceFromTop(resultRecord.rectTransform, 0f, y);
                 y += 46;
             }
 
-            ConnectionMenu menu = ConnectionMenu.Instance;
-            Rect backRect;
             if (nm.IsServer)
             {
                 // REMATCH on the left, BACK (to the main menu) on the right
-                var rematchRect = new Rect(w * 0.5f - 320, y + 40, 300, 64);
-                backRect = new Rect(w * 0.5f + 20, y + 40, 300, 64);
-                bool rematch = menu != null ? menu.HudButton(rematchRect, "REMATCH", true) : GUI.Button(rematchRect, "REMATCH", _button);
-                if (rematch)
-                {
-                    // automated test runs ignore the button (a stray mouse click must not start a second match)
-                    bool blocked = GameConfig.TestMode && !GameConfig.HasFlag("-allowrematch");
-                    var mouse = UnityEngine.InputSystem.Mouse.current;
-                    Debug.Log($"[UI] REMATCH clicked at mouse {(mouse != null ? mouse.position.ReadValue().ToString() : "n/a")} focused={Application.isFocused}{(blocked ? " (ignored in test mode)" : "")}");
-                    if (!blocked) mm.ServerRematch();
-                }
+                Show(rematchButton, true);
+                Show(rematchWaiting, false);
+                PlaceFromTop(rematchButton, -170f, y + 40);
+                PlaceFromTop(resultBackButton, 170f, y + 40);
             }
             else
             {
-                Label(new Rect(0, y + 40, w, 40), "Waiting for the host to start a rematch...", 24, new Color(1, 1, 1, 0.8f));
-                backRect = new Rect(w * 0.5f - 150, y + 100, 300, 64);
-            }
-
-            // BACK: the player does not want another game, so leave the match and go to the main menu
-            string backText = MenuStyle.Current.backText;
-            bool back = menu != null ? menu.HudButton(backRect, backText, false) : GUI.Button(backRect, backText, _button);
-            if (back)
-            {
-                bool blocked = GameConfig.TestMode && !GameConfig.HasFlag("-allowclicks");      // a stray mouse click must not end a test run
-                Debug.Log("[UI] BACK clicked" + (blocked ? " (ignored in test mode)" : ""));
-                if (!blocked) LeaveToMenu();
+                Show(rematchButton, false);
+                Show(rematchWaiting, true);
+                PlaceFromTop(rematchWaiting.rectTransform, 0f, y + 40);
+                PlaceFromTop(resultBackButton, 0f, y + 100);
             }
         }
 
-        /// <summary>Leaves the match (or lobby) and shows the main menu.</summary>
-        public static void LeaveToMenu()
-        {
-            Paused = false;
-            if (ConnectionMenu.Instance != null) ConnectionMenu.Instance.LeaveToMenu();
-            else if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
-        }
+        /// <summary>Puts a top-centre anchored element x units right of the centre, y units below the top of the screen.</summary>
+        static void PlaceFromTop(RectTransform rt, float x, float y) => rt.anchoredPosition = new Vector2(x, -y);
 
-        void DrawDeathOverlay(float w)
+        void UpdateDeathScreen()
         {
             PlayerStats local = PlayerStats.Local;
-            if (local == null || !local.IsDead.Value) return;
-            if (MatchManager.Instance == null || MatchManager.Instance.Phase.Value != MatchPhase.Playing) return;
-
+            bool dead = local != null && local.IsDead.Value && MatchManager.Instance != null && MatchManager.Instance.Phase.Value == MatchPhase.Playing;
+            Show(deathPanel, dead);
+            if (!dead) return;
             double remaining = local.RespawnAt.Value - NetworkManager.Singleton.ServerTime.Time;
-            Fill(new Rect(0, 0, w, 1080), new Color(0.6f, 0f, 0f, 0.22f));
-            Label(new Rect(0, 400, w, 100), "YOU WERE DEFEATED", 78, new Color(1f, 0.85f, 0.85f));
-            Label(new Rect(0, 500, w, 50), "Respawning in " + Mathf.Max(0f, (float)remaining).ToString("0.0") + "s  -  your rival can score freely!", 30, Color.white);
+            deathSub.text = "Respawning in " + Mathf.Max(0f, (float)remaining).ToString("0.0") + "s  -  your rival can score freely!";
         }
 
         // ------------------------------------------------------------------ world-anchored overlays
 
-        void DrawWorldOverlays(float guiScale)
+        void ClearOverlays()
         {
-            Camera cam = Camera.main;
-            if (cam == null) return;
-
-            foreach (Enemy e in Enemy.All)
-            {
-                if (e == null || e.Def == null || e.Health.Value >= e.MaxHealth) continue;
-                float barHeight = e.Def.headHeight > 0f ? e.Def.headHeight * e.Def.scale + 0.2f : 1.45f * e.Def.scale + 0.25f;     // just above the picture
-                Vector2 g = ToGui(cam, Iso.ToScreen3(e.PlanePosition) + new Vector3(0f, barHeight, 0f), guiScale);
-                DrawBar(g, 64, 8, e.HealthFraction, new Color(0.95f, 0.3f, 0.3f));
-            }
-
-            foreach (PlayerStats p in PlayerStats.All)
-            {
-                if (p.Controller == null || p.IsDead.Value) continue;
-                Vector2 g = ToGui(cam, Iso.ToScreen3(p.Controller.PlanePosition) + new Vector3(0f, 1.95f, 0f), guiScale);
-                DrawBar(g, 74, 9, p.Health.Value / (float)GameConfig.PlayerMaxHealth, GameConfig.SlotColor(Mathf.Max(0, p.Slot.Value)));
-                if (p.IsOwner) Label(new Rect(g.x - 40, g.y - 34, 80, 24), "YOU", 20, GameConfig.SlotColor(Mathf.Max(0, p.Slot.Value)));
-            }
-
-            for (int i = _popups.Count - 1; i >= 0; i--)
-            {
-                Popup pop = _popups[i];
-                float age = Time.time - pop.born;
-                if (age > 1.1f) { _popups.RemoveAt(i); continue; }
-                Vector2 g = ToGui(cam, Iso.ToScreen3(pop.plane) + new Vector3(0f, 1.3f + age * 1.3f, 0f), guiScale);
-                Color c = pop.colour; c.a = Mathf.Clamp01((1.1f - age) / 0.5f);
-                Label(new Rect(g.x - 80, g.y - 24, 160, 48), pop.text, 44, c);
-            }
+            _popups.Clear();
+            _barsUsed = _labelsUsed = 0;
         }
 
-        static Vector2 ToGui(Camera cam, Vector3 world, float guiScale)
+        void UpdateWorldOverlays()
+        {
+            _barsUsed = 0;
+            _labelsUsed = 0;
+            Camera cam = Camera.main;
+            if (cam != null && overlayRoot != null)
+            {
+                float scale = overlayRoot.GetComponentInParent<Canvas>().scaleFactor;
+
+                foreach (Enemy e in Enemy.All)
+                {
+                    if (e == null || e.Def == null || e.Health.Value >= e.MaxHealth) continue;
+                    float barHeight = e.Def.headHeight > 0f ? e.Def.headHeight * e.Def.scale + 0.2f : 1.45f * e.Def.scale + 0.25f;     // just above the picture
+                    Vector2 g = ToCanvas(cam, Iso.ToScreen3(e.PlanePosition) + new Vector3(0f, barHeight, 0f), scale);
+                    PlaceBar(g, 64, 8, e.HealthFraction, new Color(0.95f, 0.3f, 0.3f));
+                }
+
+                foreach (PlayerStats p in PlayerStats.All)
+                {
+                    if (p.Controller == null || p.IsDead.Value) continue;
+                    Vector2 g = ToCanvas(cam, Iso.ToScreen3(p.Controller.PlanePosition) + new Vector3(0f, 1.95f, 0f), scale);
+                    Color slotColour = GameConfig.SlotColor(Mathf.Max(0, p.Slot.Value));
+                    PlaceBar(g, 74, 9, p.Health.Value / (float)GameConfig.PlayerMaxHealth, slotColour);
+                    if (p.IsOwner) PlaceLabel(g + new Vector2(0f, 22f), "YOU", 20, slotColour);
+                }
+
+                for (int i = _popups.Count - 1; i >= 0; i--)
+                {
+                    Popup pop = _popups[i];
+                    float age = Time.time - pop.born;
+                    if (age > 1.1f) { _popups.RemoveAt(i); continue; }
+                    Vector2 g = ToCanvas(cam, Iso.ToScreen3(pop.plane) + new Vector3(0f, 1.3f + age * 1.3f, 0f), scale);
+                    Color c = pop.colour; c.a = Mathf.Clamp01((1.1f - age) / 0.5f);
+                    PlaceLabel(g, pop.text, 44, c);
+                }
+            }
+
+            for (int i = _barsUsed; i < _bars.Count; i++) Show(_bars[i], false);
+            for (int i = _labelsUsed; i < _labels.Count; i++) Show(_labels[i], false);
+        }
+
+        /// <summary>World position -> position inside the overlay root (top-left anchored, y down, canvas units).</summary>
+        static Vector2 ToCanvas(Camera cam, Vector3 world, float canvasScale)
         {
             Vector3 sp = cam.WorldToScreenPoint(world);
-            return new Vector2(sp.x / guiScale, (Screen.height - sp.y) / guiScale);
+            return new Vector2(sp.x / canvasScale, -(Screen.height - sp.y) / canvasScale);
         }
 
-        void DrawBar(Vector2 centre, float width, float height, float fraction, Color colour)
+        void PlaceBar(Vector2 centre, float width, float height, float fraction, Color colour)
         {
-            Rect r = new Rect(centre.x - width * 0.5f, centre.y - height * 0.5f, width, height);
-            Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), new Color(0, 0, 0, 0.75f));
-            Fill(new Rect(r.x, r.y, r.width * Mathf.Clamp01(fraction), r.height), colour);
+            if (_barsUsed == _bars.Count)
+            {
+                WorldBarUi created = Instantiate(barTemplate, overlayRoot);
+                created.name = "Bar";
+                _bars.Add(created);
+            }
+            WorldBarUi bar = _bars[_barsUsed++];
+            Show(bar, true);
+            var rt = (RectTransform)bar.transform;
+            rt.anchoredPosition = centre;
+            rt.sizeDelta = new Vector2(width + 4f, height + 4f);
+            bar.fill.anchorMax = new Vector2(Mathf.Clamp01(fraction), 1f);
+            bar.fillImage.color = colour;
+        }
+
+        void PlaceLabel(Vector2 centre, string text, int size, Color colour)
+        {
+            if (_labelsUsed == _labels.Count)
+            {
+                Text created = Instantiate(labelTemplate, overlayRoot);
+                created.name = "Label";
+                _labels.Add(created);
+            }
+            Text label = _labels[_labelsUsed++];
+            Show(label, true);
+            label.rectTransform.anchoredPosition = centre;
+            label.fontSize = size;
+            label.text = text;
+            label.color = colour;
         }
 
         // ------------------------------------------------------------------ helpers
@@ -434,26 +571,6 @@ namespace SeasonRush
         {
             foreach (PlayerStats p in PlayerStats.All) if (p.Slot.Value == slot) return p;
             return null;
-        }
-
-        void Fill(Rect r, Color c)
-        {
-            Color old = GUI.color;
-            GUI.color = c;
-            GUI.DrawTexture(r, _white);
-            GUI.color = old;
-        }
-
-        void Label(Rect r, string text, int size, Color colour, TextAnchor anchor = TextAnchor.MiddleCenter)
-        {
-            _text.fontSize = size;
-            _text.alignment = anchor;
-            // cheap outline so text stays readable on any background
-            Color shadow = new Color(0, 0, 0, colour.a * 0.85f);
-            _text.normal.textColor = shadow;
-            GUI.Label(new Rect(r.x + 2, r.y + 2, r.width, r.height), text, _text);
-            _text.normal.textColor = colour;
-            GUI.Label(r, text, _text);
         }
 
         string LocalAddresses()

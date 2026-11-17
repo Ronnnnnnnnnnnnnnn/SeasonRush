@@ -2,18 +2,18 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Owns the three season maps. Runs identically on host and clients: every peer builds the same
-    /// maps locally from the theme assets (the maps are static scenery, so nothing about them needs
-    /// to be sent over the network), and simply shows the one matching the networked season.
-    /// The camera is fixed: it frames the whole island and never follows a player.
-    /// </summary>
+   
     public class MapManager : MonoBehaviour
     {
         public static MapManager Instance { get; private set; }
 
         [Tooltip("Spring, Fall, Winter - in that order.")]
         public SeasonTheme[] themes;
+
+        [Tooltip("The three maps as objects in the scene (Environment > Maps), in season order. Made by Season Rush > Update Maps In Scene. Empty = built when the game starts.")]
+        public GameObject[] maps;
+        [Tooltip("The invisible walls around the island (Environment > ArenaWalls). Empty = built when the game starts.")]
+        public GameObject arenaWalls;
 
         GameObject[] _roots;
         int _current = -1;
@@ -28,12 +28,27 @@ namespace SeasonRush
             ApplyLayerRules();
 
             _cam = Camera.main;
-            BuildWalls();
+            if (arenaWalls == null) CreateWalls(transform);        // normally the walls are objects in the scene
 
             _roots = new GameObject[themes.Length];
             for (int i = 0; i < themes.Length; i++)
             {
-                _roots[i] = IsoMapBuilder.Build(themes[i], transform);
+                // the map baked into the scene (Environment > Maps) is used while it still matches its theme; otherwise it is built here
+                GameObject baked = maps != null && i < maps.Length ? maps[i] : null;
+                var marker = baked != null ? baked.GetComponent<BakedMap>() : null;
+                if (marker != null && marker.themeHash == themes[i].ContentHash())
+                {
+                    _roots[i] = baked;
+                }
+                else
+                {
+                    if (baked != null)
+                    {
+                        Debug.LogWarning($"[Map] The baked {themes[i].displayName} map in the scene is out of date: building it from the theme instead. Run Season Rush > Update Maps In Scene.");
+                        baked.SetActive(false);
+                    }
+                    _roots[i] = IsoMapBuilder.Build(themes[i], transform);
+                }
                 _roots[i].SetActive(false);
             }
             ShowSeason(0);
@@ -49,10 +64,6 @@ namespace SeasonRush
             FrameCamera();
         }
 
-        /// <summary>
-        /// Players, enemies and the rival never physically collide with each other (all fighting uses
-        /// distance checks on the server); they only collide with the obstacle layer.
-        /// </summary>
         static void ApplyLayerRules()
         {
             int player = LayerMask.NameToLayer("Player");
@@ -63,11 +74,12 @@ namespace SeasonRush
             Physics2D.IgnoreLayerCollision(enemy, enemy, true);
         }
 
-        void BuildWalls()
+        /// <summary>The four invisible walls just outside the island (also built into the scene by the editor).</summary>
+        public static GameObject CreateWalls(Transform parent)
         {
             float n = GameConfig.ArenaSize;
             var walls = new GameObject("ArenaWalls");
-            walls.transform.SetParent(transform, false);
+            walls.transform.SetParent(parent, false);
             int layer = LayerMask.NameToLayer(IsoMapBuilder.ObstacleLayerName);
             if (layer >= 0) walls.layer = layer;
 
@@ -76,6 +88,7 @@ namespace SeasonRush
             AddWall(walls, new Vector2(n * 0.5f, n + 1f), new Vector2(n + 4f, 2f), layer);
             AddWall(walls, new Vector2(-1f, n * 0.5f), new Vector2(2f, n + 4f), layer);
             AddWall(walls, new Vector2(n + 1f, n * 0.5f), new Vector2(2f, n + 4f), layer);
+            return walls;
         }
 
         static void AddWall(GameObject parent, Vector2 center, Vector2 size, int layer)
@@ -106,7 +119,6 @@ namespace SeasonRush
             return spawns[Mathf.Clamp(slot, 0, spawns.Length - 1)];
         }
 
-        /// <summary>Picks an enemy spawn point that is not too close to any living player.</summary>
         public Vector2 PickEnemySpawn(int season, System.Collections.Generic.IList<Vector2> playerPositions)
         {
             Vector2[] spawns = Theme(season).enemySpawns;
@@ -133,7 +145,6 @@ namespace SeasonRush
             return best;
         }
 
-        /// <summary>The fixed camera: frames the whole island (plus the cliffs below it) for any aspect ratio.</summary>
         void FrameCamera()
         {
             if (_cam == null) { _cam = Camera.main; if (_cam == null) return; }

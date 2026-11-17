@@ -2,13 +2,6 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Phone / tablet support. Does nothing on a PC.
-    ///
-    /// * On Android / iOS the game is locked to landscape, runs at 60 fps and keeps the screen awake while playing.
-    /// * <see cref="SafeInsets"/> tells the UI how far to stay away from notches, camera cut-outs, rounded corners and
-    ///   the gesture bar, so the score panels, the joystick and the ATTACK button are never hidden.
-    /// </summary>
     public static class MobileSupport
     {
         public static bool IsMobile => Application.isMobilePlatform;
@@ -22,17 +15,11 @@ namespace SeasonRush
             Screen.autorotateToPortraitUpsideDown = false;
             Screen.autorotateToLandscapeLeft = true;
             Screen.autorotateToLandscapeRight = true;
-            Screen.orientation = ScreenOrientation.AutoRotation;       // flips between the two landscape sides
-
+            Screen.orientation = ScreenOrientation.AutoRotation;
             QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = 60;
-            Screen.sleepTimeout = SleepTimeout.NeverSleep;             // the screen must not dim in the middle of a match
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
         }
-
-        /// <summary>
-        /// Distance from each screen edge to the safe area, in the UI's virtual units (a screen 1080 units high):
-        /// x = left, y = top, z = right, w = bottom. All zeros on a normal PC screen.
-        /// </summary>
         public static Vector4 SafeInsets()
         {
             Rect safe = Screen.safeArea;

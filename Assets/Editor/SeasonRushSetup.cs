@@ -102,6 +102,8 @@ namespace SeasonRush.EditorTools
             PlaceholderArt.EnsureAll();
             PlayerSkinsSetup.Ensure(false);          // player1.png / player2.png become the two warriors (if the pictures exist)
             MenuStyleSetup.Ensure();                 // Assets/Resources/MenuStyle.asset: the menu's font, texts and colours
+            UiSkinSetup.Apply(false);                // wooden buttons / panels and pixel fonts (when the pictures are there)
+            BrandingSetup.Apply(false);              // game name, app icon, title picture
 
             // ---------------- art ----------------
             // island ground textures (used on meshes, so only the texture matters)
@@ -188,13 +190,17 @@ namespace SeasonRush.EditorTools
                         Prop("IceRock1", rock1, 0.9f, 0.50f, new Color(0.78f, 0.88f, 1f)), Prop("IceRock2", rock2, 1.8f, 0.30f, new Color(0.78f, 0.88f, 1f)),
                         Prop("IceRock3", rock3, 1.4f, 0.30f, new Color(0.78f, 0.88f, 1f))
                     },
-                WinterLayout(winterProps),
+                WinterLayout(winterProps, winterProps && SeasonArtSetup.HasPine && SeasonArtSetup.HasPine2),
                 new[]
                 {
                     Foe("Snowling", EnemyTier.Weak, snowMonster, 0.8f, new Color(1f, 1f, 1f), 22, 2.3f, 6, 10, 6, 0.35f),
                     Foe("Snowman", EnemyTier.Medium, snowMonster, 1.05f, new Color(0.82f, 0.92f, 1f), 50, 2.7f, 11, 25, 3, 0.45f),
                     Foe("Frost Golem", EnemyTier.Strong, snowMonster, 1.4f, new Color(0.62f, 0.78f, 1f), 115, 3.0f, 18, 65, 1, 0.60f)
                 });
+            // ---------------- the artist's pine + animated characters (only fills what is still a placeholder / empty) ----------------
+            SeasonArtSetup.ApplyToExistingThemes();
+            CharacterAnimSetup.ApplyAll();
+
             // ---------------- prefabs ----------------
             GameObject enemyPrefab = MakeEnemyPrefab();
             GameObject playerPrefab = MakePlayerPrefab(warriorBody, warriorTunic);
@@ -468,15 +474,16 @@ namespace SeasonRush.EditorTools
             return l;
         }
 
-        static List<PropPlacement> WinterLayout(bool withBushes = false)
+        static List<PropPlacement> WinterLayout(bool withBushes = false, bool withPine2 = false)
         {
             var l = new List<PropPlacement>();
-            // 0 Pine 1 Rock1 2 Rock2 3 Rock3 (4 Bush 5 Bush2 when the artist's bush pictures are there)
+            // 0 Pine 1 Rock1 2 Rock2 3 Rock3 (4 Bush 5 Bush2 when the artist's bush pictures are there, 6 Pine2 with the second pine picture)
+            int back = withPine2 ? 6 : 0;                 // the trees at the back of the island use the second pine
             Sym(l, 0, 3.2f, 3.2f);
-            Sym(l, 0, 9.2f, 9.2f);
+            Sym(l, back, 9.2f, 9.2f);
             Sym(l, 0, 2.0f, 5.6f);
-            Sym(l, 0, 10.4f, 7.0f);
-            Sym(l, 0, 5.0f, 9.8f);
+            Sym(l, back, 10.4f, 7.0f);
+            Sym(l, back, 5.0f, 9.8f);
             Sym(l, 1, 4.4f, 8.2f);
             Sym(l, 2, 8.0f, 3.6f);
             Sym(l, 3, 4.0f, 4.8f);
@@ -614,15 +621,43 @@ namespace SeasonRush.EditorTools
             nm.NetworkConfig.TickRate = 30;
             nm.RunInBackground = true;
 
-            // game scripts
-            var game = new GameObject("Game");
-            game.AddComponent<MapManager>().themes = themes;
-            game.AddComponent<SpacetimeManager>();
-            game.AddComponent<OnlineMatchmaker>();
-            game.AddComponent<ConnectionMenu>().matchManagerPrefab = matchPrefab;
-            game.AddComponent<GameHud>();
-            game.AddComponent<VirtualControls>();
-            game.AddComponent<AutomatedTestDriver>();
+            // Environment: the invisible arena walls and the three season maps, as real objects (every map is a prefab made from its
+            // Season Theme, every tree / rock / bush on it an instance of a prop prefab). Only the first season is visible at the start.
+            var environment = new GameObject("Environment").transform;
+            GameObject walls = MapManager.CreateWalls(environment);
+            var mapsRoot = new GameObject("Maps").transform;
+            mapsRoot.SetParent(environment, false);
+            var mapInstances = new GameObject[themes.Length];
+            for (int i = 0; i < themes.Length; i++)
+            {
+                GameObject mapPrefab = SceneBaker.BakeMapPrefab(themes[i]);
+                mapInstances[i] = (GameObject)PrefabUtility.InstantiatePrefab(mapPrefab, mapsRoot);
+                mapInstances[i].SetActive(i == 0);
+            }
+
+            // Managers: one object per manager, so the Hierarchy shows what the game is made of.
+            // (The MatchManager is not here: the server spawns it as a network prefab when a match starts.)
+            var managers = new GameObject("Managers").transform;
+            GameObject Manager(string name)
+            {
+                var go = new GameObject(name);
+                go.transform.SetParent(managers, false);
+                return go;
+            }
+            var mapManager = Manager("MapManager").AddComponent<MapManager>();
+            mapManager.themes = themes;
+            mapManager.maps = mapInstances;
+            mapManager.arenaWalls = walls;
+            Manager("SpacetimeManager").AddComponent<SpacetimeManager>();
+            Manager("OnlineMatchmaker").AddComponent<OnlineMatchmaker>();
+            var menu = Manager("ConnectionMenu").AddComponent<ConnectionMenu>();
+            menu.matchManagerPrefab = matchPrefab;
+            var hud = Manager("GameHud").AddComponent<GameHud>();
+            var controls = Manager("VirtualControls").AddComponent<VirtualControls>();
+            Manager("AutomatedTestDriver").AddComponent<AutomatedTestDriver>();
+
+            // The user interface: a real Canvas (menu, HUD, joystick) with buttons that switch panels on and off.
+            UiBuilder.Build(menu, hud, controls);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };

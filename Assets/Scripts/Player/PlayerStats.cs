@@ -6,11 +6,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The synchronized state of one player: health, score, kills, deaths, alive/dead and which
-    /// colour slot (0 = blue, 1 = red) they were given. Only the server changes these
-    /// NetworkVariables; every client can read them to draw the HUD.
-    /// </summary>
+    
     public class PlayerStats : NetworkBehaviour
     {
         public static readonly List<PlayerStats> All = new List<PlayerStats>();

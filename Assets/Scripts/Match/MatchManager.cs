@@ -5,17 +5,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The referee. Spawned by the server when the host starts, it runs the 6 minute match:
-    /// Lobby -> Countdown -> Playing (Spring, Fall, Winter, 2 minutes each) -> Finished.
-    ///
-    /// What is synchronized (NetworkVariables, server-writable, readable by everyone):
-    ///   Phase, SeasonIndex, PhaseEndTime, WinnerSlot
-    /// What the server tells clients to react to (RPCs):
-    ///   SeasonChangedClientRpc, ScorePopupClientRpc, MatchFinishedClientRpc
-    /// What the server spawns / despawns over the network:
-    ///   enemies (see <see cref="Enemy"/>)
-    /// </summary>
+
     public class MatchManager : NetworkBehaviour
     {
         public static MatchManager Instance { get; private set; }
@@ -25,13 +15,22 @@ namespace SeasonRush
 
         public readonly NetworkVariable<MatchPhase> Phase = new NetworkVariable<MatchPhase>(MatchPhase.Lobby);
         public readonly NetworkVariable<int> SeasonIndex = new NetworkVariable<int>(0);
-        /// <summary>Server time at which the current phase ends. Clients derive the countdown from it.</summary>
         public readonly NetworkVariable<double> PhaseEndTime = new NetworkVariable<double>(0d);
         public readonly NetworkVariable<int> WinnerSlot = new NetworkVariable<int>(-1);
 
-        /// <summary>Raised on every peer when a new season begins (used for the big banner).</summary>
+        /// <summary>True while the game is frozen by a player's PAUSE (the match clock, the enemies, both warriors).</summary>
+        public readonly NetworkVariable<bool> Paused = new NetworkVariable<bool>(false);
+        public readonly NetworkVariable<int> PausedBySlot = new NetworkVariable<int>(-1);
+        /// <summary>Server time at which the pause started (so everybody can show how long it will last).</summary>
+        public readonly NetworkVariable<double> PausedAt = new NetworkVariable<double>(0d);
+        /// <summary>The match time that was left when the pause started (shown while frozen).</summary>
+        public readonly NetworkVariable<float> PausedRemaining = new NetworkVariable<float>(0f);
+        /// <summary>Slot of the player who gave up (-1 = nobody). The other player wins.</summary>
+        public readonly NetworkVariable<int> SurrenderSlot = new NetworkVariable<int>(-1);
+
+        /// <summary>A pause ends by itself after this many seconds, so a player cannot freeze the rival's game forever.</summary>
+        public const float MaxPauseSeconds = 60f;
         public event Action<int> SeasonChanged;
-        /// <summary>Raised on every peer when the match is over (argument = winning slot, -1 = draw).</summary>
         public event Action<int> MatchFinished;
 
         float _nextEnemySpawn;
@@ -41,6 +40,7 @@ namespace SeasonRush
             get
             {
                 if (NetworkManager == null || !NetworkManager.IsListening) return 0f;
+                if (Paused.Value) return PausedRemaining.Value;
                 return Mathf.Max(0f, (float)(PhaseEndTime.Value - NetworkManager.ServerTime.Time));
             }
         }
@@ -64,7 +64,6 @@ namespace SeasonRush
 
         void OnSeasonIndexChanged(int previous, int current)
         {
-            // every peer swaps the map and the sky when the networked season changes
             if (MapManager.Instance != null) MapManager.Instance.ShowSeason(current);
         }
 
@@ -75,6 +74,17 @@ namespace SeasonRush
             if (!IsServer) return;
 
             double now = NetworkManager.ServerTime.Time;
+
+            if (Paused.Value)
+            {
+                // nothing moves, the clocks do not run; it ends when the player resumes, leaves, or after MaxPauseSeconds
+                bool pauserHere = false;
+                foreach (PlayerStats p in PlayerStats.All) if (p.Slot.Value == PausedBySlot.Value) pauserHere = true;
+                bool inMatch = Phase.Value == MatchPhase.Countdown || Phase.Value == MatchPhase.Playing;
+                if (!pauserHere || !inMatch || now - PausedAt.Value > MaxPauseSeconds) ServerResume();
+                return;
+            }
+
             switch (Phase.Value)
             {
                 case MatchPhase.Lobby:
@@ -100,7 +110,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>Starts the 3-2-1 countdown. Called automatically with 2 players, or by the host for solo practice.</summary>
         public void ServerBeginCountdown()
         {
             if (!IsServer || Phase.Value != MatchPhase.Lobby) return;
@@ -108,6 +117,8 @@ namespace SeasonRush
             ClearEnemies();
             SeasonIndex.Value = 0;
             WinnerSlot.Value = -1;
+            SurrenderSlot.Value = -1;
+            Paused.Value = false;
             foreach (PlayerStats p in PlayerStats.All) p.ServerResetForMatch();
 
             PhaseEndTime.Value = NetworkManager.ServerTime.Time + GameConfig.CountdownSeconds;
@@ -128,11 +139,74 @@ namespace SeasonRush
             SeasonChangedClientRpc(season);
         }
 
-        void ServerFinishMatch()
+        // ------------------------------------------------------------------ pause and surrender
+
+        /// <summary>Freezes (true) or unfreezes (false) the game for everybody. Only the player who paused can resume.</summary>
+        public void RequestPause(bool pause) => SetPausedServerRpc(pause);
+
+        /// <summary>Gives up: the rival wins the match.</summary>
+        public void RequestSurrender() => SurrenderServerRpc();
+
+        PlayerStats PlayerOf(ulong clientId)
+        {
+            foreach (PlayerStats p in PlayerStats.All) if (p.OwnerClientId == clientId) return p;
+            return null;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        void SetPausedServerRpc(bool pause, ServerRpcParams rpcParams = default)
+        {
+            PlayerStats who = PlayerOf(rpcParams.Receive.SenderClientId);
+            if (who == null) return;
+            if (pause)
+            {
+                bool inMatch = Phase.Value == MatchPhase.Countdown || Phase.Value == MatchPhase.Playing;
+                if (!inMatch || Paused.Value) return;
+                PausedAt.Value = NetworkManager.ServerTime.Time;
+                PausedRemaining.Value = TimeRemaining;
+                PausedBySlot.Value = who.Slot.Value;
+                Paused.Value = true;
+            }
+            else if (Paused.Value && PausedBySlot.Value == who.Slot.Value)
+            {
+                ServerResume();
+            }
+        }
+
+        /// <summary>Ends the pause and moves every running clock forward by the time that was frozen.</summary>
+        void ServerResume()
+        {
+            if (!IsServer || !Paused.Value) return;
+            double frozen = NetworkManager.ServerTime.Time - PausedAt.Value;
+            if (Phase.Value == MatchPhase.Countdown || Phase.Value == MatchPhase.Playing) PhaseEndTime.Value += frozen;
+            foreach (PlayerStats p in PlayerStats.All)
+                if (p.IsDead.Value) p.RespawnAt.Value += frozen;
+            _nextEnemySpawn += (float)frozen;
+            Paused.Value = false;
+            PausedBySlot.Value = -1;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        void SurrenderServerRpc(ServerRpcParams rpcParams = default)
+        {
+            PlayerStats who = PlayerOf(rpcParams.Receive.SenderClientId);
+            if (who == null) return;
+            if (Phase.Value != MatchPhase.Countdown && Phase.Value != MatchPhase.Playing) return;
+
+            int rival = -1;
+            foreach (PlayerStats p in PlayerStats.All) if (p != who) rival = p.Slot.Value;
+            if (rival < 0) { ServerFinishMatch(); return; }          // nobody to win: just end it
+
+            SurrenderSlot.Value = who.Slot.Value;
+            ServerFinishMatch(rival);
+        }
+
+        void ServerFinishMatch(int forcedWinner = -2)
         {
             ClearEnemies();
+            Paused.Value = false;
+            PausedBySlot.Value = -1;
 
-            // higher score wins, tie-break: fewer deaths, otherwise it is a draw
             int winner = -1;
             PlayerStats best = null;
             bool tie = false;
@@ -140,11 +214,12 @@ namespace SeasonRush
             {
                 if (best == null) { best = p; continue; }
                 int cmp = p.Score.Value.CompareTo(best.Score.Value);
-                if (cmp == 0) cmp = best.Deaths.Value.CompareTo(p.Deaths.Value);   // fewer deaths is better
+                if (cmp == 0) cmp = best.Deaths.Value.CompareTo(p.Deaths.Value);  
                 if (cmp > 0) { best = p; tie = false; }
                 else if (cmp == 0) tie = true;
             }
             if (best != null && !tie) winner = best.Slot.Value;
+            if (forcedWinner != -2) winner = forcedWinner;           // the rival gave up
 
             WinnerSlot.Value = winner;
             Phase.Value = MatchPhase.Finished;
@@ -152,10 +227,6 @@ namespace SeasonRush
             ReportToDatabase(winner);
         }
 
-        /// <summary>
-        /// The host stores the finished match in SpacetimeDB (result history + both players' lifetime stats).
-        /// Only done for a real two-player match where both players have a database identity.
-        /// </summary>
         void ReportToDatabase(int winner)
         {
             SpacetimeManager db = SpacetimeManager.Instance;
@@ -167,7 +238,7 @@ namespace SeasonRush
                 if (p.Slot.Value == 0) blue = p;
                 else if (p.Slot.Value == 1) red = p;
             }
-            if (blue == null || red == null) return;                       // solo practice: nothing to store
+            if (blue == null || red == null) return;                       
 
             string blueId = blue.SdbIdentity.Value.ToString();
             string redId = red.SdbIdentity.Value.ToString();
@@ -179,16 +250,15 @@ namespace SeasonRush
             Debug.Log($"[DB] reported match {(code.Length > 0 ? code : "(no code)")}: blue {blue.Score.Value} vs red {red.Score.Value}, winner slot {winner}");
         }
 
-        /// <summary>Host presses "Rematch": back to the lobby (which immediately restarts with two players).</summary>
         public void ServerRematch()
         {
             if (!IsServer || Phase.Value != MatchPhase.Finished) return;
             ClearEnemies();
+            SurrenderSlot.Value = -1;
             Phase.Value = MatchPhase.Lobby;
         }
 
-        // ------------------------------------------------------------------ enemies (server only)
-
+        
         void TickEnemySpawner()
         {
             if (enemyPrefab == null || Time.time < _nextEnemySpawn) return;
@@ -208,7 +278,7 @@ namespace SeasonRush
             Vector2 spot = MapManager.Instance.PickEnemySpawn(season, playerPositions) + UnityEngine.Random.insideUnitCircle * 0.5f;
             GameObject go = Instantiate(enemyPrefab, new Vector3(spot.x, spot.y, 0f), Quaternion.identity);
             go.GetComponent<Enemy>().PendingTypeId = season * 3 + tier;
-            go.GetComponent<NetworkObject>().Spawn(true);     // creates it on every client
+            go.GetComponent<NetworkObject>().Spawn(true);    
         }
 
         static int PickTier(SeasonTheme theme)
@@ -244,7 +314,6 @@ namespace SeasonRush
             }
         }
 
-        // ------------------------------------------------------------------ server -> client events
 
         [ClientRpc]
         void SeasonChangedClientRpc(int season)

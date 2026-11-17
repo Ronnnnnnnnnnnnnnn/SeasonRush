@@ -4,14 +4,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// A season monster. Enemies are spawned and despawned by the server only. The server runs their
-    /// AI and replicates the position with a server-authority NetworkTransform; health is a
-    /// NetworkVariable so every client can draw the health bar.
-    ///
-    /// TypeId encodes which monster this is: season * 3 + tier (weak / medium / strong). Both the
-    /// server and the clients look the stats and sprite up in the matching <see cref="SeasonTheme"/>.
-    /// </summary>
+   
     public class Enemy : NetworkBehaviour
     {
         public static readonly List<Enemy> All = new List<Enemy>();
@@ -25,6 +18,14 @@ namespace SeasonRush
 
         /// <summary>Set by the spawner on the server before Spawn() is called.</summary>
         [System.NonSerialized] public int PendingTypeId;
+
+        // an animated enemy prefab (EnemyDef.visualPrefab) is placed under "visual" and replaces the single picture
+        GameObject _prefabInstance, _prefabSource;
+        SpriteRenderer _prefabBody;
+        Animator _animator;
+        bool _hasMovingParam, _hasAttackParam;
+        static readonly int MovingHash = Animator.StringToHash("IsMoving");
+        static readonly int AttackHash = Animator.StringToHash("Attack");
 
         EnemyDef _def;
         Rigidbody2D _rb;
@@ -44,6 +45,9 @@ namespace SeasonRush
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         static void ResetStatics() => All.Clear();
+
+        /// <summary>The renderer that shows the enemy: the animated prefab's picture, or the single picture of the prefab.</summary>
+        SpriteRenderer Body => _prefabBody != null ? _prefabBody : body;
 
         public EnemyDef Def => _def;
         public Vector2 PlanePosition => transform.position;
@@ -92,11 +96,39 @@ namespace SeasonRush
             _def = MapManager.Instance.Theme(season).GetEnemy(tier);
             if (_def == null) return;
 
-            body.sprite = _def.sprite;
-            body.color = _def.tint;
+            UseVisualPrefab(_def.visualPrefab);
+            if (_prefabBody == null) body.sprite = _def.sprite;
+            Body.color = _def.tint;
             visual.localScale = Vector3.one * _def.scale;
             if (_collider != null) _collider.radius = _def.radius * 0.8f;
             gameObject.name = $"Enemy_{_def.displayName}";
+        }
+
+        void UseVisualPrefab(GameObject prefab)
+        {
+            if (prefab == _prefabSource && (prefab == null || _prefabInstance != null)) return;
+            if (_prefabInstance != null) Destroy(_prefabInstance);
+            _prefabInstance = null;
+            _prefabSource = prefab;
+            _prefabBody = null;
+            _animator = null;
+            _hasMovingParam = _hasAttackParam = false;
+            body.enabled = true;
+            if (prefab == null) return;
+
+            _prefabInstance = Instantiate(prefab, visual);
+            _prefabInstance.name = prefab.name;
+            _prefabInstance.transform.localPosition = Vector3.zero;     // the prefab was made somewhere else in the scene
+            _prefabInstance.transform.localRotation = Quaternion.identity;
+            _prefabBody = _prefabInstance.GetComponentInChildren<SpriteRenderer>();
+            _animator = _prefabInstance.GetComponentInChildren<Animator>();
+            if (_prefabBody != null) body.enabled = false;
+            if (_animator != null)
+                foreach (AnimatorControllerParameter p in _animator.parameters)
+                {
+                    if (p.nameHash == MovingHash && p.type == AnimatorControllerParameterType.Bool) _hasMovingParam = true;
+                    if (p.nameHash == AttackHash && p.type == AnimatorControllerParameterType.Trigger) _hasAttackParam = true;
+                }
         }
 
         // ------------------------------------------------------------------ server AI
@@ -104,6 +136,13 @@ namespace SeasonRush
         void FixedUpdate()
         {
             if (!IsServer || _def == null) return;
+
+            if (MatchManager.Instance != null && MatchManager.Instance.Paused.Value)
+            {
+                _rb.linearVelocity = Vector2.zero;                          // the game is paused: everything stands still
+                _nextHit = Mathf.Max(_nextHit, Time.time + 0.4f);           // and nobody hits the moment it resumes
+                return;
+            }
 
             if (_dying)
             {
@@ -137,6 +176,7 @@ namespace SeasonRush
                     if (Time.time >= _nextHit)
                     {
                         _nextHit = Time.time + 1.1f;
+                        AttackClientRpc();
                         target.ServerTakeDamage(_def.contactDamage);
                     }
                 }
@@ -197,6 +237,7 @@ namespace SeasonRush
             if (Health.Value <= 0)
             {
                 _dying = true;
+                DieClientRpc();                   // everyone shows the death animation (if the enemy has one) before it is removed
                 if (MatchManager.Instance != null)
                     MatchManager.Instance.ServerAwardKill(attackerClientId, _def.points, PlanePosition, _def.displayName);
                 NetworkObject.Despawn(true);      // removes it on the server and on every client
@@ -210,11 +251,25 @@ namespace SeasonRush
         [ClientRpc]
         void HitClientRpc() => _flashUntil = Time.time + 0.12f;
 
+        [ClientRpc]
+        void AttackClientRpc()
+        {
+            if (_animator != null && _hasAttackParam) _animator.SetTrigger(AttackHash);
+        }
+
+        [ClientRpc]
+        void DieClientRpc()
+        {
+            if (_def == null || _def.visualPrefab == null || _prefabBody == null) return;
+            EnemyDeathFx.Play(_def.visualPrefab, visual.position, visual.localScale, _prefabBody.flipX, _prefabBody.sortingOrder, _def.tint);
+        }
+
         // ------------------------------------------------------------------ drawing (all peers)
 
         void LateUpdate()
         {
             if (visual == null || body == null) return;
+            SpriteRenderer shown = Body;
 
             Vector2 plane = transform.position;
             Vector3 screen = Iso.ToScreen3(plane);
@@ -225,25 +280,31 @@ namespace SeasonRush
             if (Mathf.Abs(screenDx) > 0.0005f) _facingSign = screenDx >= 0f ? 1f : -1f;
 
             Sprite[] frames = _def != null ? _def.frames : null;
-            if (frames != null && frames.Length >= 2)
+            bool paused = GameHud.Paused;
+            if (_animator != null) _animator.speed = paused ? 0f : 1f;
+            // the artist's animated prefab plays by itself, the game only tells it whether the enemy is moving
+            if (_animator != null && _hasMovingParam) _animator.SetBool(MovingHash, delta.sqrMagnitude > 0.00002f);
+
+            bool pictureFrames = frames != null && frames.Length >= 2;
+            if (_animator == null && pictureFrames)
             {
                 // the artist's own animation (for example a cloud floating up and down); every enemy starts at a different moment
                 int index = Mathf.FloorToInt(Time.time * Mathf.Max(0.1f, _def.frameRate) + (GetInstanceID() & 3) * 0.37f) % frames.Length;
-                if (frames[index] != null) body.sprite = frames[index];
+                if (frames[index] != null) shown.sprite = frames[index];
             }
-            else
+            if (!pictureFrames)
             {
-                // little hover/hop so the monsters feel alive without a full animation set
-                _bobPhase += Time.deltaTime * 6f;
+                // little hover/hop so the monsters feel alive (the walk pictures differ only slightly)
+                if (!paused) _bobPhase += Time.deltaTime * 6f;
                 screen.y += Mathf.Abs(Mathf.Sin(_bobPhase + GetInstanceID())) * 0.08f;
             }
 
             visual.position = screen;
-            body.flipX = _facingSign < 0f;
-            body.sortingOrder = Iso.SortOrder(plane, 3);
+            shown.flipX = _facingSign < 0f;
+            shown.sortingOrder = Iso.SortOrder(plane, 3);
 
             Color baseColour = _def != null ? _def.tint : Color.white;
-            body.color = Time.time < _flashUntil ? Color.Lerp(baseColour, Color.white, 0.8f) : baseColour;
+            shown.color = Time.time < _flashUntil ? Color.Lerp(baseColour, Color.white, 0.8f) : baseColour;
         }
     }
 }

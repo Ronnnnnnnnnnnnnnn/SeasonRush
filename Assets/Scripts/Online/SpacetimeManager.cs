@@ -7,17 +7,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The game's connection to the SpacetimeDB database (see spacetimedb/Lib.cs for the tables and reducers).
-    ///
-    /// It keeps a local copy of the data the UI needs (this player's profile, the leaderboard, recent matches, the
-    /// matchmaking queue, the pairing for this player) and offers a few simple calls:
-    /// SetName, JoinQueue, LeaveQueue, PublishHostAddress, ReportMatch.
-    ///
-    /// Only this class touches the generated SpacetimeDB.Types; everything else uses the plain classes in
-    /// SpacetimeData.cs. If no database is configured (SpacetimeSettings.Enabled is false) it does nothing and the
-    /// game works exactly as before.
-    /// </summary>
+    
     public class SpacetimeManager : MonoBehaviour
     {
         public enum ConnState { Disabled, Connecting, Connected, Failed }

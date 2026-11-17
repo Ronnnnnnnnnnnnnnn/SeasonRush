@@ -5,17 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Movement and presentation of the warrior.
-    ///
-    /// Networking model: each player OWNS their warrior. The owner reads the keyboard and moves their
-    /// own Rigidbody2D; the NetworkTransform (set to Owner authority) replicates the position to
-    /// everyone else, where a NetworkRigidbody2D keeps the body kinematic so remote copies just
-    /// follow the interpolated network position.
-    ///
-    /// The transform of this object is on the flat gameplay plane. The drawn sprite (the child
-    /// "Visual") is projected to the isometric screen position every frame.
-    /// </summary>
+    
     [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerController : NetworkBehaviour
     {
@@ -39,6 +29,18 @@ namespace SeasonRush
         float _flashUntil;
         float _bobPhase;
         bool _hasSkin;                    // true while the body shows a PlayerSkins picture instead of the placeholder
+
+        // an animated character prefab (PlayerSkins.slotPrefabs) is placed under "visual" and replaces the placeholder body
+        GameObject _skinInstance, _skinSource;
+        SpriteRenderer _skinBody;
+        Animator _animator;
+        bool _hasMovingParam, _hasAttackParam, _hasDeadParam;
+        static readonly int DeadHash = Animator.StringToHash("IsDead");
+        static readonly int MovingHash = Animator.StringToHash("IsMoving");
+        static readonly int AttackHash = Animator.StringToHash("Attack");
+
+        /// <summary>The renderer that shows the warrior: the animated prefab's picture, or the placeholder body.</summary>
+        SpriteRenderer Body => _skinBody != null ? _skinBody : body;
 
         public Vector2 Facing => _facing.Value.sqrMagnitude > 0.01f ? _facing.Value.normalized : Vector2.right;
         public Vector2 PlanePosition => transform.position;
@@ -76,9 +78,17 @@ namespace SeasonRush
         {
             // Player 1 / player 2 have their own full-colour pictures (PlayerSkins). Without one the placeholder
             // warrior is kept: a grey body with a tunic that is tinted in the player's colour.
+            GameObject skinPrefab = slot >= 0 ? PlayerSkins.PrefabFor(slot) : null;
+            UseSkinPrefab(skinPrefab);
+
             Sprite skin = slot >= 0 ? PlayerSkins.For(slot) : null;
-            _hasSkin = skin != null && body != null;
-            if (_hasSkin)
+            _hasSkin = skinPrefab != null || (skin != null && body != null);
+            if (skinPrefab != null)
+            {
+                if (body != null) body.enabled = false;
+                if (tunic != null) tunic.gameObject.SetActive(false);
+            }
+            else if (_hasSkin)
             {
                 body.sprite = skin;
                 if (tunic != null) tunic.gameObject.SetActive(false);
@@ -88,6 +98,40 @@ namespace SeasonRush
                 tunic.color = GameConfig.SlotColor(slot);
             }
             gameObject.name = slot >= 0 ? $"Player_{GameConfig.SlotName(slot)}" : "Player";
+        }
+
+        /// <summary>Puts the animated character prefab under "visual" (or removes it when there is none for this slot).</summary>
+        void UseSkinPrefab(GameObject prefab)
+        {
+            if (prefab == _skinSource && (prefab == null || _skinInstance != null)) return;
+            if (_skinInstance != null) Destroy(_skinInstance);
+            _skinInstance = null;
+            _skinSource = prefab;
+            _skinBody = null;
+            _animator = null;
+            _hasMovingParam = _hasAttackParam = _hasDeadParam = false;
+            if (body != null) body.enabled = true;
+            if (prefab == null || visual == null) return;
+
+            _skinInstance = Instantiate(prefab, visual);
+            _skinInstance.name = prefab.name;
+            _skinInstance.transform.localPosition = Vector3.zero;       // the prefab was made somewhere else in the scene
+            _skinInstance.transform.localRotation = Quaternion.identity;
+            _skinBody = _skinInstance.GetComponentInChildren<SpriteRenderer>();
+            _animator = _skinInstance.GetComponentInChildren<Animator>();
+            if (_animator != null)
+                foreach (AnimatorControllerParameter p in _animator.parameters)
+                {
+                    if (p.nameHash == MovingHash && p.type == AnimatorControllerParameterType.Bool) _hasMovingParam = true;
+                    if (p.nameHash == AttackHash && p.type == AnimatorControllerParameterType.Trigger) _hasAttackParam = true;
+                    if (p.nameHash == DeadHash && p.type == AnimatorControllerParameterType.Bool) _hasDeadParam = true;
+                }
+        }
+
+        /// <summary>Plays the attack animation (all peers).</summary>
+        public void PlayAttack()
+        {
+            if (_animator != null && _hasAttackParam) _animator.SetTrigger(AttackHash);
         }
 
         // ------------------------------------------------------------------ input (owner only)
@@ -135,9 +179,9 @@ namespace SeasonRush
         {
             if (!IsOwner) return;
 
-            if (_stats.IsDead.Value)
+            if (_stats.IsDead.Value || GameHud.Paused)
             {
-                _rb.linearVelocity = Vector2.zero;
+                _rb.linearVelocity = Vector2.zero;                          // dead, or the game is paused
                 return;
             }
 
@@ -158,24 +202,29 @@ namespace SeasonRush
             _lastPlane = plane;
             if (speed > 0.6f) _bobPhase += Time.deltaTime * 14f;
             else _bobPhase = 0f;
-            screen.y += Mathf.Abs(Mathf.Sin(_bobPhase)) * 0.07f;
+            screen.y += Mathf.Abs(Mathf.Sin(_bobPhase)) * 0.07f;      // a little hop while walking (the walk pictures differ only slightly)
+            if (_animator != null) _animator.speed = GameHud.Paused ? 0f : 1f;
+            if (_animator != null && _hasMovingParam) _animator.SetBool(MovingHash, speed > 0.6f && !_stats.IsDead.Value);
 
             visual.position = screen;
 
             int order = Iso.SortOrder(plane, 5);
-            body.sortingOrder = order;
-            tunic.sortingOrder = order + 1;
+            SpriteRenderer shown = Body;
+            shown.sortingOrder = order;
+            if (_skinBody == null) tunic.sortingOrder = order + 1;
 
             bool facingLeft = Iso.ToScreen(Facing).x < 0f;
             // The knight pictures look to the left (sword on the left): mirror them when the player walks to the right.
-            body.flipX = _hasSkin && PlayerSkins.ArtFacesLeft ? !facingLeft : facingLeft;
+            shown.flipX = _hasSkin && PlayerSkins.ArtFacesLeft ? !facingLeft : facingLeft;
             tunic.flipX = facingLeft;
 
             bool dead = _stats.IsDead.Value;
-            body.enabled = !dead;
-            tunic.enabled = !dead;
+            if (_animator != null && _hasDeadParam) _animator.SetBool(DeadHash, dead);
+            // with a death animation the warrior stays on screen, lying down, until the respawn; without one it just disappears
+            shown.enabled = !dead || (_animator != null && _hasDeadParam);
+            if (_skinBody == null) tunic.enabled = !dead;
 
-            body.color = Time.time < _flashUntil ? new Color(1f, 0.45f, 0.45f) : Color.white;
+            shown.color = Time.time < _flashUntil ? new Color(1f, 0.45f, 0.45f) : Color.white;
         }
 
         public void FlashHit() => _flashUntil = Time.time + 0.18f;

@@ -7,19 +7,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Test helper, only active when the game is started with -autotest. In a normal game it does
-    /// nothing at all: warriors are controlled by the keyboard only.
-    ///
-    /// With -autotest it writes a status line to the log every couple of seconds, saves screenshots,
-    /// and quits after a while, so a Host and a Client can be verified by running two copies of the
-    /// game and comparing their logs. Two optional ways to produce input:
-    ///   -bot       a simple bot chases the nearest enemy and swings (no keyboard involved)
-    ///   -simkeys   presses real keys through Unity's Input System (the same Keyboard.current the
-    ///              game reads): D, W, A, S to walk in each direction, then taps Space to attack
-    ///
-    /// Options:  -autotest  -solo  -bot  -simkeys  -quitAfter 60  -shotEvery 8  -outDir path  -tag host
-    /// </summary>
+   
     public class AutomatedTestDriver : MonoBehaviour
     {
         bool _bot;
@@ -41,7 +29,8 @@ namespace SeasonRush
         float _finishedAt = -1f;
         bool _backPressed;
         float _playingAt = -1f;
-        bool _pauseOpened, _quitPressed, _lobbyBackPressed;
+        bool _pauseOpened, _quitPressed, _lobbyBackPressed, _pauseLogged, _surrendered;
+        float _pausedRemaining;
 
         void Start()
         {
@@ -87,21 +76,35 @@ namespace SeasonRush
                 }
             }
 
-            // test of the pause screen: open it 3 s into the match, press QUIT TO MENU 7 s into the match
+            // test of PAUSE: pause 3 s into the match, check that the match clock stands still, resume at 7 s; -surrenderTest then surrenders at 9 s
             if (GameConfig.HasFlag("-pauseTest") && MatchManager.Instance != null && MatchManager.Instance.Phase.Value == MatchPhase.Playing)
             {
                 if (_playingAt < 0f) _playingAt = _time;
-                if (!_pauseOpened && _time - _playingAt > 3f)
+                float t = _time - _playingAt;
+                MatchManager mm = MatchManager.Instance;
+                if (!_pauseOpened && t > 3f)
                 {
                     _pauseOpened = true;
+                    _pausedRemaining = mm.TimeRemaining;
                     GameHud.SetPaused(true);
-                    Debug.Log("[TEST] pause screen opened, Paused=" + GameHud.Paused);
+                    Debug.Log($"[TEST] pause requested, match time left {_pausedRemaining:0.0}");
                 }
-                else if (_pauseOpened && !_quitPressed && _time - _playingAt > 7f)
+                else if (_pauseOpened && !_pauseLogged && t > 5f)
+                {
+                    _pauseLogged = true;
+                    Debug.Log($"[TEST] 2 s after PAUSE: Paused={GameHud.Paused} byMe={GameHud.PausedByMe} match time left {mm.TimeRemaining:0.0} (was {_pausedRemaining:0.0}) enemies={Enemy.All.Count}");
+                }
+                else if (_pauseLogged && !_quitPressed && t > 7f)
                 {
                     _quitPressed = true;
-                    Debug.Log("[TEST] pressing QUIT TO MENU on the pause screen");
-                    GameHud.LeaveToMenu();
+                    GameHud.SetPaused(false);
+                    Debug.Log("[TEST] resume requested");
+                }
+                else if (_quitPressed && !_surrendered && t > 9.5f)
+                {
+                    Debug.Log($"[TEST] after RESUME: Paused={GameHud.Paused} match time left {mm.TimeRemaining:0.0}");
+                    _surrendered = true;
+                    if (GameConfig.HasFlag("-surrenderTest")) { Debug.Log("[TEST] surrendering"); mm.RequestSurrender(); }
                 }
             }
 

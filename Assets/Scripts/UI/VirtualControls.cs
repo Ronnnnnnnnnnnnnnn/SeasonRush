@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace SeasonRush
 {
@@ -45,7 +46,15 @@ namespace SeasonRush
         Vector2 _stickCentrePx;
         Vector2 _knob;                     // -1..1, y up
         bool _visible;
-        Texture2D _disc, _ring;
+
+        [Header("Canvas (made by Season Rush > Create UI Canvas In Scene)")]
+        [Tooltip("Switched on while the controls are shown (in a match).")]
+        public GameObject controlsRoot;
+        public Image stickRing;
+        public Image stickKnob;
+        public Image attackDisc;
+        public Image attackRing;
+        public Text attackLabel;
 
         void Awake() => Instance = this;
 
@@ -92,6 +101,7 @@ namespace SeasonRush
         void Update()
         {
             _visible = GameConfig.ShowOnScreenControls && InMatch();
+            if (controlsRoot != null && controlsRoot.activeSelf != _visible) controlsRoot.SetActive(_visible);
             if (!_visible)
             {
                 ResetState();
@@ -142,6 +152,7 @@ namespace SeasonRush
             float magnitude = _knob.magnitude;
             Move = magnitude < DeadZone ? Vector2.zero : _knob.normalized * Mathf.InverseLerp(DeadZone, 1f, magnitude);
             AttackHeld = _attackPointer != None;
+            UpdateVisuals();
         }
 
         void ResetState()
@@ -189,65 +200,35 @@ namespace SeasonRush
             }
         }
 
-        // ---- drawing ----------------------------------------------------------------------------
+        // ---- drawing (the pictures are real objects of the UI canvas: Hierarchy > UI > Controls) -----------------
 
-        void OnGUI()
+        void UpdateVisuals()
         {
-            if (!_visible || Event.current.type != EventType.Repaint) return;
-            EnsureTextures();
-
-            float s = Scale;
-            GUI.matrix = Matrix4x4.Scale(new Vector3(s, s, 1f));
-            GUI.depth = -100;
+            if (controlsRoot == null) return;
 
             // joystick
             bool stickActive = _stickPointer != None;
             Vector2 centre = stickActive ? PixelToGui(_stickCentrePx) : IdleStickCentreGui;
-            Disc(_ring, centre, StickRadius, new Color(1f, 1f, 1f, stickActive ? 0.55f : 0.28f));
+            Place(stickRing, centre, StickRadius, new Color(1f, 1f, 1f, stickActive ? 0.55f : 0.28f));
             Vector2 knob = centre + new Vector2(_knob.x, -_knob.y) * StickRadius;
-            Disc(_disc, knob, KnobRadius, new Color(1f, 1f, 1f, stickActive ? 0.7f : 0.32f));
+            Place(stickKnob, knob, KnobRadius, new Color(1f, 1f, 1f, stickActive ? 0.7f : 0.32f));
 
             // attack button
             bool pressed = _attackPointer != None || (Keyboard.current != null && Keyboard.current.spaceKey.isPressed);
             Vector2 a = AttackCentreGui;
-            Disc(_disc, a, AttackRadius, pressed ? new Color(1f, 0.55f, 0.35f, 0.85f) : new Color(1f, 0.35f, 0.25f, 0.45f));
-            Disc(_ring, a, AttackRadius, new Color(1f, 1f, 1f, 0.6f));
-            var style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 30, fontStyle = FontStyle.Bold };
-            style.normal.textColor = new Color(1f, 1f, 1f, pressed ? 1f : 0.85f);
-            GUI.Label(new Rect(a.x - AttackRadius, a.y - 24f, AttackRadius * 2f, 48f), "ATTACK", style);
+            Place(attackDisc, a, AttackRadius, pressed ? new Color(1f, 0.55f, 0.35f, 0.85f) : new Color(1f, 0.35f, 0.25f, 0.45f));
+            Place(attackRing, a, AttackRadius, new Color(1f, 1f, 1f, 0.6f));
+            if (attackLabel != null) attackLabel.color = new Color(1f, 1f, 1f, pressed ? 1f : 0.85f);
         }
 
-        static void Disc(Texture2D texture, Vector2 centre, float radius, Color colour)
+        /// <summary>Puts a round picture at a position given in virtual GUI units (origin top-left, y down = canvas units).</summary>
+        static void Place(Image image, Vector2 centre, float radius, Color colour)
         {
-            GUI.DrawTexture(new Rect(centre.x - radius, centre.y - radius, radius * 2f, radius * 2f),
-                texture, ScaleMode.StretchToFill, true, 0f, colour, 0f, 0f);
-        }
-
-        void EnsureTextures()
-        {
-            if (_disc != null) return;
-            _disc = MakeCircleTexture(filled: true);
-            _ring = MakeCircleTexture(filled: false);
-        }
-
-        static Texture2D MakeCircleTexture(bool filled)
-        {
-            const int size = 128;
-            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
-            var px = new Color32[size * size];
-            float c = (size - 1) * 0.5f;
-            for (int y = 0; y < size; y++)
-                for (int x = 0; x < size; x++)
-                {
-                    float d = Mathf.Sqrt((x - c) * (x - c) + (y - c) * (y - c)) / c;       // 0 centre .. 1 edge
-                    float alpha = filled
-                        ? Mathf.Clamp01((1f - d) * 18f)                                     // soft edge
-                        : Mathf.Clamp01(1f - Mathf.Abs(d - 0.93f) / 0.06f);                 // thin ring
-                    px[y * size + x] = new Color32(255, 255, 255, (byte)(alpha * 255f));
-                }
-            tex.SetPixels32(px);
-            tex.Apply();
-            return tex;
+            if (image == null) return;
+            RectTransform rt = image.rectTransform;
+            rt.anchoredPosition = new Vector2(centre.x, -centre.y);
+            rt.sizeDelta = new Vector2(radius * 2f, radius * 2f);
+            image.color = colour;
         }
     }
 }

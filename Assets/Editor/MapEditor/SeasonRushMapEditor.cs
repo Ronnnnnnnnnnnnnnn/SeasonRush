@@ -209,6 +209,7 @@ namespace SeasonRush.EditorTools
             if (EditorGUI.EndChangeCheck()) { SyncPreview(); if (_show) FrameMap(); }
 
             if (GUILayout.Button("Frame the map in the Scene view")) FrameMap();
+            if (GUILayout.Button("Update the maps in the scene (Environment > Maps)")) { string message = SceneBaker.UpdateMapsInOpenScene(); Debug.Log("[Map Editor] " + message.Replace("\n\n", " ")); }
 
             _mirror = EditorGUILayout.ToggleLeft("Keep the mirror twin in step (fair for both players)", _mirror);
 

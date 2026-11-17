@@ -12,24 +12,7 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// Random online matchmaking for two players.
-    ///
-    /// WHO plays WHOM is decided by the SpacetimeDB database (see <see cref="SpacetimeManager"/>):
-    ///   1. FIND MATCH puts the player in the database queue.
-    ///   2. As soon as a second player joins, the database pairs the two. The one who waited longest is the Host.
-    ///   3. Both players now connect their Netcode game:
-    ///        * Unity Relay (when the project is linked to Unity Cloud): works across the internet, no ports to open.
-    ///        * a direct connection to the host's address (otherwise, or with -direct): works on the same network.
-    ///   4. When two players are connected the normal Season Rush match starts by itself.
-    ///
-    /// If the database is not configured or cannot be reached, the older Unity-only quick join is used instead,
-    /// so FIND MATCH still works once Unity Cloud is set up.
-    ///
-    /// The Multiplayer Services package starts the Netcode NetworkManager (host or client) when a Relay session
-    /// is created or joined. See docs/SpacetimeDB_Setup.md and docs/Online_Matchmaking_Setup.md.
-    /// </summary>
-    public class OnlineMatchmaker : MonoBehaviour
+        public class OnlineMatchmaker : MonoBehaviour
     {
         public enum State { Idle, Searching, WaitingForRival, Matched, Failed }
 
@@ -197,7 +180,7 @@ namespace SeasonRush
         /// <summary>Direct connection: the host listens, publishes its address in the database, the guest connects to it.</summary>
         async Task ConnectDirectAsync(SpacetimeManager db, PairingInfo pairing, CancellationToken token)
         {
-            ConnectionMenu menu = GetComponent<ConnectionMenu>();
+            ConnectionMenu menu = ConnectionMenu.Instance;
             if (menu == null) throw new Exception("No connection menu in the scene.");
             ushort port = GameConfig.DefaultPort;
 
@@ -254,8 +237,7 @@ namespace SeasonRush
             return "127.0.0.1";
         }
 
-        // ------------------------------------------------------------------ Unity-only quick join (fallback)
-
+       
         async Task RunUnityQuickJoinAsync(CancellationToken token)
         {
             Stage = "Connecting to online services...";
@@ -269,8 +251,6 @@ namespace SeasonRush
             await EnsureSignedInAsync();
             token.ThrowIfCancellationRequested();
 
-            // Two players who press Play at the same moment can each create their own session, so a host that
-            // waits too long with nobody joining leaves and searches again (after a random pause).
             for (int attempt = 1; ; attempt++)
             {
                 token.ThrowIfCancellationRequested();

@@ -45,4 +45,33 @@ MonoBehaviour:
   buttonSize: 28
   smallButtonSize: 22
   labelSize: 22
+  usePixelSkin: 1
+  headingFont: {fileID: 12800000, guid: 08d3d14efa788cd479830c7ceb5c1624, type: 3}
+  bodyFont: {fileID: 12800000, guid: eac7af46f7ddf37438c86dc209874f2d, type: 3}
+  headingFontScale: 1.4
+  bodyFontScale: 1.45
+  skinTextColor: {r: 0.169, g: 0.102, b: 0.055, a: 1}
+  skinHintColor: {r: 0.478, g: 0.306, b: 0.149, a: 1}
+  skinHighlightColor: {r: 0.78, g: 0.44, b: 0.12, a: 1}
+  skinGoodColor: {r: 0.16, g: 0.46, b: 0.2, a: 1}
+  skinPendingColor: {r: 0.65, g: 0.45, b: 0.08, a: 1}
+  skinWarnColor: {r: 0.72, g: 0.18, b: 0.14, a: 1}
+  titleImage: {fileID: 21300000, guid: 6ac955df59dca5e44adf64dc11817397, type: 3}
+  springLarge: {fileID: 21300000, guid: e97d0c7bb07c44e4a9defbd2e7adf4a6, type: 3}
+  springMedium: {fileID: 21300000, guid: 51a606fbd77ae1d4cb00e30b16ea599c, type: 3}
+  springSmall: {fileID: 21300000, guid: 269e111d4b46bb94a831b7218f691bdd, type: 3}
+  autumnLarge: {fileID: 21300000, guid: 5a480dc32f3e8d6488baaceec1816246, type: 3}
+  autumnMedium: {fileID: 21300000, guid: 663908d1897699645a43a9b660bc06de, type: 3}
+  autumnSmall: {fileID: 21300000, guid: 55296fb9f5c298648a294d4a3769cf07, type: 3}
+  winterLarge: {fileID: 21300000, guid: b7dfc508d6bf27f479c879dc0410745a, type: 3}
+  winterMedium: {fileID: 21300000, guid: 93d68f15cdc87d7459e2e9ba9d51377b, type: 3}
+  winterSmall: {fileID: 21300000, guid: b963e778e6918ae48b59aa7bcb2e7fc7, type: 3}
+  panelMenu: {fileID: 21300000, guid: 66df91745ed9e364eb1016d7091084f7, type: 3}
+  panelProfile: {fileID: 21300000, guid: 63a1f54d311e19b48b765cde66ed0999, type: 3}
+  panelLeaderboard: {fileID: 21300000, guid: 82afa365e447cd6428092e72afc8398d, type: 3}
+  panelLocalNetwork: {fileID: 21300000, guid: 043aca8dcbc97864f9a38c45de0d9603, type: 3}
+  divider: {fileID: 21300000, guid: 96bdcb7963a330e4488fe4538646123a, type: 3}
+  inputField: {fileID: 21300000, guid: f18688217512ba944bee335f1297032a, type: 3}
+  checkboxOff: {fileID: 21300000, guid: 892fda0f14bfc25468e7446b8fe10e33, type: 3}
+  checkboxOn: {fileID: 21300000, guid: 0d02f691400e4fa4e8fcb8020af08e02, type: 3}
   defaultsVersion: 3
