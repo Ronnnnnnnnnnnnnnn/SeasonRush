@@ -90,10 +90,8 @@ namespace SeasonRush
         public Sprite panelMenu, panelProfile, panelLeaderboard, panelLocalNetwork;
         public Sprite divider, inputField, checkboxOff, checkboxOn;
 
-        /// <summary>True when the pixel skin is switched on and its main pictures are assigned.</summary>
         public bool SkinActive => usePixelSkin && springLarge != null && panelMenu != null;
 
-        // colours as the menu should show them now (the skin colours, or the flat-look colours above)
         public Color Text => SkinActive ? skinTextColor : textColor;
         public Color Hint => SkinActive ? skinHintColor : hintTextColor;
         public Color Highlight => SkinActive ? skinHighlightColor : highlightColor;
@@ -123,14 +121,9 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>Which set of default colours this asset was last updated to (used by the editor tool, not shown).</summary>
         [HideInInspector] public int defaultsVersion;
         public const int CurrentDefaultsVersion = 3;
 
-        /// <summary>
-        /// Earlier versions of the menu used other default colours (dark grey buttons on a dark backdrop). An asset made back
-        /// then is moved to the pastel defaults, but only the colours that were never changed by hand.
-        /// </summary>
         public void MigrateDefaults()
         {
             if (defaultsVersion >= CurrentDefaultsVersion) return;
@@ -156,7 +149,6 @@ namespace SeasonRush
         static bool Same(Color a, Color b) =>
             Mathf.Abs(a.r - b.r) < 0.002f && Mathf.Abs(a.g - b.g) < 0.002f && Mathf.Abs(a.b - b.b) < 0.002f && Mathf.Abs(a.a - b.a) < 0.002f;
 
-        /// <summary>Goes up whenever a value is edited in the Inspector, so the open menu rebuilds its styles at once.</summary>
         public static int Version { get; private set; }
 
         void OnValidate() => Version++;
@@ -164,7 +156,6 @@ namespace SeasonRush
         static MenuStyle _loaded;
         static bool _triedLoading;
 
-        /// <summary>The menu style asset, or a default one when the asset is missing.</summary>
         public static MenuStyle Current
         {
             get

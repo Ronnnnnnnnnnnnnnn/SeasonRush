@@ -7,7 +7,6 @@ namespace SeasonRush
    
     public class PlayerCombat : NetworkBehaviour
     {
-        /// <summary>Automated tests set this to make the local player attack without a keyboard.</summary>
         public static bool TestAttack;
 
         PlayerController _controller;
@@ -27,7 +26,6 @@ namespace SeasonRush
 
             bool pressed = TestAttack;
 
-            // on-screen ATTACK button: hold it to keep swinging (the cooldown below limits the speed)
             if (VirtualControls.AttackHeld) pressed = true;
 
             if (Application.isFocused || GameConfig.TestMode)
@@ -36,7 +34,6 @@ namespace SeasonRush
                 if (kb != null && (kb.spaceKey.wasPressedThisFrame || kb.jKey.wasPressedThisFrame || kb.kKey.wasPressedThisFrame))
                     pressed = true;
 
-                // a mouse click also attacks, unless the on-screen controls are showing (then clicks drive the joystick)
                 Mouse mouse = Mouse.current;
                 if (!VirtualControls.Visible && mouse != null && mouse.leftButton.wasPressedThisFrame) pressed = true;
             }
@@ -47,23 +44,22 @@ namespace SeasonRush
             Vector2 dir = _controller.Facing;
             SlashFx.Spawn(_controller.PlanePosition, dir, GameConfig.SlotColor(Mathf.Max(0, _stats.Slot.Value)));
             _controller.PlayAttack();
+            AudioManager.PlaySlash();
             if (GameConfig.TestMode) Debug.Log($"[TEST] attack input on owner, slot {_stats.Slot.Value}, facing ({dir.x:0.00},{dir.y:0.00})");
             AttackServerRpc(dir);
         }
 
-        /// <summary>Owner -> server: "I swung in this direction." The server decides what was hit.</summary>
         [ServerRpc]
         void AttackServerRpc(Vector2 direction)
         {
             if (_stats.IsDead.Value) return;
-            if (MatchManager.Instance != null && MatchManager.Instance.Paused.Value) return;       // the game is paused
-            if (Time.time < _nextServerAttack) return;           // ignore swings faster than the cooldown
+            if (MatchManager.Instance != null && MatchManager.Instance.Paused.Value) return;
+            if (Time.time < _nextServerAttack) return;
             _nextServerAttack = Time.time + GameConfig.AttackCooldown * 0.8f;
 
             Vector2 dir = direction.sqrMagnitude > 0.01f ? direction.normalized : _controller.Facing;
             Vector2 origin = _controller.PlanePosition;
 
-            // enemies: copy the list because a kill despawns the enemy and removes it from Enemy.All
             int hits = 0;
             foreach (Enemy enemy in Enemy.All.ToArray())
             {
@@ -73,7 +69,6 @@ namespace SeasonRush
             }
             if (GameConfig.TestMode) Debug.Log($"[TEST] server received swing from client {OwnerClientId}: enemies hit = {hits}");
 
-            // the rival is never damaged (score only comes from enemies) but a hit shoves them away
             if (GameConfig.AttackShovesRival)
             {
                 foreach (PlayerStats other in PlayerStats.All)
@@ -96,13 +91,11 @@ namespace SeasonRush
             return Vector2.Angle(dir, to) <= GameConfig.AttackHalfArcDegrees;
         }
 
-        /// <summary>Server -> everyone: show the slash. The swinger already played it locally.</summary>
         [ClientRpc]
         void AttackFxClientRpc(Vector2 direction)
         {
             if (IsOwner) return;
             SlashFx.Spawn(_controller.PlanePosition, direction, GameConfig.SlotColor(Mathf.Max(0, _stats.Slot.Value)));
-            _controller.PlayAttack();
         }
     }
 }

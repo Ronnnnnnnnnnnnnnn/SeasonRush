@@ -7,13 +7,6 @@ using UnityEngine.UI;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The main menu and the network start-up (host / join / find a match).
-    ///
-    /// The menu is a real canvas in the scene (Hierarchy: UI > MainMenu > HomePanel / ProfilePanel / LeaderboardPanel / LocalPanel /
-    /// SearchingPanel). The navigation buttons simply switch panels on and off (see their On Click lists in the Inspector); this script
-    /// fills the texts, runs the host / join / matchmaking logic and shows the main menu only while no match is running.
-    /// </summary>
     public class ConnectionMenu : MonoBehaviour
     {
         const string AutoFindKey = "sr_autofind";
@@ -45,18 +38,18 @@ namespace SeasonRush
         public Text nameHint;
         public Text profileDatabaseStatus;
         public Text profileDatabaseError;
-        public GameObject profileStats;           // name + the four stat rows (shown when there is a profile)
+        public GameObject profileStats;
         public Text profileName;
-        public Text[] profileStatValues;          // 4 values
-        public Text profileEmpty;                 // shown instead of the stats when there is no profile
+        public Text[] profileStatValues;
+        public Text profileEmpty;
         public Toggle autoFindToggle;
 
         [Header("Leaderboard")]
         public Text leaderboardNotConnected;
         public GameObject leaderboardContent;
-        public LeaderboardRow[] leaderboardRows;  // 8 rows
+        public LeaderboardRow[] leaderboardRows;
         public Text leaderboardEmpty;
-        public Text[] recentMatchRows;            // 5 rows
+        public Text[] recentMatchRows;
         public Text recentNone;
 
         [Header("Local network")]
@@ -91,16 +84,14 @@ namespace SeasonRush
 
         void Awake() => Instance = this;
 
-        /// <summary>Leaves the running match (or online session) and shows the main menu. Used by the result screen's BACK button.</summary>
         public void LeaveToMenu()
         {
             _message = "";
-            Disconnect();                    // also switches the menu to its home screen
+            Disconnect();
         }
 
         void Start()
         {
-            // Two copies of the game on one PC must both keep running while the other window has focus.
             Application.runInBackground = true;
 
             _nm = NetworkManager.Singleton;
@@ -117,7 +108,6 @@ namespace SeasonRush
             _nm.OnClientConnectedCallback += OnClientConnected;
             _nm.OnClientDisconnectCallback += OnClientDisconnected;
 
-            // searching as soon as the game opens is now an option (Profile screen) and is off by default: the menu has a PLAY button
             _autoFind = PlayerPrefs.GetInt(AutoFindKey, 0) == 1;
             if (autoFindToggle != null)
             {
@@ -133,7 +123,7 @@ namespace SeasonRush
                     case "local": ShowScreen(MenuScreen.Local); break;
                 }
             }
-            if (GameConfig.TryGetArg("-name", out string nameArg)) LocalPlayer.Override = nameArg;   // for tests: -name Ana (never saved)
+            if (GameConfig.TryGetArg("-name", out string nameArg)) LocalPlayer.Override = nameArg;
             if (nameField != null)
                 nameField.text = LocalPlayer.HasSavedName || !string.IsNullOrEmpty(LocalPlayer.Override) ? LocalPlayer.Name : "";
 
@@ -157,7 +147,6 @@ namespace SeasonRush
             _nm.OnClientDisconnectCallback -= OnClientDisconnected;
         }
 
-        /// <summary>Things the canvas needs to work: an input module with actions, no keyboard navigation, no clicks in automated tests.</summary>
         void PrepareCanvas()
         {
             EventSystem events = EventSystem.current != null ? EventSystem.current : FindFirstObjectByType<EventSystem>();
@@ -166,21 +155,18 @@ namespace SeasonRush
                 events = new GameObject("EventSystem", typeof(EventSystem)).GetComponent<EventSystem>();
                 Debug.LogWarning("[UI] There was no EventSystem in the scene, one was created.");
             }
-            events.sendNavigationEvents = false;                          // Space / Enter in the game must never "press" a selected button
+            events.sendNavigationEvents = false;
 
             var module = events.GetComponent<InputSystemUIInputModule>();
             if (module == null) module = events.gameObject.AddComponent<InputSystemUIInputModule>();
             if (module.actionsAsset == null) module.AssignDefaultActions();
 
-            // Automated tests ignore the mouse so that a stray real click cannot press PAUSE / BACK / QUIT.
             if (GameConfig.TestMode && !GameConfig.HasFlag("-allowclicks"))
             {
                 var raycaster = canvas.GetComponent<GraphicRaycaster>();
                 if (raycaster != null) raycaster.enabled = false;
             }
         }
-
-        // ------------------------------------------------------------------ buttons (also called from the On Click lists)
 
         ushort ParsePort() => portField != null && ushort.TryParse(portField.text, out ushort p) ? p : GameConfig.DefaultPort;
         string Address() => addressField != null ? addressField.text.Trim() : GameConfig.DefaultAddress;
@@ -199,7 +185,6 @@ namespace SeasonRush
         {
             ApplyName();
             var transport = _nm.GetComponent<UnityTransport>();
-            // 0.0.0.0 = accept connections from other PCs on the LAN as well as from this PC
             transport.SetConnectionData(GameConfig.DefaultAddress, port, "0.0.0.0");
             _message = "";
             _starting = true;
@@ -232,7 +217,6 @@ namespace SeasonRush
             return true;
         }
 
-        /// <summary>Saves the name typed in the Profile screen (the "Save name" button).</summary>
         public void ApplyName()
         {
             if (nameField == null) return;
@@ -242,7 +226,6 @@ namespace SeasonRush
             if (SpacetimeManager.Instance != null) SpacetimeManager.Instance.SetName(clean);
         }
 
-        /// <summary>The CANCEL buttons: stop searching / connecting and go back to the main menu.</summary>
         public void CancelConnection() => Disconnect();
 
         void OnAutoFindChanged(bool value)
@@ -254,7 +237,7 @@ namespace SeasonRush
 
         void Disconnect()
         {
-            if (_online != null && _online.IsBusy) _online.Leave();      // leaves the online session and shuts Netcode down
+            if (_online != null && _online.IsBusy) _online.Leave();
             else _nm.Shutdown();
             _starting = false;
             ShowScreen(MenuScreen.Home);
@@ -304,8 +287,6 @@ namespace SeasonRush
             }
         }
 
-        // ------------------------------------------------------------------ canvas
-
         bool InGame => _nm.IsListening && (_nm.IsServer || _nm.IsConnectedClient);
 
         static void Show(GameObject go, bool on)
@@ -313,7 +294,6 @@ namespace SeasonRush
             if (go != null && go.activeSelf != on) go.SetActive(on);
         }
 
-        /// <summary>Shows exactly one screen of the main menu (everything else is switched off).</summary>
         void ShowScreen(MenuScreen screen)
         {
             Show(homePanel, screen == MenuScreen.Home);
@@ -326,7 +306,7 @@ namespace SeasonRush
         void ApplyStyle()
         {
             MenuStyle m = MenuStyle.Current;
-            if (_ms == m && _styleVersion == MenuStyle.Version) return;     // applied again when the asset is edited
+            if (_ms == m && _styleVersion == MenuStyle.Version) return;
             _ms = m;
             _styleVersion = MenuStyle.Version;
             if (!useMenuStyle || canvas == null) return;

@@ -57,66 +57,55 @@ MonoBehaviour:
     tint: {r: 1, g: 1, b: 1, a: 1}
   placements:
   - prop: 0
-    position: {x: 3.4, y: 3.4}
+    position: {x: 4.7, y: 3.4}
     flipX: 0
-  - prop: 0
-    position: {x: 8.8, y: 8.8}
+  - prop: 2
+    position: {x: 10.25, y: 9.5}
     flipX: 0
   - prop: 1
-    position: {x: 2.2, y: 5.8}
+    position: {x: 1.75, y: 6.6}
     flipX: 0
   - prop: 1
-    position: {x: 5.8, y: 2.2}
+    position: {x: 6.6, y: 1.75}
     flipX: 1
   - prop: 2
-    position: {x: 4.6, y: 9.2}
+    position: {x: 10.25, y: 7.4}
     flipX: 0
   - prop: 2
-    position: {x: 9.2, y: 4.6}
-    flipX: 1
-  - prop: 0
-    position: {x: 7, y: 2.2}
-    flipX: 0
-  - prop: 0
-    position: {x: 2.2, y: 7}
-    flipX: 1
-  - prop: 2
-    position: {x: 10.4, y: 6.6}
-    flipX: 0
-  - prop: 2
-    position: {x: 6.6, y: 10.4}
+    position: {x: 7.4, y: 10.25}
     flipX: 1
   - prop: 3
-    position: {x: 4.4, y: 8.2}
+    position: {x: 4.8, y: 8}
     flipX: 0
   - prop: 3
-    position: {x: 8.2, y: 4.4}
+    position: {x: 8, y: 4.8}
     flipX: 1
   - prop: 4
-    position: {x: 8.4, y: 4.2}
+    position: {x: 1.9, y: 3.4}
     flipX: 0
   - prop: 4
-    position: {x: 4.2, y: 8.4}
+    position: {x: 3.4, y: 1.9}
     flipX: 1
   - prop: 5
-    position: {x: 5.6, y: 3}
+    position: {x: 8.7, y: 1.9}
     flipX: 0
   - prop: 5
-    position: {x: 3, y: 5.6}
+    position: {x: 1.9, y: 8.7}
     flipX: 1
   playerSpawns:
-  - {x: 1.8, y: 10.2}
-  - {x: 10.2, y: 1.8}
+  - {x: 1.3, y: 10.8}
+  - {x: 10.8, y: 1.3}
   enemySpawns:
   - {x: 1.8, y: 1.8}
-  - {x: 10.2, y: 10.2}
-  - {x: 10.6, y: 6}
-  - {x: 6, y: 10.6}
+  - {x: 9.6, y: 11}
+  - {x: 11, y: 4.7}
+  - {x: 4.7, y: 11}
   enemies:
   - displayName: Sapling
     tier: 0
     sprite: {fileID: 21300000, guid: 2505db46bd776284e8aae4e528e20910, type: 3}
     visualPrefab: {fileID: 8536609200756730228, guid: c5b11b2727783a0419c6c7010f00c8a9, type: 3}
+    artFacing: 2
     frames: []
     frameRate: 2.5
     headHeight: 1.1088889
@@ -132,6 +121,7 @@ MonoBehaviour:
     tier: 1
     sprite: {fileID: 21300000, guid: 2505db46bd776284e8aae4e528e20910, type: 3}
     visualPrefab: {fileID: 8536609200756730228, guid: c5b11b2727783a0419c6c7010f00c8a9, type: 3}
+    artFacing: 2
     frames: []
     frameRate: 2.5
     headHeight: 1.1088889
@@ -147,6 +137,7 @@ MonoBehaviour:
     tier: 2
     sprite: {fileID: 21300000, guid: 2505db46bd776284e8aae4e528e20910, type: 3}
     visualPrefab: {fileID: 8536609200756730228, guid: c5b11b2727783a0419c6c7010f00c8a9, type: 3}
+    artFacing: 2
     frames: []
     frameRate: 2.5
     headHeight: 1.1088889

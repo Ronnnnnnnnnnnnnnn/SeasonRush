@@ -7,19 +7,12 @@ using UnityEngine.UI;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The heads-up display of a match. Everything is a real object of the UI canvas in the scene (Hierarchy: UI > HUD):
-    /// top bar, the two player boxes, PAUSE button, season banner, lobby, countdown, result screen, death screen and pause screen.
-    /// This script only switches those objects on and off (SetActive) and fills in their texts and bars.
-    /// </summary>
     public class GameHud : MonoBehaviour
     {
         public static GameHud Instance { get; private set; }
 
-        /// <summary>True while the game is frozen by a PAUSE (for both players). The state lives on the server (MatchManager.Paused).</summary>
         public static bool Paused => MatchManager.Instance != null && MatchManager.Instance.Paused.Value;
 
-        /// <summary>Asks the server to freeze / unfreeze the game.</summary>
         public static void SetPaused(bool value)
         {
             MatchManager mm = MatchManager.Instance;
@@ -28,17 +21,14 @@ namespace SeasonRush
             mm.RequestPause(value);
         }
 
-        /// <summary>Colour of the text on the boxes: dark brown with the wooden skin, white on the dark boxes of the flat look.</summary>
         static Color Ink => MenuStyle.Current.SkinActive ? MenuStyle.Current.skinTextColor : Color.white;
 
         static Color Alert => MenuStyle.Current.SkinActive ? MenuStyle.Current.skinWarnColor : new Color(1f, 0.45f, 0.4f);
 
         static int LocalSlot => PlayerStats.Local != null ? PlayerStats.Local.Slot.Value : -1;
 
-        /// <summary>True when the pause was started by this player (only this player can resume it).</summary>
         public static bool PausedByMe => Paused && MatchManager.Instance.PausedBySlot.Value == LocalSlot;
 
-        /// <summary>Automated tests ignore the mouse so that a stray real click cannot press PAUSE / BACK / QUIT.</summary>
         static bool TestBlocksClicks => GameConfig.TestMode && !GameConfig.HasFlag("-allowclicks");
 
         struct Popup
@@ -61,7 +51,7 @@ namespace SeasonRush
         [Header("Top bar and player boxes")]
         public Text topTitle;
         public Text topTime;
-        public PlayerPanelUi[] playerPanels;       // slot 0 (left) and slot 1 (right)
+        public PlayerPanelUi[] playerPanels;
         public GameObject controlsHint;
 
         [Header("PAUSE button and pause screen")]
@@ -80,9 +70,9 @@ namespace SeasonRush
         [Header("Lobby")]
         public GameObject lobbyPanel;
         public Text lobbyTitle;
-        public Text lobbyLine1;                    // online / client lines
+        public Text lobbyLine1;
         public Text lobbyLine2;
-        public Text lobbyHostLabel;                // "Tell your friend to join this address:"
+        public Text lobbyHostLabel;
         public Text lobbyAddress;
         public GameObject soloButton;
 
@@ -94,7 +84,7 @@ namespace SeasonRush
         public Text resultHeadline;
         [Tooltip("A line under the headline: \"Your rival surrendered.\"")]
         public Text resultNote;
-        public Text[] resultLines;                 // one per player
+        public Text[] resultLines;
         public Text resultRecord;
         public RectTransform rematchButton;
         public RectTransform resultBackButton;
@@ -133,13 +123,10 @@ namespace SeasonRush
             _popups.Add(new Popup { plane = planePosition, text = text, colour = colour, born = Time.time });
         }
 
-        // ------------------------------------------------------------------ buttons (On Click lists in the canvas)
-
         public void PauseGame() { if (!TestBlocksClicks) SetPaused(true); }
 
         public void ResumeGame() { if (!TestBlocksClicks) SetPaused(false); }
 
-        /// <summary>SURRENDER (pause menu): the rival wins. Playing alone there is nobody to win, so it just goes back to the menu.</summary>
         public void Surrender()
         {
             if (TestBlocksClicks) return;
@@ -154,7 +141,6 @@ namespace SeasonRush
             if (MatchManager.Instance != null) MatchManager.Instance.ServerBeginCountdown();
         }
 
-        /// <summary>BACK in the lobby: leave and return to the main menu.</summary>
         public void LobbyBack()
         {
             if (TestBlocksClicks) return;
@@ -162,17 +148,14 @@ namespace SeasonRush
             LeaveToMenu();
         }
 
-        /// <summary>REMATCH on the result screen (host only).</summary>
         public void Rematch()
         {
-            // automated test runs ignore the button (a stray mouse click must not start a second match)
             bool blocked = GameConfig.TestMode && !GameConfig.HasFlag("-allowrematch");
             var mouse = UnityEngine.InputSystem.Mouse.current;
             Debug.Log($"[UI] REMATCH clicked at mouse {(mouse != null ? mouse.position.ReadValue().ToString() : "n/a")} focused={Application.isFocused}{(blocked ? " (ignored in test mode)" : "")}");
             if (!blocked && MatchManager.Instance != null) MatchManager.Instance.ServerRematch();
         }
 
-        /// <summary>BACK on the result screen: the player does not want another game.</summary>
         public void ResultBack()
         {
             bool blocked = TestBlocksClicks;
@@ -180,24 +163,19 @@ namespace SeasonRush
             if (!blocked) LeaveToMenu();
         }
 
-        /// <summary>Leaves the match (or lobby) and shows the main menu.</summary>
         public static void LeaveToMenu()
         {
             if (ConnectionMenu.Instance != null) ConnectionMenu.Instance.LeaveToMenu();
             else if (NetworkManager.Singleton != null) NetworkManager.Singleton.Shutdown();
         }
 
-        // ------------------------------------------------------------------ event hookup
-
         void Update()
         {
             MatchManager current = MatchManager.Instance;
 
-            // Escape (or the Android back button) opens / closes the pause screen during a match; it closes by itself afterwards
             bool inMatch = current != null && (current.Phase.Value == MatchPhase.Countdown || current.Phase.Value == MatchPhase.Playing);
             if (inMatch)
             {
-                // Escape (or the Android back button) pauses; it resumes only for the player who paused
                 var keyboard = UnityEngine.InputSystem.Keyboard.current;
                 if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && (Application.isFocused || GameConfig.TestMode))
                 {
@@ -234,8 +212,6 @@ namespace SeasonRush
             _bannerUntil = Time.time + 2.8f;
         }
 
-        // ------------------------------------------------------------------ canvas
-
         static void Show(GameObject go, bool on)
         {
             if (go != null && go.activeSelf != on) go.SetActive(on);
@@ -256,7 +232,7 @@ namespace SeasonRush
 
             if (safeAreas != null && safeAreas.Length > 0)
             {
-                Vector4 ins = MobileSupport.SafeInsets();                 // left, top, right, bottom in canvas units
+                Vector4 ins = MobileSupport.SafeInsets();
                 foreach (RectTransform area in safeAreas)
                 {
                     if (area == null) continue;
@@ -323,7 +299,7 @@ namespace SeasonRush
             PlayerStats p = FindBySlot(slot);
             bool isLocal = p != null && p.IsOwner;
             panel.who.text = (p != null ? p.DisplayName : GameConfig.SlotName(slot)) + (isLocal ? "  (YOU)" : "");
-            panel.who.color = MenuStyle.Current.SkinActive ? Color.Lerp(slotColour, Color.black, 0.3f) : slotColour;   // darker on the light box
+            panel.who.color = MenuStyle.Current.SkinActive ? Color.Lerp(slotColour, Color.black, 0.3f) : slotColour;
 
             Show(panel.waiting, p == null);
             Show(panel.details, p != null);
@@ -434,7 +410,6 @@ namespace SeasonRush
                 y += 62;
             }
 
-            // lifetime record from the online database (updates a moment after the host reports the match)
             SpacetimeManager db = SpacetimeManager.Instance;
             bool record = db != null && db.State == SpacetimeManager.ConnState.Connected && db.LocalProfile != null;
             Show(resultRecord, record);
@@ -448,7 +423,6 @@ namespace SeasonRush
 
             if (nm.IsServer)
             {
-                // REMATCH on the left, BACK (to the main menu) on the right
                 Show(rematchButton, true);
                 Show(rematchWaiting, false);
                 PlaceFromTop(rematchButton, -170f, y + 40);
@@ -463,7 +437,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>Puts a top-centre anchored element x units right of the centre, y units below the top of the screen.</summary>
         static void PlaceFromTop(RectTransform rt, float x, float y) => rt.anchoredPosition = new Vector2(x, -y);
 
         void UpdateDeathScreen()
@@ -475,8 +448,6 @@ namespace SeasonRush
             double remaining = local.RespawnAt.Value - NetworkManager.Singleton.ServerTime.Time;
             deathSub.text = "Respawning in " + Mathf.Max(0f, (float)remaining).ToString("0.0") + "s  -  your rival can score freely!";
         }
-
-        // ------------------------------------------------------------------ world-anchored overlays
 
         void ClearOverlays()
         {
@@ -496,7 +467,7 @@ namespace SeasonRush
                 foreach (Enemy e in Enemy.All)
                 {
                     if (e == null || e.Def == null || e.Health.Value >= e.MaxHealth) continue;
-                    float barHeight = e.Def.headHeight > 0f ? e.Def.headHeight * e.Def.scale + 0.2f : 1.45f * e.Def.scale + 0.25f;     // just above the picture
+                    float barHeight = e.Def.headHeight > 0f ? e.Def.headHeight * e.Def.scale + 0.2f : 1.45f * e.Def.scale + 0.25f;
                     Vector2 g = ToCanvas(cam, Iso.ToScreen3(e.PlanePosition) + new Vector3(0f, barHeight, 0f), scale);
                     PlaceBar(g, 64, 8, e.HealthFraction, new Color(0.95f, 0.3f, 0.3f));
                 }
@@ -525,7 +496,6 @@ namespace SeasonRush
             for (int i = _labelsUsed; i < _labels.Count; i++) Show(_labels[i], false);
         }
 
-        /// <summary>World position -> position inside the overlay root (top-left anchored, y down, canvas units).</summary>
         static Vector2 ToCanvas(Camera cam, Vector3 world, float canvasScale)
         {
             Vector3 sp = cam.WorldToScreenPoint(world);
@@ -565,8 +535,6 @@ namespace SeasonRush
             label.color = colour;
         }
 
-        // ------------------------------------------------------------------ helpers
-
         static PlayerStats FindBySlot(int slot)
         {
             foreach (PlayerStats p in PlayerStats.All) if (p.Slot.Value == slot) return p;
@@ -582,7 +550,7 @@ namespace SeasonRush
                 foreach (IPAddress ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
                     if (ip.AddressFamily == AddressFamily.InterNetwork) found.Add(ip.ToString());
             }
-            catch { /* offline: fall through */ }
+            catch {  }
             found.Add("127.0.0.1 (same PC)");
             _localAddresses = string.Join("   |   ", found) + "    port " + GameConfig.DefaultPort;
             return _localAddresses;

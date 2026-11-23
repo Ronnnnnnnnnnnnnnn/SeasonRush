@@ -30,6 +30,9 @@ Your Winter pictures and the Spring cloud enemies are used automatically, see [`
 The two warriors use `Assets/2D Asset/Players/player1.png` (blue, host) and `player2.png` (red); Unity applies them by
 itself, see [`docs/Character_Sprites.md`](docs/Character_Sprites.md).
 
+**The "Season Rush" menu in Unity is hidden** (it was only for building and setup; the tools still run by themselves when Unity loads the project).
+To show it again: Project Settings > Player > Other Settings > Scripting Define Symbols, add `SEASON_RUSH_MENU`.
+
 ### The "Season Rush" menu in Unity
 
 The menu in Unity's top bar is made with `[MenuItem("Season Rush/...")]` on a `public static` or `static` method in a script inside an
@@ -42,6 +45,7 @@ The menu in Unity's top bar is made with `[MenuItem("Season Rush/...")]` on a `p
 | Build Android APK (for a phone) | builds `Builds/Android/SeasonRush.apk` (needs the Android module) | `Assets/Editor/BuildScript.cs` |
 | Apply Pixel UI Skin | uses the wooden buttons, panels and pixel fonts (Buttonborder, Panelborder, Font folders) in the menu | `Assets/Editor/UiSkinSetup.cs` |
 | Apply Game Title And Icon | game name "Season Rush", app icon (Game logo.png), title picture on the menu (Game title.png) | `Assets/Editor/BrandingSetup.cs` |
+| Apply Sounds | sets up the sounds in Assets/Sound (menu music, sword slash, damage) | `Assets/Editor/SoundSetup.cs` |
 | Set Up Character Animations | fills your empty Idle / Walk / Attack clips and controllers and hooks the player and enemy prefabs into the game | `Assets/Editor/CharacterAnimSetup.cs` |
 | Update Maps In Scene | regenerates the map and prop prefabs after you edited a Season Theme | `Assets/Editor/SceneBaker.cs` |
 | Create UI Canvas In Scene | rebuilds the Canvas (menu, HUD, controls) in the open scene | `Assets/Editor/UiBuilder.cs` |
@@ -65,6 +69,12 @@ Map_Winter). Every map is a prefab in `Assets/Prefabs/Maps`, and every tree / ro
 in `Assets/Prefabs/Props`. The Season Theme assets stay the source of truth: after you change one (Map Editor or Inspector) run
 **Season Rush > Update Maps In Scene** so the prefabs match. If you forget, the game notices the baked map is out of date and builds
 the map from the theme instead. The MatchManager is not in the scene on purpose: the server spawns it as a network prefab when a match starts.
+
+**Sound:** the menu music plays in the menu and the lobby and fades out when the battle starts (the 3-2-1 countdown); it comes back on the result screen.
+Each season has its own battle music (Spring, Fall, Winter), the 3-2-1 countdown and the last 10 seconds of a season have their own sounds, and you hear your own death. A short sound plays when a new season starts (both players) and when any button is pressed. You hear your own sword slash and your own "taking damage" sound only (not your rival's, not the enemies'). The files are in `Assets/Sound`,
+the volumes are in `Assets/Resources/Sounds.asset`, the `AudioManager` plays them. Automated test windows are muted (`-sound` turns it on).
+
+**NetworkAnimator:** each warrior has an Animator and a `NetworkAnimator` (owner authority) on the Player prefab. The player's own machine sets the parameters (IsMoving, IsDead, trigger Attack) and Netcode replays the animation on the other screen. Red uses the same controller with its own clips (an Animator Override Controller built at runtime). Season Rush > Add NetworkAnimator To Player upgrades an older Player prefab (it also happens by itself).
 
 **Animated characters:** `Assets/Prefabs/Players/Player 1.prefab` / `Player 2.prefab` (Idle, Walk, Attack, Death) and `Assets/Prefabs/Enemy/Cloud` (Spring), `Dryleaves` (Fall),
 `Snowman` (Winter, with Attack and Death) are used by the game. Unity fills the empty clips and controllers by itself (menu: **Set Up Character Animations**),

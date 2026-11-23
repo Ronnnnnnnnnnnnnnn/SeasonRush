@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8297041039212013001}
   - component: {fileID: 2366124002654990665}
+  - component: {fileID: 2366166630239909161}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -91,6 +92,28 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!95 &2366166630239909161
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2185764215599539265}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4239a58bdbd856c49b2b2f2d6a41e1c1, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4976412985979724761
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,6 +255,7 @@ GameObject:
   - component: {fileID: 2654512904532267684}
   - component: {fileID: 8264075396666023512}
   - component: {fileID: 6799875817184422234}
+  - component: {fileID: 2363442210592498784}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -437,6 +461,8 @@ MonoBehaviour:
   visual: {fileID: 3647367572930192203}
   body: {fileID: 2366124002654990665}
   tunic: {fileID: 5600553244887050505}
+  animator: {fileID: 2366166630239909161}
+  netAnimator: {fileID: 2363442210592498784}
 --- !u!114 &6799875817184422234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -450,3 +476,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SeasonRush.PlayerCombat
   ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &2363442210592498784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7105543646272218205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkAnimator
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkAnimatorExpanded: 0
+  AuthorityMode: 1
+  m_Animator: {fileID: 2366166630239909161}
+  TransitionStateInfoList: []
+  AnimatorParameterEntries:
+    ParameterEntries:
+    - name: IsMoving
+      NameHash: 120489994
+      Synchronize: 1
+      ParameterType: 4
+    - name: Attack
+      NameHash: 1080829965
+      Synchronize: 1
+      ParameterType: 9
+    - name: IsDead
+      NameHash: 1270110494
+      Synchronize: 1
+      ParameterType: 4
+  AnimatorParametersExpanded: 0

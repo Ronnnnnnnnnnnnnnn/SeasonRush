@@ -17,7 +17,6 @@ namespace SeasonRush
         public static float CountdownSeconds = 3f;
         public static float RespawnSeconds = 5f;
 
-        // --- Arena ---
         public const float ArenaSize = 12f;
 
         public const int PlayerMaxHealth = 100;
@@ -53,10 +52,6 @@ namespace SeasonRush
 
         static int _verbose = -1;
 
-        /// <summary>
-        /// True when the game was started with -autotest (automated verification run). In a normal game
-        /// this is false: no bot, no extra logging, and keyboard input only counts while the window has focus.
-        /// </summary>
         public static bool TestMode
         {
             get

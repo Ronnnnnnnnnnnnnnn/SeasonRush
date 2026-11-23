@@ -20,8 +20,8 @@ namespace SeasonRush
 
         public static Vector2 ToPlane(Vector2 screen)
         {
-            float a = screen.x / HalfW;   // x - y
-            float b = screen.y / HalfH;   // x + y
+            float a = screen.x / HalfW;
+            float b = screen.y / HalfH;
             return new Vector2((a + b) * 0.5f, (b - a) * 0.5f);
         }
 

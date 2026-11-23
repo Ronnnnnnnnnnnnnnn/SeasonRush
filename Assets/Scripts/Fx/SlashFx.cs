@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>Short-lived crescent that shows the warrior's swing. Created from code, no prefab needed.</summary>
     public class SlashFx : MonoBehaviour
     {
         static Sprite _arc;
@@ -57,7 +56,7 @@ namespace SeasonRush
                 {
                     float dx = x - c, dy = y - c;
                     float r = Mathf.Sqrt(dx * dx + dy * dy);
-                    float ang = Mathf.Abs(Mathf.Atan2(dy, dx) * Mathf.Rad2Deg);       // 0 = facing right
+                    float ang = Mathf.Abs(Mathf.Atan2(dy, dx) * Mathf.Rad2Deg);
                     float ring = 1f - Mathf.Clamp01(Mathf.Abs(r - 22f) / 8f);
                     float arc = 1f - Mathf.Clamp01((ang - 45f) / 25f);
                     byte a = (byte)(255f * Mathf.Clamp01(ring * arc * 1.4f));

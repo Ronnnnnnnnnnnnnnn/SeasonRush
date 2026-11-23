@@ -9,17 +9,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Sets up the animated characters from the pictures and the (empty) Animation Clips / Animator Controllers / prefabs you made:
-    ///
-    ///  * Player 1 (blue) and Player 2 (red):  Assets/Prefabs/Players/Player 1.prefab, Player 2.prefab
-    ///      Idle (idle1, idle2), Walk (walk1, walk2), Attack (attack1-3);  Animator: Bool IsMoving, Trigger Attack
-    ///  * Spring enemy "Cloud", Fall enemy "Dryleaves", Winter enemy "Snowman":  Assets/Prefabs/Enemy/
-    ///      Cloud: walk (cloud1, cloud2); Dryleaves: walk (walk1, walk2); Snowman: Walk, Attack, Death;  Animator: Trigger Attack, Trigger Die
-    ///
-    /// It fills only what is still EMPTY (a clip without pictures, a controller without states, an enemy without a prefab), so whatever
-    /// you changed by hand stays. It runs by itself when Unity loads the project; Season Rush > Set Up Character Animations runs it again.
-    /// </summary>
     [InitializeOnLoad]
     public static class CharacterAnimSetup
     {
@@ -27,10 +16,10 @@ namespace SeasonRush.EditorTools
         const string AnimationDir = "Assets/Animation";
         const string PrefabDir = "Assets/Prefabs";
         const string ThemeDir = "Assets/Data";
-        const float PlayerPpu = PlayerSkinsSetup.Ppu;       // the knight is about 1.5 map units tall
-        const float DryleavesPpu = 900f;                    // about 1.1 map units tall
-        const float SnowmanPpu = 950f;                      // about 1.1 map units tall
-        const int FrameTextureSize = 1024;                  // the characters are drawn small on screen: no need for 2100 px
+        const float PlayerPpu = PlayerSkinsSetup.Ppu;
+        const float DryleavesPpu = 900f;
+        const float SnowmanPpu = 950f;
+        const int FrameTextureSize = 1024;
 
         class Clip
         {
@@ -46,9 +35,9 @@ namespace SeasonRush.EditorTools
             public string prefab;
             public string controller;
             public float ppu;
-            public string pivotFrame;            // the picture whose feet give the pivot of every frame
+            public string pivotFrame;
             public Clip[] clips;
-            public string defaultClip;           // name of the state shown first
+            public string defaultClip;
         }
 
         static string P(int n, string name) => $"{PlayersDir}/p{n}_{name}.png";
@@ -80,7 +69,6 @@ namespace SeasonRush.EditorTools
                         new Clip { path = AnimationDir + "/Enemy/Fall/walk.anim", frames = new[] { "Assets/2D Asset/Falll/fall_enemy_walk1.png", "Assets/2D Asset/Falll/fall_enemy_walk2.png" }, fps = 5f, loop = true }
                     }
                 }
-                // the Spring cloud is handled separately (its pictures keep the pivot in the middle of their shadow, see SeasonArtSetup)
             };
         }
 
@@ -100,8 +88,6 @@ namespace SeasonRush.EditorTools
             };
         }
 
-        // ------------------------------------------------------------------ entry points
-
         static CharacterAnimSetup()
         {
             EditorApplication.update += WaitThenApply;
@@ -116,7 +102,9 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogWarning("[Setup] Character animations could not be set up: " + e.Message); }
         }
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Set Up Character Animations")]
+#endif
         public static void ApplyFromMenu()
         {
             bool changed = ApplyAll();
@@ -131,11 +119,10 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogError("[Setup] FAILED: " + e); EditorApplication.Exit(1); }
         }
 
-        /// <summary>Returns true when something was changed.</summary>
         public static bool ApplyAll()
         {
             bool changed = RepairSpriteReferences();
-            var prepared = new Dictionary<string, Sprite>();       // character name -> first picture of its default animation
+            var prepared = new Dictionary<string, Sprite>();
 
             foreach (Character c in Characters())
             {
@@ -144,12 +131,11 @@ namespace SeasonRush.EditorTools
                 prepared[c.name] = first;
             }
 
-            // the cloud keeps its own import (pivot in the shadow); its clip and controller are filled like the others
             changed |= PrepareCloud(out Sprite cloudFirst);
             if (cloudFirst != null) prepared["Cloud"] = cloudFirst;
 
-            AssetDatabase.SaveAssets();                     // the repair below rewrites files: save what is changed in memory first
-            changed |= RepairSpriteReferences();            // pictures imported just now (for example new frames in your clips) get their right ids too
+            AssetDatabase.SaveAssets();
+            changed |= RepairSpriteReferences();
             changed |= LinkPlayerSkins();
             changed |= LinkEnemies();
             if (changed)
@@ -173,20 +159,16 @@ namespace SeasonRush.EditorTools
             return true;
         }
 
-        // ------------------------------------------------------------------ one character
-
         static bool PrepareCharacter(Character c, out Sprite firstFrame)
         {
             bool changed = false;
 
-            // 1) pictures: one shared pivot (the feet) so the character does not jump when the frames change
             Vector2 pivot = FeetPivot(c.pivotFrame, out _);
             var frames = new List<string>();
             foreach (Clip clip in c.clips) foreach (string f in clip.frames) if (!frames.Contains(f)) frames.Add(f);
             if (!frames.Contains(c.pivotFrame)) frames.Add(c.pivotFrame);
             foreach (string f in frames) changed |= ImportFrame(f, c.ppu, pivot);
 
-            // 2) clips
             Sprite first = null;
             foreach (Clip clip in c.clips)
             {
@@ -198,10 +180,8 @@ namespace SeasonRush.EditorTools
             }
             firstFrame = first != null ? first : AssetDatabase.LoadAssetAtPath<Sprite>(c.pivotFrame);
 
-            // 3) controller
             changed |= BuildController(c);
 
-            // 4) prefab
             changed |= FixPrefab(c.prefab, firstFrame);
             return changed;
         }
@@ -226,8 +206,6 @@ namespace SeasonRush.EditorTools
             changed |= FixPrefab(prefab, first);
             return changed;
         }
-
-        // ---- pictures
 
         static bool ImportFrame(string path, float ppu, Vector2 pivot)
         {
@@ -258,7 +236,6 @@ namespace SeasonRush.EditorTools
             return true;
         }
 
-        /// <summary>The bottom-centre of the drawing's lowest part (the feet), as a pivot, and how tall the drawing is in pixels.</summary>
         static Vector2 FeetPivot(string path, out int drawnHeight)
         {
             drawnHeight = 0;
@@ -275,7 +252,7 @@ namespace SeasonRush.EditorTools
                 if (maxY < 0) return new Vector2(0.5f, 0.05f);
                 drawnHeight = maxY - minY + 1;
 
-                int band = Mathf.Max(2, (int)(drawnHeight * 0.08f));                   // the lowest 8 % of the drawing = the feet
+                int band = Mathf.Max(2, (int)(drawnHeight * 0.08f));
                 int minX = w, maxX = -1;
                 for (int y = minY; y < minY + band && y < h; y++)
                     for (int x = 0; x < w; x++)
@@ -286,9 +263,6 @@ namespace SeasonRush.EditorTools
             finally { UnityEngine.Object.DestroyImmediate(tex); }
         }
 
-        // ---- clips
-
-        /// <summary>Puts the pictures into an Animation Clip, but only when the clip is still empty (so your own edits are never overwritten).</summary>
         static bool FillClip(Clip spec, Sprite[] sprites)
         {
             var clip = AssetDatabase.LoadAssetAtPath<AnimationClip>(spec.path);
@@ -306,13 +280,12 @@ namespace SeasonRush.EditorTools
             AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(clip);
             settings.loopTime = spec.loop;
             settings.startTime = 0f;
-            settings.stopTime = sprites.Length / spec.fps;            // the last picture is shown for its full time
+            settings.stopTime = sprites.Length / spec.fps;
             AnimationUtility.SetAnimationClipSettings(clip, settings);
             EditorUtility.SetDirty(clip);
             return true;
         }
 
-        /// <summary>A "Death" animation plays once (not in a loop).</summary>
         static bool StopLooping(Clip spec)
         {
             if (spec.loop || !Path.GetFileNameWithoutExtension(spec.path).Equals("Death", StringComparison.OrdinalIgnoreCase)) return false;
@@ -329,11 +302,6 @@ namespace SeasonRush.EditorTools
 
         static readonly Regex SpriteReference = new Regex(@"\{fileID: (-?\d+), guid: ([0-9a-f]{32}), type: 3\}");
 
-        /// <summary>
-        /// The pictures used to be "Multiple" sprites (each picture had a long random id). They are single sprites now, whose id is always
-        /// 21300000, so a clip or prefab that still has the old id shows NOTHING (an empty sprite). This writes the right id into the character
-        /// clips and prefabs and keeps everything else of them (your frames, timing, names).
-        /// </summary>
         static bool RepairSpriteReferences()
         {
             var single = new HashSet<string>();
@@ -356,7 +324,7 @@ namespace SeasonRush.EditorTools
             {
                 string full = Path.GetFullPath(path);
                 string text = File.ReadAllText(full);
-                if (!text.StartsWith("%YAML", StringComparison.Ordinal)) continue;                 // binary asset: not touched
+                if (!text.StartsWith("%YAML", StringComparison.Ordinal)) continue;
                 string fixedText = SpriteReference.Replace(text, m =>
                     single.Contains(m.Groups[2].Value) && m.Groups[1].Value != "21300000"
                         ? "{fileID: 21300000, guid: " + m.Groups[2].Value + ", type: 3}"
@@ -369,8 +337,6 @@ namespace SeasonRush.EditorTools
             }
             return changed;
         }
-
-        // ---- animator controllers
 
         static AnimationClip Load(Character c, string clipName)
         {
@@ -394,11 +360,6 @@ namespace SeasonRush.EditorTools
             return true;
         }
 
-        /// <summary>
-        /// Makes the controller work with the game: the parameters the game sets (IsMoving / Attack / Die) and the transitions between the
-        /// states. A controller with no states gets states too; one that already has your states (and no transitions yet) only gets the
-        /// parameters and the transitions, so your states, clips and positions stay.
-        /// </summary>
         static bool BuildController(Character c)
         {
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(c.controller);
@@ -426,7 +387,6 @@ namespace SeasonRush.EditorTools
                 }
                 else
                 {
-                    // Cloud, Dryleaves: one looping walk animation
                     AnimationClip clip = c.clips[0] != null ? AssetDatabase.LoadAssetAtPath<AnimationClip>(c.clips[0].path) : null;
                     AddState(machine, "Walk", clip, 0);
                 }
@@ -445,14 +405,13 @@ namespace SeasonRush.EditorTools
                     Transition(idle.AddTransition(walk), false, 0f).AddCondition(AnimatorConditionMode.If, 0f, "IsMoving");
                     Transition(walk.AddTransition(idle), false, 0f).AddCondition(AnimatorConditionMode.IfNot, 0f, "IsMoving");
                     AnimatorStateTransition swing = Transition(machine.AddAnyStateTransition(attack), false, 0f);
-                    swing.canTransitionToSelf = true;                                   // swinging again restarts the attack
+                    swing.canTransitionToSelf = true;
                     swing.AddCondition(AnimatorConditionMode.If, 0f, "Attack");
-                    Transition(attack.AddTransition(idle), true, 0f);                   // back to idle / walk when the swing is over
+                    Transition(attack.AddTransition(idle), true, 0f);
                     changed = true;
                 }
                 if (machine.defaultState != idle) { machine.defaultState = idle; changed = true; }
 
-                // dying: the game sets the Bool IsDead; the death animation plays once and stays on its last picture until the respawn
                 if (death != null)
                 {
                     changed |= AddParameter(controller, "IsDead", AnimatorControllerParameterType.Bool);
@@ -461,7 +420,7 @@ namespace SeasonRush.EditorTools
                     if (!hasDeathTransition)
                     {
                         AnimatorStateTransition die = Transition(machine.AddAnyStateTransition(death), false, 0f);
-                        die.canTransitionToSelf = false;                         // a Bool condition stays true: do not restart the animation every frame
+                        die.canTransitionToSelf = false;
                         die.AddCondition(AnimatorConditionMode.If, 0f, "IsDead");
                         Transition(death.AddTransition(idle), false, 0f).AddCondition(AnimatorConditionMode.IfNot, 0f, "IsDead");
                         changed = true;
@@ -504,9 +463,6 @@ namespace SeasonRush.EditorTools
             return t;
         }
 
-        // ---- prefabs
-
-        /// <summary>The prefab's root sits at 0,0 and shows the first picture of its default animation.</summary>
         static bool FixPrefab(string path, Sprite first)
         {
             GameObject root = PrefabUtility.LoadPrefabContents(path);
@@ -522,9 +478,6 @@ namespace SeasonRush.EditorTools
             finally { PrefabUtility.UnloadPrefabContents(root); }
         }
 
-        // ------------------------------------------------------------------ hooking the prefabs into the game
-
-        /// <summary>PlayerSkins.asset gets the two player prefabs (Player 1 = slot 0, Player 2 = slot 1).</summary>
         static bool LinkPlayerSkins()
         {
             string[] paths = { PrefabDir + "/Players/Player 1.prefab", PrefabDir + "/Players/Player 2.prefab" };
@@ -550,7 +503,6 @@ namespace SeasonRush.EditorTools
             return changed;
         }
 
-        /// <summary>Spring = Cloud, Fall = Dryleaves, Winter = Snowman: the three enemies of every season get that prefab (when they have none).</summary>
         static bool LinkEnemies()
         {
             bool changed = false;
@@ -573,13 +525,18 @@ namespace SeasonRush.EditorTools
             if (pictureForHeight != null && Exists(pictureForHeight))
             {
                 FeetPivot(pictureForHeight, out int drawn);
-                head = drawn / ppu;                                  // how high the picture reaches above the feet at scale 1
+                head = drawn / ppu;
             }
 
             bool changed = false;
             foreach (EnemyDef def in theme.enemies)
             {
-                if (def.visualPrefab != null) continue;              // already chosen (by you or an earlier run)
+                if (def.artFacing == ArtFacing.Unset)
+                {
+                    def.artFacing = ArtFacing.Left;
+                    changed = true;
+                }
+                if (def.visualPrefab != null) continue;
                 def.visualPrefab = prefab;
                 string current = def.sprite != null ? AssetDatabase.GetAssetPath(def.sprite) : "";
                 if (first != null && (current.Length == 0 || current.Contains("/Placeholders/"))) def.sprite = first;

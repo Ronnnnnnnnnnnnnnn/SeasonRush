@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 416350c6e62adcc47829f4c7406911c8, type: 3}
+  m_Name: Sounds
+  m_EditorClassIdentifier: Assembly-CSharp::SeasonRush.SoundSettings
+  menuMusic: {fileID: 8300000, guid: dd4da340195469a4db9fcfa17b249068, type: 3}
+  musicVolume: 0.5
+  fadeSeconds: 0.8
+  menuLoopSeconds: 16
+  loopCrossfadeSeconds: 1.2
+  seasonMusic:
+  - {fileID: 8300000, guid: 6fb95084202323f448f4f9bf1721f741, type: 3}
+  - {fileID: 8300000, guid: b90033d71c9c88f409ee067f3b289024, type: 3}
+  - {fileID: 8300000, guid: 1db7099e7a7d6f942b974edf6759d8ee, type: 3}
+  seasonMusicVolume: 0.45
+  countdownClip: {fileID: 8300000, guid: 0624eb470613ecd4185870239d6194a9, type: 3}
+  countdownSeconds: 3
+  endSeasonClip: {fileID: 8300000, guid: aacf43bf712ca44498409adc2f5a39d6, type: 3}
+  endSeasonSeconds: 10
+  duckedMusicLevel: 0.35
+  seasonChangeClip: {fileID: 8300000, guid: 15ebb5a7dfe92bc4696e089d3dd0475b, type: 3}
+  buttonClickClip: {fileID: 8300000, guid: 37c554306d647d44f8c212ed0ba33803, type: 3}
+  slashClips:
+  - {fileID: 8300000, guid: 2551e91c6fb418e42b864c3072c633bf, type: 3}
+  - {fileID: 8300000, guid: 68ae46caadabe8a41af7b306e3d8b2bf, type: 3}
+  hurtClip: {fileID: 8300000, guid: f25e5887dcb582b4b9c712cef02e7254, type: 3}
+  deathClip: {fileID: 8300000, guid: b0078a3946fe9334580993e1d8228b9c, type: 3}
+  winClip: {fileID: 8300000, guid: b3f9af4d3c25b2d47bee572c9e52cf5e, type: 3}
+  loseClip: {fileID: 8300000, guid: a4079aaf6b02e8a4f85f9bfa8ddcf4fb, type: 3}
+  drawClip: {fileID: 8300000, guid: d89d4326390978644a69b4184c7e987d, type: 3}
+  resultVolume: 1
+  sfxVolume: 1
+  pitchVariation: 0.06

@@ -5,10 +5,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Makes sure Assets/Resources/MenuStyle.asset exists (with the default look) so the menu's font, texts and colours can
-    /// be edited in the Inspector. It never overwrites an existing asset, so your edits are safe.
-    /// </summary>
     [InitializeOnLoad]
     public static class MenuStyleSetup
     {
@@ -28,7 +24,6 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogWarning("[Setup] Menu style asset could not be created: " + e.Message); }
         }
 
-        /// <returns>True when the asset was created just now.</returns>
         public static bool Ensure()
         {
             var existing = AssetDatabase.LoadAssetAtPath<MenuStyle>(AssetPath);
@@ -36,7 +31,7 @@ namespace SeasonRush.EditorTools
             {
                 if (existing.defaultsVersion < MenuStyle.CurrentDefaultsVersion)
                 {
-                    existing.MigrateDefaults();                  // flat-button colours (only colours you never changed)
+                    existing.MigrateDefaults();
                     EditorUtility.SetDirty(existing);
                     AssetDatabase.SaveAssets();
                     Debug.Log("[Setup] Menu style updated to the pastel colours: " + AssetPath);
@@ -52,7 +47,9 @@ namespace SeasonRush.EditorTools
             return true;
         }
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Select Menu Style (edit menu font, texts, colours)")]
+#endif
         public static void SelectAsset()
         {
             Ensure();

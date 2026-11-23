@@ -6,13 +6,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// The look of the game as a product:
-    ///  * Assets/2D Asset/Logo/Game title.png  -> the title picture at the top of the main menu (MenuStyle > Title Image),
-    ///  * Assets/2D Asset/Logo/Game logo.png   -> the app icon (Windows .exe, the phone's home screen) = Project Settings > Player > Icon,
-    ///  * the game's name is just "Season Rush" (Project Settings > Player > Product Name: the window title, the name under the phone icon).
-    /// It runs by itself when Unity loads the project (and from Rebuild Project Setup); Season Rush > Apply Game Title And Icon runs it again.
-    /// </summary>
     [InitializeOnLoad]
     public static class BrandingSetup
     {
@@ -35,7 +28,9 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogWarning("[Setup] The game title / icon could not be applied: " + e.Message); }
         }
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Apply Game Title And Icon")]
+#endif
         public static void ApplyFromMenu()
         {
             Apply(true);
@@ -55,14 +50,12 @@ namespace SeasonRush.EditorTools
         {
             bool changed = false;
 
-            // the game's name
             if (PlayerSettings.productName != ProductName)
             {
                 PlayerSettings.productName = ProductName;
                 changed = true;
             }
 
-            // the title picture on the menu
             if (Exists(TitlePath))
             {
                 ImportSprite(TitlePath);
@@ -77,7 +70,6 @@ namespace SeasonRush.EditorTools
                 }
             }
 
-            // the app icon
             if (Exists(IconPath))
             {
                 ImportIcon(IconPath);
@@ -86,7 +78,7 @@ namespace SeasonRush.EditorTools
                 bool has = current != null && current.Length > 0 && current[0] == icon;
                 if (icon != null && !has)
                 {
-                    PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { icon }, IconKind.Any);      // the default icon: used by every platform without its own
+                    PlayerSettings.SetIcons(NamedBuildTarget.Unknown, new[] { icon }, IconKind.Any);
                     changed = true;
                 }
             }
@@ -108,7 +100,7 @@ namespace SeasonRush.EditorTools
             importer.spritePixelsPerUnit = 100f;
             importer.alphaIsTransparency = true;
             importer.mipmapEnabled = false;
-            importer.filterMode = FilterMode.Point;                      // sharp pixel art
+            importer.filterMode = FilterMode.Point;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.maxTextureSize = 2048;

@@ -4,14 +4,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Visual map editor (menu: Season Rush > Map Editor).
-    ///
-    /// Shows the season map in the Scene view while the game is not running. Drag a tree or rock to move it, click
-    /// "Place with mouse" to drop new ones, Delete removes the selected one. With "mirror twin" on, every change is
-    /// applied to the matching prop on the other side, so both players keep the same cover.
-    /// Everything is stored in the Season Theme asset (Assets/Data), exactly like editing it in the Inspector.
-    /// </summary>
     public class SeasonRushMapEditor : EditorWindow
     {
         enum Kind { None, Prop, PlayerSpawn, EnemySpawn }
@@ -46,7 +38,6 @@ namespace SeasonRush.EditorTools
         List<SeasonTheme> _themes = new List<SeasonTheme>();
         bool _framed;
 
-        // state of the drag in progress (not saved)
         int _dragIndex = -1;
         int _dragTwin = -1;
         int _undoGroup;
@@ -55,15 +46,15 @@ namespace SeasonRush.EditorTools
 
         GUIStyle _labelStyle;
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Map Editor (move trees and rocks)")]
+#endif
         public static void Open()
         {
             var window = GetWindow<SeasonRushMapEditor>("Map Editor");
             window.minSize = new Vector2(330f, 440f);
             window.Show();
         }
-
-        // ================================================================== life cycle
 
         void OnEnable()
         {
@@ -111,7 +102,6 @@ namespace SeasonRush.EditorTools
             Repaint();
         }
 
-        /// <summary>Makes the preview match the window: shown for the chosen season, or removed.</summary>
         void SyncPreview()
         {
             bool want = _show && _theme != null && !EditorApplication.isPlayingOrWillChangePlaymode;
@@ -143,7 +133,6 @@ namespace SeasonRush.EditorTools
             _selIndex = -1;
         }
 
-        /// <summary>Call after any change to the theme: refresh preview, save, redraw.</summary>
         void Commit(bool save)
         {
             EditorUtility.SetDirty(_theme);
@@ -152,8 +141,6 @@ namespace SeasonRush.EditorTools
             SceneView.RepaintAll();
             Repaint();
         }
-
-        // ================================================================== window
 
         void OnGUI()
         {
@@ -348,11 +335,9 @@ namespace SeasonRush.EditorTools
             }
         }
 
-        // ================================================================== actions
-
         void AddNearCentre(int prop)
         {
-            Vector2 at = MapEditModel.Constrain(new Vector2(4.8f, 7.2f), _snap);       // off the mirror line: the twin lands at (7.2, 4.8)
+            Vector2 at = MapEditModel.Constrain(new Vector2(4.8f, 7.2f), _snap);
             AddProp(prop, at);
         }
 
@@ -395,21 +380,19 @@ namespace SeasonRush.EditorTools
             return "Enemy spawn point " + (index + 1);
         }
 
-        // ================================================================== Scene view
-
         bool Editable => _show && _theme != null && MapPreview.IsShown && MapPreview.Theme == _theme && !EditorApplication.isPlayingOrWillChangePlaymode;
 
         static bool MousePlane(Event e, out Vector2 plane)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-            var ground = new Plane(Vector3.back, Vector3.zero);                        // the z = 0 plane the map is drawn on
+            var ground = new Plane(Vector3.back, Vector3.zero);
             if (ground.Raycast(ray, out float distance))
             {
                 Vector3 p = ray.GetPoint(distance);
                 plane = Iso.ToPlane(new Vector2(p.x, p.y));
                 return true;
             }
-            plane = Iso.ToPlane(new Vector2(ray.origin.x, ray.origin.y));              // orthographic fallback
+            plane = Iso.ToPlane(new Vector2(ray.origin.x, ray.origin.y));
             return true;
         }
 
@@ -425,7 +408,6 @@ namespace SeasonRush.EditorTools
 
             if (e.type == EventType.Repaint) DrawGuides();
 
-            // clicking empty space clears the selection (and does not pick other scene objects)
             int emptyId = GUIUtility.GetControlID(EmptyHash, FocusType.Passive);
             if (_placeProp < 0)
             {
@@ -515,7 +497,6 @@ namespace SeasonRush.EditorTools
             }
         }
 
-        /// <summary>One draggable marker. Used for props and start points.</summary>
         void DoHandle(Kind kind, int index, Vector3 pos, Color colour, bool emphasise, string label, float colliderRadius, Vector2 plane)
         {
             Event e = Event.current;
@@ -542,7 +523,7 @@ namespace SeasonRush.EditorTools
                         _dragTwin = -1;
                         if (_mirror)
                             _dragTwin = kind == Kind.Prop ? MapEditModel.FindTwin(_theme, index) : MapEditModel.FindSpawnTwin(SpawnList(kind), index);
-                        Undo.IncrementCurrentGroup();                    // the whole drag becomes one Ctrl+Z step
+                        Undo.IncrementCurrentGroup();
                         _undoGroup = Undo.GetCurrentGroup();
                         Undo.RecordObject(_theme, kind == Kind.Prop ? "Move prop" : "Move start point");
                         e.Use();
@@ -590,7 +571,6 @@ namespace SeasonRush.EditorTools
         {
             if (_showColliders && colliderRadius > 0f)
             {
-                // the blocking circle lives on the flat plane; on screen it is an ellipse
                 const int steps = 40;
                 var ring = new Vector3[steps + 1];
                 for (int s = 0; s <= steps; s++)

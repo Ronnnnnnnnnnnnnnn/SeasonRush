@@ -2,11 +2,6 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// The death animation of an enemy. An enemy is removed from the game the moment it is killed, so the animation plays on a
-    /// harmless copy of its visual prefab (no network, no collider) that removes itself after a moment.
-    /// Only enemies whose Animator has a Trigger called "Die" get this (the Snowman does).
-    /// </summary>
     public static class EnemyDeathFx
     {
         const float Lifetime = 0.6f;

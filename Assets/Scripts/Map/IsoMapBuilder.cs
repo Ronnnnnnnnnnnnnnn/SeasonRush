@@ -54,7 +54,6 @@ namespace SeasonRush
             float n = GameConfig.ArenaSize;
             int cells = Mathf.RoundToInt(n);
 
-            // ---------- top surface ----------
             var ground = new MeshBatch();
             var side = new MeshBatch();
             for (int i = 0; i < cells; i++)
@@ -66,24 +65,21 @@ namespace SeasonRush
                     Vector2 p11 = Iso.ToScreen(new Vector2(i + 1, j + 1));
                     Vector2 p01 = Iso.ToScreen(new Vector2(i, j + 1));
 
-                    bool outerY = j == cells - 1;   // back-left edge of the diamond
-                    bool outerX = i == cells - 1;   // back-right edge of the diamond
+                    bool outerY = j == cells - 1;
+                    bool outerX = i == cells - 1;
 
                     if (outerY && theme.sideMaterial != null)
                     {
-                        // texture "right" edge (the ragged fringe) must face plane +y
                         side.Quad(p00, p10, p11, p01,
                             new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0));
                     }
                     else if (outerX && theme.sideMaterial != null)
                     {
-                        // texture "right" edge must face plane +x
                         side.Quad(p00, p10, p11, p01,
                             new Vector2(0, 0), new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 1));
                     }
                     else
                     {
-                        // alternate the orientation a little so the grass tufts do not form a visible grid
                         bool flip = ((i * 7 + j * 13) & 1) == 1;
                         if (flip)
                             ground.Quad(p00, p10, p11, p01,
@@ -97,7 +93,6 @@ namespace SeasonRush
             AddMesh(root.transform, "Ground", ground, theme.groundMaterial, Iso.GroundSortOrder);
             AddMesh(root.transform, "GroundFringe", side, theme.sideMaterial, Iso.GroundSortOrder + 1);
 
-            // ---------- patch (sand / ice) ----------
             if (theme.hasPatch && theme.patchMaterial != null)
             {
                 var patch = new MeshBatch();
@@ -118,25 +113,23 @@ namespace SeasonRush
                 AddMesh(root.transform, "Patch", patch, theme.patchMaterial, Iso.GroundSortOrder + 2);
             }
 
-            // ---------- cliff faces on the two front sides ----------
             if (theme.cliffMaterial != null)
             {
                 var cliff = new MeshBatch();
                 Vector2 south = Iso.ToScreen(new Vector2(0, 0));
                 Vector2 east = Iso.ToScreen(new Vector2(n, 0));
                 Vector2 west = Iso.ToScreen(new Vector2(0, n));
-                AddCliff(cliff, west, south, theme.cliffHeight);   // front-left face
-                AddCliff(cliff, south, east, theme.cliffHeight);   // front-right face
+                AddCliff(cliff, west, south, theme.cliffHeight);
+                AddCliff(cliff, south, east, theme.cliffHeight);
                 AddMesh(root.transform, "Cliff", cliff, theme.cliffMaterial, Iso.GroundSortOrder + 3);
             }
 
-            if (withProps) BuildProps(theme, root.transform, withColliders);      // the map baker builds the props itself, as prefabs
+            if (withProps) BuildProps(theme, root.transform, withColliders);
             return root;
         }
 
         public static Transform BuildProps(SeasonTheme theme, Transform mapRoot, bool withColliders = true)
         {
-            // ---------- props ----------
             var propsRoot = new GameObject("Props").transform;
             propsRoot.SetParent(mapRoot, false);
             int obstacleLayer = LayerMask.NameToLayer(ObstacleLayerName);
@@ -163,7 +156,6 @@ namespace SeasonRush
 
                     if (withColliders && def.colliderRadius > 0f)
                     {
-                        // The blocking collider lives on the flat gameplay plane, not at the drawn position.
                         var col = new GameObject("Collider");
                         col.transform.SetParent(propsRoot, false);
                         col.transform.position = new Vector3(pl.position.x, pl.position.y, 0f);
@@ -179,7 +171,6 @@ namespace SeasonRush
 
         static Vector2 PatchPoint(SeasonTheme theme, float angle)
         {
-            // slightly irregular outline so the patch looks organic, like the concept art
             float wobble = 1f + 0.13f * Mathf.Sin(angle * 3f + 1f) + 0.07f * Mathf.Sin(angle * 5f + 2f);
             return theme.patchCenter + new Vector2(Mathf.Cos(angle) * 1.15f, Mathf.Sin(angle)) * (theme.patchRadius * wobble);
         }

@@ -19,13 +19,9 @@ namespace SeasonRush
         public static OnlineMatchmaker Instance { get; private set; }
 
         public State Current { get; private set; } = State.Idle;
-        /// <summary>Short status line for the UI ("Waiting for a rival...").</summary>
         public string Stage { get; private set; } = "";
-        /// <summary>Why the last search failed, in plain language.</summary>
         public string Error { get; private set; } = "";
-        /// <summary>Name of the rival once the database has paired the players.</summary>
         public string Opponent { get; private set; } = "";
-        /// <summary>True while this player is part of an online match (waiting for, or playing against, a rival).</summary>
         public bool InSession => Current == State.WaitingForRival || Current == State.Matched;
         public bool IsBusy => Current == State.Searching || InSession;
         public float SearchSeconds => IsBusy ? Time.unscaledTime - _startedAt : 0f;
@@ -42,9 +38,6 @@ namespace SeasonRush
             _cts?.Cancel();
         }
 
-        // ------------------------------------------------------------------ public API
-
-        /// <summary>Start looking for a random rival. Safe to call from a button.</summary>
         public async void FindMatch()
         {
             if (IsBusy) return;
@@ -61,7 +54,6 @@ namespace SeasonRush
             await RunAsync(_cts.Token);
         }
 
-        /// <summary>Stop searching / leave the online match and return to the menu.</summary>
         public async void Leave()
         {
             _cts?.Cancel();
@@ -72,8 +64,6 @@ namespace SeasonRush
             Stage = "";
             Opponent = "";
         }
-
-        // ------------------------------------------------------------------ the search
 
         async Task RunAsync(CancellationToken token)
         {
@@ -121,15 +111,12 @@ namespace SeasonRush
             }
         }
 
-        // ------------------------------------------------------------------ database queue
-
         async Task RunDatabaseMatchAsync(SpacetimeManager db, CancellationToken token)
         {
             db.ClearPairing();
             db.JoinQueue();
             Debug.Log("[Online] joined the database queue as " + LocalPlayer.Name);
 
-            // wait here until the database pairs us with a rival (as long as it takes, the player can cancel)
             PairingInfo pairing;
             while ((pairing = db.CurrentPairing) == null)
             {
@@ -149,7 +136,6 @@ namespace SeasonRush
             else await ConnectDirectAsync(db, pairing, token);
         }
 
-        /// <summary>Unity Relay: both players open the session named by the database's match code.</summary>
         async Task ConnectViaRelayAsync(SpacetimeManager db, PairingInfo pairing, CancellationToken token)
         {
             Stage = $"Rival found: {Opponent}! Connecting through Unity Relay...";
@@ -158,7 +144,6 @@ namespace SeasonRush
 
             if (pairing.IAmHost)
             {
-                // the host creates the session; the guest joins it by the same id after the host says it is ready
                 _session = await MultiplayerService.Instance.CreateOrJoinSessionAsync(pairing.Code, options, token);
                 HookSession(_session);
                 db.PublishHostAddress("relay");
@@ -177,7 +162,6 @@ namespace SeasonRush
             Current = State.Matched;
         }
 
-        /// <summary>Direct connection: the host listens, publishes its address in the database, the guest connects to it.</summary>
         async Task ConnectDirectAsync(SpacetimeManager db, PairingInfo pairing, CancellationToken token)
         {
             ConnectionMenu menu = ConnectionMenu.Instance;
@@ -217,7 +201,6 @@ namespace SeasonRush
             Current = State.Matched;
         }
 
-        /// <summary>The address other PCs on the network can use to reach this one.</summary>
         static string LocalAddress()
         {
             try
@@ -233,11 +216,10 @@ namespace SeasonRush
                 }
                 if (fallback != null) return fallback;
             }
-            catch { /* offline: use loopback */ }
+            catch {  }
             return "127.0.0.1";
         }
 
-       
         async Task RunUnityQuickJoinAsync(CancellationToken token)
         {
             Stage = "Connecting to online services...";
@@ -308,17 +290,11 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>
-        /// Each game window signs in as its own anonymous player. A random profile name lets two copies of the
-        /// game on one PC (Editor + build) be two different players. Use -profile name to choose one.
-        /// </summary>
         static string Profile()
         {
             if (GameConfig.TryGetArg("-profile", out string profile) && !string.IsNullOrWhiteSpace(profile)) return profile;
             return "sr" + UnityEngine.Random.Range(100000, 999999);
         }
-
-        // ------------------------------------------------------------------ helpers
 
         static async Task WaitUntilAsync(Func<bool> condition, float timeoutSeconds, CancellationToken token, string timeoutMessage = "Timed out.")
         {
@@ -366,8 +342,6 @@ namespace SeasonRush
             NetworkManager nm = NetworkManager.Singleton;
             if (shutdownNetwork && nm != null && nm.IsListening) nm.Shutdown();
         }
-
-        // ------------------------------------------------------------------ errors
 
         const string NotLinkedMessage =
             "Online play is not set up yet. In Unity: Edit > Project Settings > Services, link this project to a Unity " +

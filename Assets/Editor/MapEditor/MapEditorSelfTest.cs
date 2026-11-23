@@ -8,12 +8,6 @@ using Object = UnityEngine.Object;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Automated check of the map editor's logic and preview (it cannot click in the Scene view, but everything the
-    /// mouse handles call is exercised). Run in batch mode:
-    /// Unity -batchmode -executeMethod SeasonRush.EditorTools.MapEditorSelfTest.Run -outDir some/folder
-    /// It never modifies the real theme assets: it works on copies.
-    /// </summary>
     public static class MapEditorSelfTest
     {
         static readonly List<string> Failures = new List<string>();
@@ -58,7 +52,6 @@ namespace SeasonRush.EditorTools
             SeasonTheme spring = Load("SpringTheme"), fall = Load("FallTheme"), winter = Load("WinterTheme");
             Check(spring != null && fall != null && winter != null, "the three theme assets load");
 
-            // ---------- maths ----------
             bool roundTrip = true;
             for (float x = 0.3f; x < 12f; x += 2.9f)
                 for (float y = 0.4f; y < 12f; y += 3.1f)
@@ -67,7 +60,6 @@ namespace SeasonRush.EditorTools
             Check(Near(MapEditModel.Constrain(new Vector2(-3f, 15f), 0f), new Vector2(0f, 12f)), "positions are kept inside the island");
             Check(Near(MapEditModel.Constrain(new Vector2(3.44f, 3.46f), 0.1f), new Vector2(3.4f, 3.5f)), "snapping to 0.1");
 
-            // ---------- the generated maps are fair ----------
             foreach (SeasonTheme t in new[] { spring, fall, winter })
             {
                 int noTwin = 0, offAxis = 0;
@@ -82,16 +74,14 @@ namespace SeasonRush.EditorTools
                 Check(w.Count == 0, $"{t.displayName}: map check finds nothing ({string.Join(" | ", w)})");
             }
 
-            // ---------- editing rules (on a copy) ----------
             SeasonTheme copy = Object.Instantiate(spring);
-            copy.hideFlags = HideFlags.HideAndDontSave;        // otherwise opening the scene below unloads the unreferenced copy
+            copy.hideFlags = HideFlags.HideAndDontSave;
             int small = -1;
             for (int i = 0; i < copy.placements.Length && small < 0; i++)
                 if (copy.placements[i].prop == 1 && !MapEditModel.OnMirrorAxis(copy.placements[i].position)) small = i;
             int smallTwin = MapEditModel.FindTwin(copy, small);
             Check(small >= 0 && smallTwin >= 0 && Near(copy.placements[smallTwin].position, MapEditModel.Swap(copy.placements[small].position)), "twin of a small tree found at the mirrored position");
 
-            // a whole drag (many small moves recorded the way the Scene handles do it) is undone by ONE Ctrl+Z
             SeasonTheme undoCopy = Object.Instantiate(spring);
             Vector2 original = undoCopy.placements[small].position;
             Undo.IncrementCurrentGroup();
@@ -142,7 +132,6 @@ namespace SeasonRush.EditorTools
             }
             Check(diag >= 0 && side >= 0, "enemy spawns: corner points have no twin, side points do");
 
-            // ---------- preview in the scene ----------
             EditorSceneManager.OpenScene(SeasonRushSetup.ScenePath, OpenSceneMode.Single);
             var scene = EditorSceneManager.GetActiveScene();
             bool dirtyBefore = scene.isDirty;
@@ -168,7 +157,6 @@ namespace SeasonRush.EditorTools
             Check(moved != null && Vector2.Distance(moved.position, Iso.ToScreen3(where)) < 0.001f, "UpdateProps puts the moved prop at its new screen position");
             Check(map.Find("Props").childCount == validProps + 1, "UpdateProps keeps exactly one Props object");
 
-            // ---------- picture of the preview (with the guide markers the Scene view draws) ----------
             string outDir = Arg("-outDir");
             if (!string.IsNullOrEmpty(outDir))
             {
@@ -181,7 +169,6 @@ namespace SeasonRush.EditorTools
                 RenderPicture(Path.Combine(outDir, "preview_fall.png"), fall);
             }
 
-            // ---------- clean up ----------
             MapPreview.Show(spring);
             MapPreview.OnPlayModeChanged(PlayModeStateChange.ExitingEditMode);
             Check(!MapPreview.IsShown && FindPreviewRoot() == null, "pressing Play removes the preview");
@@ -189,7 +176,6 @@ namespace SeasonRush.EditorTools
             foreach (Mesh m in Resources.FindObjectsOfTypeAll<Mesh>()) if (m.name == "Ground" || m.name == "Cliff" || m.name == "GroundFringe" || m.name == "Patch") leftoverMeshes++;
             Check(leftoverMeshes == 0, "the generated island meshes are freed");
 
-            // ---------- the window opens and closes without errors ----------
             SeasonRushMapEditor.Open();
             SeasonRushMapEditor window = EditorWindow.GetWindow<SeasonRushMapEditor>();
             Check(window != null, "the Map Editor window opens");
@@ -209,7 +195,6 @@ namespace SeasonRush.EditorTools
             return null;
         }
 
-        /// <summary>Renders the preview like the game camera does, then paints the markers the editor draws on top.</summary>
         static void RenderPicture(string path, SeasonTheme theme)
         {
             const int W = 1600, H = 900;
@@ -258,7 +243,7 @@ namespace SeasonRush.EditorTools
             }
             for (int i = 0; i < theme.playerSpawns.Length; i++) Dot(theme.playerSpawns[i], i == 0 ? new Color(0.2f, 0.4f, 1f) : new Color(1f, 0.2f, 0.2f), 8);
             foreach (Vector2 e in theme.enemySpawns) Dot(e, new Color(0.8f, 0.2f, 1f), 6);
-            for (int i = 0; i <= 48; i++)       // island outline and the mirror line
+            for (int i = 0; i <= 48; i++)
             {
                 float t = i / 48f * n;
                 Dot(new Vector2(t, 0f), Color.white, 1); Dot(new Vector2(t, n), Color.white, 1);

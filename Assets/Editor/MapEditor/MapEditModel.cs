@@ -3,28 +3,17 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// The rules of map editing, without any window or mouse code (so they can be tested in batch mode).
-    ///
-    /// Positions are in "plane" units (0..12), see <see cref="Iso"/>. The two players should have the same cover, so a
-    /// prop at (x, y) normally has a <b>mirror twin</b> of the same type at (y, x) drawn flipped. Moving, adding and
-    /// deleting can keep the pair together.
-    /// </summary>
     public static class MapEditModel
     {
-        /// <summary>How close the twin must be to the exact mirror position to count as the twin.</summary>
         public const float TwinTolerance = 0.06f;
-        /// <summary>Blocking props closer than this to a player start are reported by <see cref="Check"/>.</summary>
         public const float MinSpawnClearance = 1.5f;
 
         public static float Limit => GameConfig.ArenaSize;
 
         public static Vector2 Swap(Vector2 v) => new Vector2(v.y, v.x);
 
-        /// <summary>True on the diagonal x = y: such a prop is its own mirror image and has no twin.</summary>
         public static bool OnMirrorAxis(Vector2 p) => Mathf.Abs(p.x - p.y) <= 0.01f;
 
-        /// <summary>Snaps to the grid (0 = no snapping) and keeps the point inside the island.</summary>
         public static Vector2 Constrain(Vector2 p, float snap)
         {
             if (snap > 0.0001f)
@@ -47,9 +36,6 @@ namespace SeasonRush.EditorTools
             return "?";
         }
 
-        // ------------------------------------------------------------------ props
-
-        /// <summary>Index of the mirror twin of placement <paramref name="i"/>, or -1 if it has none.</summary>
         public static int FindTwin(SeasonTheme t, int i)
         {
             if (!IsValid(t, i)) return -1;
@@ -67,7 +53,6 @@ namespace SeasonRush.EditorTools
             return best;
         }
 
-        /// <summary>Moves placement <paramref name="i"/> and, if <paramref name="twin"/> is a valid index, its twin to the mirror position.</summary>
         public static void MovePlacement(SeasonTheme t, int i, int twin, Vector2 position)
         {
             if (!IsValid(t, i)) return;
@@ -82,8 +67,6 @@ namespace SeasonRush.EditorTools
             }
         }
 
-        /// <summary>Adds a prop. With <paramref name="mirror"/> and a position off the diagonal the twin is added right after it.</summary>
-        /// <returns>The index of the new prop; the twin (if any) is returned in <paramref name="twinIndex"/>, otherwise -1.</returns>
         public static int AddPlacement(SeasonTheme t, int prop, Vector2 position, bool mirror, out int twinIndex)
         {
             var list = new List<PropPlacement>(t.placements ?? new PropPlacement[0]);
@@ -99,7 +82,6 @@ namespace SeasonRush.EditorTools
             return index;
         }
 
-        /// <summary>Removes the given placements (indices may be in any order; invalid ones are ignored).</summary>
         public static void RemovePlacements(SeasonTheme t, params int[] indices)
         {
             if (t.placements == null) return;
@@ -110,7 +92,6 @@ namespace SeasonRush.EditorTools
             t.placements = keep.ToArray();
         }
 
-        /// <summary>Changes the type of a prop (and of its twin).</summary>
         public static void SetType(SeasonTheme t, int i, int twin, int prop)
         {
             if (!IsValid(t, i)) return;
@@ -132,8 +113,6 @@ namespace SeasonRush.EditorTools
             a.flipX = flip;
             t.placements[i] = a;
         }
-
-        // ------------------------------------------------------------------ spawn points
 
         public static int FindSpawnTwin(Vector2[] list, int i)
         {
@@ -157,9 +136,6 @@ namespace SeasonRush.EditorTools
             if (twin >= 0 && twin < list.Length && twin != i) list[twin] = Swap(position);
         }
 
-        // ------------------------------------------------------------------ checks
-
-        /// <summary>Plain-language problems with the layout (empty list = nothing wrong).</summary>
         public static List<string> Check(SeasonTheme t)
         {
             var warnings = new List<string>();
@@ -177,7 +153,7 @@ namespace SeasonRush.EditorTools
                 string label = $"{def.name} #{i} at ({pl.position.x:0.0}, {pl.position.y:0.0})";
                 if (pl.position.x < 0f || pl.position.y < 0f || pl.position.x > Limit || pl.position.y > Limit)
                     warnings.Add($"{label} is outside the island.");
-                if (def.colliderRadius <= 0f) continue;                                    // decoration only: cosmetic
+                if (def.colliderRadius <= 0f) continue;
 
                 if (t.playerSpawns != null)
                     for (int s = 0; s < t.playerSpawns.Length; s++)

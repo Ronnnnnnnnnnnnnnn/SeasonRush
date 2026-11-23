@@ -18,17 +18,12 @@ namespace SeasonRush
         public readonly NetworkVariable<double> PhaseEndTime = new NetworkVariable<double>(0d);
         public readonly NetworkVariable<int> WinnerSlot = new NetworkVariable<int>(-1);
 
-        /// <summary>True while the game is frozen by a player's PAUSE (the match clock, the enemies, both warriors).</summary>
         public readonly NetworkVariable<bool> Paused = new NetworkVariable<bool>(false);
         public readonly NetworkVariable<int> PausedBySlot = new NetworkVariable<int>(-1);
-        /// <summary>Server time at which the pause started (so everybody can show how long it will last).</summary>
         public readonly NetworkVariable<double> PausedAt = new NetworkVariable<double>(0d);
-        /// <summary>The match time that was left when the pause started (shown while frozen).</summary>
         public readonly NetworkVariable<float> PausedRemaining = new NetworkVariable<float>(0f);
-        /// <summary>Slot of the player who gave up (-1 = nobody). The other player wins.</summary>
         public readonly NetworkVariable<int> SurrenderSlot = new NetworkVariable<int>(-1);
 
-        /// <summary>A pause ends by itself after this many seconds, so a player cannot freeze the rival's game forever.</summary>
         public const float MaxPauseSeconds = 60f;
         public event Action<int> SeasonChanged;
         public event Action<int> MatchFinished;
@@ -46,8 +41,6 @@ namespace SeasonRush
         }
 
         public string SeasonName => MapManager.Instance != null ? MapManager.Instance.Theme(SeasonIndex.Value).displayName : "";
-
-        // ------------------------------------------------------------------ lifecycle
 
         public override void OnNetworkSpawn()
         {
@@ -67,8 +60,6 @@ namespace SeasonRush
             if (MapManager.Instance != null) MapManager.Instance.ShowSeason(current);
         }
 
-        // ------------------------------------------------------------------ server state machine
-
         void Update()
         {
             if (!IsServer) return;
@@ -77,7 +68,6 @@ namespace SeasonRush
 
             if (Paused.Value)
             {
-                // nothing moves, the clocks do not run; it ends when the player resumes, leaves, or after MaxPauseSeconds
                 bool pauserHere = false;
                 foreach (PlayerStats p in PlayerStats.All) if (p.Slot.Value == PausedBySlot.Value) pauserHere = true;
                 bool inMatch = Phase.Value == MatchPhase.Countdown || Phase.Value == MatchPhase.Playing;
@@ -88,7 +78,6 @@ namespace SeasonRush
             switch (Phase.Value)
             {
                 case MatchPhase.Lobby:
-                    // the match starts by itself as soon as both players are connected
                     if (PlayerStats.All.Count >= GameConfig.MaxPlayers) ServerBeginCountdown();
                     break;
 
@@ -127,24 +116,19 @@ namespace SeasonRush
 
         void ServerStartSeason(int season)
         {
-            ClearEnemies();                                   // every season is a fresh start
+            ClearEnemies();
             SeasonIndex.Value = season;
             PhaseEndTime.Value = NetworkManager.ServerTime.Time + GameConfig.SeasonSeconds;
             Phase.Value = MatchPhase.Playing;
             _nextEnemySpawn = Time.time + 1.0f;
 
-            // new map, new obstacles: put both warriors back on their starting spots
             foreach (PlayerStats p in PlayerStats.All) p.MoveToSpawn();
 
             SeasonChangedClientRpc(season);
         }
 
-        // ------------------------------------------------------------------ pause and surrender
-
-        /// <summary>Freezes (true) or unfreezes (false) the game for everybody. Only the player who paused can resume.</summary>
         public void RequestPause(bool pause) => SetPausedServerRpc(pause);
 
-        /// <summary>Gives up: the rival wins the match.</summary>
         public void RequestSurrender() => SurrenderServerRpc();
 
         PlayerStats PlayerOf(ulong clientId)
@@ -173,7 +157,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>Ends the pause and moves every running clock forward by the time that was frozen.</summary>
         void ServerResume()
         {
             if (!IsServer || !Paused.Value) return;
@@ -195,7 +178,7 @@ namespace SeasonRush
 
             int rival = -1;
             foreach (PlayerStats p in PlayerStats.All) if (p != who) rival = p.Slot.Value;
-            if (rival < 0) { ServerFinishMatch(); return; }          // nobody to win: just end it
+            if (rival < 0) { ServerFinishMatch(); return; }
 
             SurrenderSlot.Value = who.Slot.Value;
             ServerFinishMatch(rival);
@@ -219,7 +202,7 @@ namespace SeasonRush
                 else if (cmp == 0) tie = true;
             }
             if (best != null && !tie) winner = best.Slot.Value;
-            if (forcedWinner != -2) winner = forcedWinner;           // the rival gave up
+            if (forcedWinner != -2) winner = forcedWinner;
 
             WinnerSlot.Value = winner;
             Phase.Value = MatchPhase.Finished;
@@ -258,7 +241,6 @@ namespace SeasonRush
             Phase.Value = MatchPhase.Lobby;
         }
 
-        
         void TickEnemySpawner()
         {
             if (enemyPrefab == null || Time.time < _nextEnemySpawn) return;
@@ -300,7 +282,6 @@ namespace SeasonRush
                 if (e != null && e.NetworkObject != null && e.NetworkObject.IsSpawned) e.NetworkObject.Despawn(true);
         }
 
-        /// <summary>Called by an enemy when it dies: the killer gets the points.</summary>
         public void ServerAwardKill(ulong killerClientId, int points, Vector2 planePosition, string enemyName)
         {
             if (!IsServer) return;
@@ -313,7 +294,6 @@ namespace SeasonRush
                 return;
             }
         }
-
 
         [ClientRpc]
         void SeasonChangedClientRpc(int season)

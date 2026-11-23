@@ -6,25 +6,14 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Puts the artist's own pictures in place of the generated placeholders:
-    ///  * Winter: Assets/2D Asset/Winter (ground, side, cliff, ice patch, rocks, bushes, pine_tree.png + pine_tree2.png),
-    ///  * the Spring cloud enemies: cloud1.png + cloud2.png (two pictures of a floating cloud; the game shows them one
-    ///    after the other).
-    /// It runs by itself when Unity loads the project (and when "Rebuild Project Setup" / "Reset Maps" build the defaults), changes
-    /// only what still uses a placeholder, and never touches maps, props or enemies you changed by hand.
-    /// Menu: Season Rush > Apply Winter And Cloud Art runs it again.
-    /// </summary>
     [InitializeOnLoad]
     public static class SeasonArtSetup
     {
         public const string WinterDir = "Assets/2D Asset/Winter";
         public const string ThemeDir = "Assets/Data";
         public const string MaterialDir = "Assets/Materials";
-        /// <summary>Pixels per unit of the cloud pictures: the cloud (without its shadow) becomes about 0.9 map units wide.</summary>
         public const float CloudPpu = 1100f;
 
-        /// <summary>The Winter map as generated has this many props (8 pines + 6 rocks); more or fewer means it was edited by hand.</summary>
         const int DefaultWinterPlacementCount = 14;
 
         static SeasonArtSetup()
@@ -41,7 +30,9 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogWarning("[Setup] Winter / cloud art could not be applied: " + e.Message); }
         }
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Apply Winter And Cloud Art")]
+#endif
         public static void ApplyFromMenu()
         {
             bool changed = ApplyToExistingThemes();
@@ -50,14 +41,11 @@ namespace SeasonRush.EditorTools
                 : "Nothing to change: everything that can use your pictures already does (or the pictures are not in Assets/2D Asset yet).", "OK");
         }
 
-        /// <summary>Batch mode: Unity -batchmode -executeMethod SeasonRush.EditorTools.SeasonArtSetup.ApplyFromCommandLine</summary>
         public static void ApplyFromCommandLine()
         {
             try { ApplyToExistingThemes(); EditorApplication.Exit(0); }
             catch (Exception e) { Debug.LogError("[Setup] FAILED: " + e); EditorApplication.Exit(1); }
         }
-
-        // ------------------------------------------------------------------ what is available
 
         static bool Exists(string path) => File.Exists(Path.GetFullPath(path));
 
@@ -71,7 +59,6 @@ namespace SeasonRush.EditorTools
         public static bool HasPine => Exists(WinterDir + "/pine_tree.png");
         public static bool HasPine2 => Exists(WinterDir + "/pine_tree2.png");
 
-        /// <summary>Finds a picture by file name anywhere under Assets/2D Asset (the artist may have put it in any folder).</summary>
         static string FindPicture(string fileName)
         {
             foreach (string guid in AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension(fileName) + " t:Texture2D", new[] { "Assets/2D Asset" }))
@@ -82,9 +69,6 @@ namespace SeasonRush.EditorTools
             return null;
         }
 
-        // ------------------------------------------------------------------ for the generated default maps
-
-        /// <summary>The Winter prop types with the artist's pictures: pine (placeholder), 3 rocks, 2 bushes.</summary>
         internal static PropDef[] WinterPropDefs(Sprite pine)
         {
             var list = new List<PropDef>(WinterPropDefsWithoutPine2(pine));
@@ -92,7 +76,6 @@ namespace SeasonRush.EditorTools
             return list.ToArray();
         }
 
-        /// <summary>Size of the artist's pine relative to the other props (the picture is about 2.9 map units tall at scale 1).</summary>
         public const float PineScale = 0.8f;
 
         static PropDef[] WinterPropDefsWithoutPine2(Sprite placeholderPine)
@@ -109,7 +92,6 @@ namespace SeasonRush.EditorTools
             };
         }
 
-        /// <summary>Gives the Spring cloud enemies (as generated) the artist's cloud pictures. Does nothing without the pictures.</summary>
         internal static void ApplyCloudSprites(EnemyDef[] enemies)
         {
             if (!PrepareCloudFrames(out Sprite[] frames, out float headHeight)) return;
@@ -124,14 +106,12 @@ namespace SeasonRush.EditorTools
             def.headHeight = headHeight;
         }
 
-        // ------------------------------------------------------------------ for maps that already exist
-
-        /// <summary>Applies the pictures to the existing Winter and Spring maps. Returns true when something changed.</summary>
         public static bool ApplyToExistingThemes()
         {
             bool changed = false;
             if (HasWinterArt) changed |= ApplyWinter();
             changed |= ApplyPines();
+            changed |= ApplyFallSide();
             changed |= ApplyClouds();
             if (changed)
             {
@@ -152,7 +132,6 @@ namespace SeasonRush.EditorTools
             var theme = AssetDatabase.LoadAssetAtPath<SeasonTheme>(ThemeDir + "/WinterTheme.asset");
             if (theme == null || theme.props == null || !HasWinterProps) return changed;
 
-            // rocks that still use the Spring rock pictures become the Winter rocks
             for (int i = 0; i < theme.props.Length; i++)
             {
                 PropDef def = theme.props[i];
@@ -161,14 +140,13 @@ namespace SeasonRush.EditorTools
                 char n = name[name.Length - 1];
                 if (n < '1' || n > '3') continue;
                 string current = def.sprite != null ? AssetDatabase.GetAssetPath(def.sprite) : "";
-                if (current.Length > 0 && !current.Contains("/Spring/")) continue;                    // not the generated one: leave it
+                if (current.Length > 0 && !current.Contains("/Spring/")) continue;
                 def.sprite = SeasonRushSetup.PropSprite($"{WinterDir}/rock{n}_winter.png");
-                def.tint = Color.white;                                                                   // the Winter rocks already have snow on them
+                def.tint = Color.white;
                 def.name = "Rock" + n;
                 changed = true;
             }
 
-            // the two bush types (added at the end, so no existing prop number changes)
             bool hasBush = false;
             foreach (PropDef def in theme.props) if (def.name == "Bush" || def.name == "Bush2") hasBush = true;
             if (!hasBush)
@@ -181,7 +159,6 @@ namespace SeasonRush.EditorTools
                 };
                 theme.props = list.ToArray();
 
-                // a map that was never edited by hand also gets a few bushes; an edited one only gets the new types to place itself
                 if (theme.placements != null && theme.placements.Length == DefaultWinterPlacementCount)
                 {
                     var placements = new List<PropPlacement>(theme.placements);
@@ -196,10 +173,6 @@ namespace SeasonRush.EditorTools
             return changed;
         }
 
-        /// <summary>
-        /// The Winter pine is a placeholder picture until pine_tree.png is there. Then "Pine" uses it, and a second type "Pine2" (pine_tree2.png)
-        /// is added; on a Winter map that was never edited by hand the trees at the back of the island use it, so the forest is not all the same.
-        /// </summary>
         static bool ApplyPines()
         {
             if (!HasPine) return false;
@@ -237,7 +210,7 @@ namespace SeasonRush.EditorTools
                     for (int i = 0; i < theme.placements.Length; i++)
                     {
                         PropPlacement pl = theme.placements[i];
-                        if (pl.prop == pine && pl.position.x + pl.position.y > 12f) { pl.prop = pine2; theme.placements[i] = pl; }     // mirror twins stay equal: same x + y
+                        if (pl.prop == pine && pl.position.x + pl.position.y > 12f) { pl.prop = pine2; theme.placements[i] = pl; }
                     }
                 }
                 changed = true;
@@ -251,7 +224,6 @@ namespace SeasonRush.EditorTools
             return changed;
         }
 
-        /// <summary>The Winter map prefab in Assets/Prefabs/Maps is made from the theme: make it again so the scene shows the new pines.</summary>
         static void RebakeWinterMap(SeasonTheme theme)
         {
             try
@@ -261,19 +233,32 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogWarning("[Setup] The Winter map prefab was not updated (run Season Rush > Update Maps In Scene): " + e.Message); }
         }
 
+        static bool ApplyFallSide()
+        {
+            var material = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialDir}/Fall_Side.mat");
+            if (material == null) return false;
+            string current = material.mainTexture != null ? AssetDatabase.GetAssetPath(material.mainTexture) : "";
+            if (!current.EndsWith("side2_grass_fall.png", StringComparison.OrdinalIgnoreCase)) return false;
+            string better = FindPicture("side1_grass_fall.png");
+            if (better == null) return false;
+            material.mainTexture = SeasonRushSetup.Tex(better);
+            EditorUtility.SetDirty(material);
+            Debug.Log("[Setup] Fall_Side now uses side1_grass_fall.png: side2_grass_fall.png has its see-through edge on the wrong side, which left a thin gap (a line) along the back edges of the Fall island.");
+            return true;
+        }
+
         static void AddPair(List<PropPlacement> list, int prop, float x, float y)
         {
             list.Add(new PropPlacement { prop = prop, position = new Vector2(x, y), flipX = false });
             list.Add(new PropPlacement { prop = prop, position = new Vector2(y, x), flipX = true });
         }
 
-        /// <summary>Gives a material the artist's picture when it still shows a generated placeholder.</summary>
         static bool ReplacePlaceholderTexture(string materialName, string picturePath)
         {
             var material = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialDir}/{materialName}.mat");
             if (material == null) return false;
             string current = material.mainTexture != null ? AssetDatabase.GetAssetPath(material.mainTexture) : "";
-            if (current.Length > 0 && !current.Contains("/Placeholders/")) return false;                // already the artist's (or your own)
+            if (current.Length > 0 && !current.Contains("/Placeholders/")) return false;
             material.mainTexture = SeasonRushSetup.Tex(picturePath);
             EditorUtility.SetDirty(material);
             return true;
@@ -298,12 +283,6 @@ namespace SeasonRush.EditorTools
             return true;
         }
 
-        // ------------------------------------------------------------------ the cloud pictures
-
-        /// <summary>
-        /// cloud1.png / cloud2.png are two pictures of the same floating cloud, each with its own shadow underneath. They
-        /// get their pivot in the middle of the shadow, so the shadow stays on the cloud's ground position in both.
-        /// </summary>
         internal static bool PrepareCloudFrames(out Sprite[] frames, out float headHeight)
         {
             frames = null;
@@ -330,7 +309,6 @@ namespace SeasonRush.EditorTools
             return true;
         }
 
-        /// <summary>Pivot in the middle of the lowest part of the drawing (the shadow), and how high the drawing reaches above it.</summary>
         static Vector2 GroundPivot(string path, out float topUnits)
         {
             var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);

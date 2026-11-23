@@ -4,13 +4,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Shows one season map in the Scene view while you are NOT playing, so it can be edited.
-    ///
-    /// The preview objects are hidden and flagged "do not save": they never end up in the scene file or in a build.
-    /// They are removed automatically when you press Play, switch or close the scene, recompile, or close the
-    /// Map Editor window.
-    /// </summary>
     [InitializeOnLoad]
     public static class MapPreview
     {
@@ -38,7 +31,6 @@ namespace SeasonRush.EditorTools
             if (state == PlayModeStateChange.ExitingEditMode || state == PlayModeStateChange.EnteredPlayMode) Clear();
         }
 
-        /// <summary>Builds the whole map (ground, cliffs, patch and props) of <paramref name="theme"/> in the Scene view.</summary>
         public static void Show(SeasonTheme theme)
         {
             Clear();
@@ -51,7 +43,6 @@ namespace SeasonRush.EditorTools
             MarkAll();
         }
 
-        /// <summary>Rebuilds only the props (cheap): call it after changing placements or prop types.</summary>
         public static void UpdateProps()
         {
             if (_root == null || _map == null || _theme == null) return;
@@ -65,7 +56,6 @@ namespace SeasonRush.EditorTools
         {
             if (_root != null)
             {
-                // the island is made of generated meshes: free them too
                 foreach (MeshFilter filter in _root.GetComponentsInChildren<MeshFilter>(true))
                     if (filter.sharedMesh != null) Object.DestroyImmediate(filter.sharedMesh);
                 Object.DestroyImmediate(_root);
@@ -78,10 +68,9 @@ namespace SeasonRush.EditorTools
         static void MarkAll()
         {
             foreach (Transform t in _root.GetComponentsInChildren<Transform>(true)) t.gameObject.hideFlags = Flags;
-            SceneVisibilityManager.instance.DisablePicking(_root, true);      // clicks go to the editor handles, not to the preview
+            SceneVisibilityManager.instance.DisablePicking(_root, true);
         }
 
-        /// <summary>After a crash or an odd reload a hidden preview may be left behind: remove it.</summary>
         static void RemoveStrays()
         {
             foreach (GameObject go in Resources.FindObjectsOfTypeAll<GameObject>())

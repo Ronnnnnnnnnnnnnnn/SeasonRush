@@ -55,7 +55,6 @@ namespace SeasonRush
             NetworkManager nm = NetworkManager.Singleton;
             if (nm == null) return;
 
-            // solo practice: the host starts the match itself after a short pause
             if (!_soloStarted && GameConfig.HasFlag("-solo") && nm.IsServer && MatchManager.Instance != null
                 && MatchManager.Instance.Phase.Value == MatchPhase.Lobby && _time > 3f)
             {
@@ -64,7 +63,6 @@ namespace SeasonRush
                 MatchManager.Instance.ServerBeginCountdown();
             }
 
-            // test of the result screen's BACK button: press it (through the same code) 2.5 s after the match is finished
             if (GameConfig.HasFlag("-backAfterFinish") && MatchManager.Instance != null && MatchManager.Instance.Phase.Value == MatchPhase.Finished)
             {
                 if (_finishedAt < 0f) _finishedAt = _time;
@@ -76,7 +74,6 @@ namespace SeasonRush
                 }
             }
 
-            // test of PAUSE: pause 3 s into the match, check that the match clock stands still, resume at 7 s; -surrenderTest then surrenders at 9 s
             if (GameConfig.HasFlag("-pauseTest") && MatchManager.Instance != null && MatchManager.Instance.Phase.Value == MatchPhase.Playing)
             {
                 if (_playingAt < 0f) _playingAt = _time;
@@ -108,7 +105,6 @@ namespace SeasonRush
                 }
             }
 
-            // test of the BACK button in the waiting lobby
             if (GameConfig.HasFlag("-lobbyBack") && !_lobbyBackPressed && _time > 6f && MatchManager.Instance != null && MatchManager.Instance.Phase.Value == MatchPhase.Lobby)
             {
                 _lobbyBackPressed = true;
@@ -143,10 +139,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>
-        /// Presses keys the way a human would, but through the Input System instead of the OS keyboard.
-        /// Timeline (seconds after the match starts): D, W, A, S held 2 s each, then D+W, then Space taps.
-        /// </summary>
         void SimulateKeys()
         {
             Keyboard kb = Keyboard.current;
@@ -165,7 +157,6 @@ namespace SeasonRush
             else if (t >= 9f && t < 11f) { state.Set(Key.D, true); state.Set(Key.W, true); label = "D+W"; }
             else if (t >= 11f)
             {
-                // tap Space for 0.1 s every 0.5 s
                 if ((t - 11f) % 0.5f < 0.1f) { state.Set(Key.Space, true); label = "Space"; }
             }
 
@@ -178,10 +169,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>
-        /// Uses the on-screen controls like a finger would, but through a simulated pointer:
-        /// press on the left side and drag right, then up, release, then press and release the ATTACK button.
-        /// </summary>
         void SimulateJoystick()
         {
             Mouse mouse = Mouse.current;
@@ -214,7 +201,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>Bot: run to the closest enemy and keep swinging; otherwise wander to the centre.</summary>
         void Drive()
         {
             PlayerStats me = PlayerStats.Local;
@@ -237,7 +223,7 @@ namespace SeasonRush
                 float dist = to.magnitude;
                 PlayerController.TestPlaneMove = dist > 1.0f ? to / dist : Vector2.zero;
                 PlayerCombat.TestAttack = dist < 2.0f;
-                if (dist <= 1.0f) PlayerController.TestPlaneMove = to / Mathf.Max(0.01f, dist) * 0.12f;  // keep facing it
+                if (dist <= 1.0f) PlayerController.TestPlaneMove = to / Mathf.Max(0.01f, dist) * 0.12f;
             }
             else
             {

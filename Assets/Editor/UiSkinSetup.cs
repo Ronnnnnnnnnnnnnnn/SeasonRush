@@ -5,15 +5,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Makes the wooden menu skin work: Assets/2D Asset/Buttonborder (buttons, input field, checkbox), Assets/2D Asset/Panelborder (panels,
-    /// divider) and Assets/Font (Jersey 10 for titles and buttons, VT323 for small texts).
-    ///
-    /// The pictures get the right import settings (sharp pixels, 9-slice borders so a button or panel can be any size without stretching its
-    /// wooden frame, 200 pixels per unit = drawn at half size on the 1080 px high canvas), the fonts are imported, and the pictures / fonts are
-    /// put into Assets/Resources/MenuStyle.asset (only where it is still empty). It runs by itself when Unity loads the project;
-    /// Season Rush > Apply Pixel UI Skin runs it again.
-    /// </summary>
     [InitializeOnLoad]
     public static class UiSkinSetup
     {
@@ -36,7 +27,9 @@ namespace SeasonRush.EditorTools
             catch (Exception e) { Debug.LogWarning("[Setup] The pixel UI skin could not be applied: " + e.Message); }
         }
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Apply Pixel UI Skin")]
+#endif
         public static void ApplyFromMenu()
         {
             bool found = Apply(true);
@@ -55,12 +48,10 @@ namespace SeasonRush.EditorTools
 
         public static bool HasArt => Exists(ButtonDir + "/Btn_Spring_Large.png") && Exists(PanelDir + "/Panel_Menu.png");
 
-        /// <param name="force">True = fill the pictures into MenuStyle even where it already has others.</param>
         public static bool Apply(bool force)
         {
             if (!HasArt) return false;
 
-            // ---- pictures: (path, border left/bottom/right/top in pixels)
             foreach (string size in new[] { "Large", "Medium", "Small" })
             {
                 int b = size == "Large" ? 36 : size == "Medium" ? 32 : 28;
@@ -75,11 +66,9 @@ namespace SeasonRush.EditorTools
             foreach (string panel in new[] { "Menu", "Profile", "Leaderboard", "LocalNetwork" })
                 ImportSliced($"{PanelDir}/Panel_{panel}.png", new Vector4(10, 10, 10, 10));
 
-            // ---- fonts
             Font jersey = ImportFont(FontDir + "/Jersey_10/Jersey10-Regular.ttf");
             Font vt323 = ImportFont(FontDir + "/VT323/VT323-Regular.ttf");
 
-            // ---- MenuStyle.asset
             MenuStyleSetup.Ensure();
             var style = AssetDatabase.LoadAssetAtPath<MenuStyle>(MenuStyleSetup.AssetPath);
             if (style == null) return true;
@@ -131,8 +120,6 @@ namespace SeasonRush.EditorTools
             return null;
         }
 
-        // ------------------------------------------------------------------ importing
-
         static void ImportSliced(string path, Vector4 border)
         {
             var importer = AssetImporter.GetAtPath(path) as TextureImporter;
@@ -148,14 +135,14 @@ namespace SeasonRush.EditorTools
             importer.spriteBorder = border;
             importer.alphaIsTransparency = true;
             importer.mipmapEnabled = false;
-            importer.filterMode = FilterMode.Point;                          // sharp pixel art
+            importer.filterMode = FilterMode.Point;
             importer.wrapMode = TextureWrapMode.Clamp;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.maxTextureSize = 2048;
 
             var settings = new TextureImporterSettings();
             importer.ReadTextureSettings(settings);
-            settings.spriteMeshType = SpriteMeshType.FullRect;               // a sliced picture needs the full rectangle
+            settings.spriteMeshType = SpriteMeshType.FullRect;
             settings.spriteAlignment = (int)SpriteAlignment.Center;
             importer.SetTextureSettings(settings);
             importer.SaveAndReimport();
@@ -166,7 +153,7 @@ namespace SeasonRush.EditorTools
             var importer = AssetImporter.GetAtPath(path) as TrueTypeFontImporter;
             if (importer != null && importer.fontRenderingMode != FontRenderingMode.HintedRaster)
             {
-                importer.fontRenderingMode = FontRenderingMode.HintedRaster;        // crisp edges for a pixel font
+                importer.fontRenderingMode = FontRenderingMode.HintedRaster;
                 importer.SaveAndReimport();
             }
             return AssetDatabase.LoadAssetAtPath<Font>(path);

@@ -6,26 +6,14 @@ using UnityEngine.UI;
 
 namespace SeasonRush
 {
-    /// <summary>
-    /// On-screen controls: a floating joystick (touch or press anywhere in the left part of the screen
-    /// and drag) and a big ATTACK button on the right (hold it to keep swinging).
-    ///
-    /// Works with fingers (multi-touch: move with one finger, attack with another) and with a mouse.
-    /// The keyboard keeps working at the same time. The joystick direction is "screen aligned":
-    /// pushing it up moves the warrior up the screen, exactly like the W key.
-    /// </summary>
     public class VirtualControls : MonoBehaviour
     {
         public static VirtualControls Instance { get; private set; }
 
-        /// <summary>Joystick direction on the screen: right = +x, up = +y, length 0..1 (0 inside the dead zone).</summary>
         public static Vector2 Move { get; private set; }
-        /// <summary>True while a finger / the mouse is holding the attack button.</summary>
         public static bool AttackHeld { get; private set; }
-        /// <summary>True while the on-screen controls are shown (in a match, after the warrior has spawned).</summary>
         public static bool Visible => Instance != null && Instance._visible;
 
-        // sizes are in "virtual pixels" of a 1080 pixel high screen
         const float StickRadius = 120f;
         const float KnobRadius = 54f;
         const float AttackRadius = 100f;
@@ -35,7 +23,7 @@ namespace SeasonRush
         struct Pointer
         {
             public int id;
-            public Vector2 position;       // pixels, origin bottom-left (Input System convention)
+            public Vector2 position;
             public bool down;
             public bool pressedThisFrame;
         }
@@ -44,7 +32,7 @@ namespace SeasonRush
         int _stickPointer = None;
         int _attackPointer = None;
         Vector2 _stickCentrePx;
-        Vector2 _knob;                     // -1..1, y up
+        Vector2 _knob;
         bool _visible;
 
         [Header("Canvas (made by Season Rush > Create UI Canvas In Scene)")]
@@ -68,9 +56,6 @@ namespace SeasonRush
         float Scale => Screen.height / 1080f;
         float VirtualWidth => Screen.width / Scale;
 
-        // ---- layout helpers (virtual GUI coordinates: origin top-left, y down) -----------------
-
-        // on phones the controls stay clear of rounded corners, notches and the gesture bar (zero on a PC)
         static Vector4 Ins => MobileSupport.SafeInsets();
 
         Vector2 AttackCentreGui => new Vector2(VirtualWidth - 190f - Ins.z, 860f - Ins.w);
@@ -84,13 +69,9 @@ namespace SeasonRush
         public Vector2 GuiToPixel(Vector2 gui) => new Vector2(gui.x * Scale, Screen.height - gui.y * Scale);
         public Vector2 PixelToGui(Vector2 px) => new Vector2(px.x / Scale, (Screen.height - px.y) / Scale);
 
-        /// <summary>Where to press to start the joystick (used by the automated tests).</summary>
         public Vector2 StickStartPixel => GuiToPixel(new Vector2(300f, 700f));
-        /// <summary>Where the attack button is (used by the automated tests).</summary>
         public Vector2 AttackButtonPixel => GuiToPixel(AttackCentreGui);
         public float StickRadiusPixels => StickRadius * Scale;
-
-        // ---- input ------------------------------------------------------------------------------
 
         static bool InMatch()
         {
@@ -110,7 +91,6 @@ namespace SeasonRush
 
             GatherPointers();
 
-            // forget pointers that were lifted
             bool stickAlive = false, attackAlive = false;
             foreach (Pointer p in _pointers)
             {
@@ -121,7 +101,6 @@ namespace SeasonRush
             if (!stickAlive) { _stickPointer = None; _knob = Vector2.zero; }
             if (!attackAlive) _attackPointer = None;
 
-            // new presses: the attack button wins if the press is on it, otherwise the left side starts the joystick
             foreach (Pointer p in _pointers)
             {
                 if (!p.down || !p.pressedThisFrame) continue;
@@ -138,7 +117,6 @@ namespace SeasonRush
                 }
             }
 
-            // follow the joystick finger
             if (_stickPointer != None)
             {
                 foreach (Pointer p in _pointers)
@@ -186,7 +164,6 @@ namespace SeasonRush
                 }
             }
 
-            // a mouse is used when no finger is on the screen (touch screens can also emulate a mouse)
             Mouse mouse = Mouse.current;
             if (!anyTouch && mouse != null)
             {
@@ -200,20 +177,16 @@ namespace SeasonRush
             }
         }
 
-        // ---- drawing (the pictures are real objects of the UI canvas: Hierarchy > UI > Controls) -----------------
-
         void UpdateVisuals()
         {
             if (controlsRoot == null) return;
 
-            // joystick
             bool stickActive = _stickPointer != None;
             Vector2 centre = stickActive ? PixelToGui(_stickCentrePx) : IdleStickCentreGui;
             Place(stickRing, centre, StickRadius, new Color(1f, 1f, 1f, stickActive ? 0.55f : 0.28f));
             Vector2 knob = centre + new Vector2(_knob.x, -_knob.y) * StickRadius;
             Place(stickKnob, knob, KnobRadius, new Color(1f, 1f, 1f, stickActive ? 0.7f : 0.32f));
 
-            // attack button
             bool pressed = _attackPointer != None || (Keyboard.current != null && Keyboard.current.spaceKey.isPressed);
             Vector2 a = AttackCentreGui;
             Place(attackDisc, a, AttackRadius, pressed ? new Color(1f, 0.55f, 0.35f, 0.85f) : new Color(1f, 0.35f, 0.25f, 0.45f));
@@ -221,7 +194,6 @@ namespace SeasonRush
             if (attackLabel != null) attackLabel.color = new Color(1f, 1f, 1f, pressed ? 1f : 0.85f);
         }
 
-        /// <summary>Puts a round picture at a position given in virtual GUI units (origin top-left, y down = canvas units).</summary>
         static void Place(Image image, Vector2 centre, float radius, Color colour)
         {
             if (image == null) return;

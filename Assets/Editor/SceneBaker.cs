@@ -5,29 +5,21 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Turns the Season Theme data into real objects: one prefab for every prop type (a tree, a rock, a bush) and one prefab for every
-    /// season map (island meshes + all its props, each prop an instance of its prop prefab). The map prefabs are placed in the scene under
-    /// Environment > Maps, so the Hierarchy shows the whole game.
-    ///
-    /// The Season Theme assets stay the place where maps are edited (Map Editor, Inspector). After editing a theme run
-    /// Season Rush > Update Maps In Scene: it regenerates the prefabs. Until you do, the game notices the baked map is out of date and
-    /// builds the map from the theme itself, so you never see old data in a match.
-    /// </summary>
     public static class SceneBaker
     {
         public const string PropDir = "Assets/Prefabs/Props";
         public const string MapDir = "Assets/Prefabs/Maps";
         const string MeshDir = MapDir + "/Meshes";
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Update Maps In Scene")]
+#endif
         public static void UpdateMapsFromMenu()
         {
             string message = UpdateMapsInOpenScene();
             EditorUtility.DisplayDialog("Season Rush", message, "OK");
         }
 
-        /// <summary>Regenerates the prop and map prefabs and makes sure the open scene has an instance of every map.</summary>
         public static string UpdateMapsInOpenScene()
         {
             MapManager manager = Object.FindFirstObjectByType<MapManager>();
@@ -84,9 +76,6 @@ namespace SeasonRush.EditorTools
             return parent;
         }
 
-        // ------------------------------------------------------------------ prefabs
-
-        /// <summary>Writes Prop_* prefabs and Map_* prefab for one theme (overwriting the old ones) and returns the map prefab.</summary>
         public static GameObject BakeMapPrefab(SeasonTheme theme)
         {
             EnsureFolder(PropDir);
@@ -94,7 +83,6 @@ namespace SeasonRush.EditorTools
             EnsureFolder(MeshDir);
             string season = SafeName(theme.displayName);
 
-            // 1) a prefab for every prop type
             var propPrefabs = new GameObject[theme.props != null ? theme.props.Length : 0];
             var used = new HashSet<string>();
             for (int i = 0; i < propPrefabs.Length; i++)
@@ -104,7 +92,6 @@ namespace SeasonRush.EditorTools
                 propPrefabs[i] = SaveProp(theme.props[i], name);
             }
 
-            // 2) the island (ground, ragged edge, patch, cliffs) without props
             GameObject root = IsoMapBuilder.Build(theme, null, false, false);
             root.name = "Map_" + season;
             foreach (MeshFilter filter in root.GetComponentsInChildren<MeshFilter>(true))
@@ -114,7 +101,6 @@ namespace SeasonRush.EditorTools
                 AssetDatabase.CreateAsset(filter.sharedMesh, meshPath);
             }
 
-            // 3) the props: one instance of its prop prefab for every placement
             Transform props = new GameObject("Props").transform;
             props.SetParent(root.transform, false);
             if (theme.placements != null)
@@ -126,13 +112,13 @@ namespace SeasonRush.EditorTools
                     PropDef def = theme.props[pl.prop];
                     var instance = (GameObject)PrefabUtility.InstantiatePrefab(propPrefabs[pl.prop], props);
                     instance.name = $"{def.name}_{i}";
-                    instance.transform.position = Iso.ToScreen3(pl.position);                     // where it is drawn
+                    instance.transform.position = Iso.ToScreen3(pl.position);
                     Transform visual = instance.transform.Find("Visual");
                     visual.localScale = new Vector3(pl.flipX ? -def.scale : def.scale, def.scale, 1f);
                     var renderer = visual.GetComponent<SpriteRenderer>();
                     if (renderer != null) renderer.sortingOrder = Iso.SortOrder(pl.position);
                     Transform collider = instance.transform.Find("Collider");
-                    if (collider != null) collider.position = new Vector3(pl.position.x, pl.position.y, 0f);   // the blocking circle is on the flat plane
+                    if (collider != null) collider.position = new Vector3(pl.position.x, pl.position.y, 0f);
                 }
             }
 
@@ -145,7 +131,6 @@ namespace SeasonRush.EditorTools
             return prefab;
         }
 
-        /// <summary>A prop prefab: an empty root, a "Visual" child with the picture and a "Collider" child (blocking props only).</summary>
         static GameObject SaveProp(PropDef def, string name)
         {
             var go = new GameObject(name);

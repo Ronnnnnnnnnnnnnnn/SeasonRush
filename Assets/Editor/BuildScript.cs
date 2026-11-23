@@ -6,12 +6,13 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>Builds a Windows player so a second copy of the game can be launched next to the Editor.</summary>
     public static class BuildScript
     {
         const string OutputPath = "Builds/Windows/SeasonRush.exe";
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Build Windows Player (for a second game window)")]
+#endif
         public static void BuildWindows()
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(OutputPath)));
@@ -27,18 +28,15 @@ namespace SeasonRush.EditorTools
             if (report.summary.result != BuildResult.Succeeded) throw new Exception("Build failed");
         }
 
-        /// <summary>Batch mode entry point.</summary>
         public static void BuildFromCommandLine()
         {
             try { BuildWindows(); EditorApplication.Exit(0); }
             catch (Exception e) { Debug.LogError("[Build] FAILED: " + e); EditorApplication.Exit(1); }
         }
 
-        /// <summary>
-        /// Builds an installable Android app (.apk) for a phone. Needs Unity's "Android Build Support" module
-        /// (Unity Hub > Installs > your editor > Add modules). See docs/Mobile_Testing.md.
-        /// </summary>
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Build Android APK (for a phone)")]
+#endif
         public static void BuildAndroidFromMenu()
         {
             try { BuildAndroid(); EditorUtility.DisplayDialog("Season Rush", "Android app built:\n\nBuilds/Android/SeasonRush.apk\n\nSee docs/Mobile_Testing.md to install it on your phone.", "OK"); }
@@ -54,7 +52,7 @@ namespace SeasonRush.EditorTools
             string output = "Builds/Android/SeasonRush.apk";
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output)));
 
-            EditorUserBuildSettings.buildAppBundle = false;                 // an .apk can be installed directly
+            EditorUserBuildSettings.buildAppBundle = false;
             var options = new BuildPlayerOptions
             {
                 scenes = new[] { SeasonRushSetup.ScenePath },
@@ -68,14 +66,12 @@ namespace SeasonRush.EditorTools
             if (report.summary.result != BuildResult.Succeeded) throw new Exception("Android build failed - see the Console for the errors.");
         }
 
-        /// <summary>Batch mode: build the Android app.</summary>
         public static void BuildAndroidFromCommandLine()
         {
             try { BuildAndroid(); EditorApplication.Exit(0); }
             catch (Exception e) { Debug.LogError("[Build] FAILED: " + e.Message); EditorApplication.Exit(1); }
         }
 
-        /// <summary>Batch mode: refresh the whole project setup, then build the player.</summary>
         public static void SetupAndBuildFromCommandLine()
         {
             try { SeasonRushSetup.BuildAll(); BuildWindows(); EditorApplication.Exit(0); }

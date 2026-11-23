@@ -4,13 +4,6 @@ using UnityEngine;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Generates simple, clearly-temporary pixel art for everything the art pack does not have yet:
-    /// the warrior, the three season monsters and the Winter ground / pine tree. Files are only
-    /// created when they do not exist, so artists can drop in real sprites with the same file
-    /// names (or just reassign the sprites in the Season Theme assets / prefabs) without anything
-    /// being overwritten.
-    /// </summary>
     public static class PlaceholderArt
     {
         public const string Dir = "Assets/2D Asset/Placeholders";
@@ -54,7 +47,6 @@ namespace SeasonRush.EditorTools
 
             static float Sign(Vector2 p1, Vector2 p2, Vector2 p3) => (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 
-            /// <summary>Adds a 1 pixel outline around everything that is already drawn.</summary>
             public void Outline(Color32 colour)
             {
                 var copy = (Color32[])Px.Clone();
@@ -117,38 +109,35 @@ namespace SeasonRush.EditorTools
             Debug.Log("[Setup] generated placeholder art: " + path);
         }
 
-        // ----------------------------------------------------------------- characters (64 x 64)
-
         static Canvas DrawWarriorBody()
         {
             var c = new Canvas(64, 64);
             Color32 steel = C(176, 184, 200), dark = C(74, 64, 56), skin = C(240, 200, 160), leather = C(110, 74, 48),
                     blade = C(232, 238, 245), gold = C(214, 170, 50), eye = C(30, 30, 40);
-            c.Rect(23, 2, 31, 7, dark); c.Rect(33, 2, 41, 7, dark);              // boots
-            c.Rect(24, 7, 30, 17, leather); c.Rect(34, 7, 40, 17, leather);     // legs
-            c.Rect(21, 17, 43, 38, steel);                                       // armour
-            c.Rect(21, 17, 43, 20, leather);                                     // belt
-            c.Rect(15, 22, 21, 36, steel); c.Rect(43, 22, 49, 36, steel);       // arms
-            c.Rect(15, 19, 21, 23, skin); c.Rect(43, 19, 49, 23, skin);         // hands
-            c.Ellipse(32, 45, 9, 9, skin);                                       // head
-            c.Ellipse(32, 50, 10.5f, 8, steel);                                  // helmet
-            c.Rect(22, 46, 42, 49, dark);                                        // visor band
-            c.Rect(27, 43, 30, 46, eye); c.Rect(35, 43, 38, 46, eye);            // eyes
-            c.Rect(51, 20, 54, 52, blade); c.Rect(52, 52, 53, 56, blade);        // sword blade
-            c.Rect(48, 22, 57, 25, gold); c.Rect(51, 16, 54, 22, leather);       // guard + grip
+            c.Rect(23, 2, 31, 7, dark); c.Rect(33, 2, 41, 7, dark);
+            c.Rect(24, 7, 30, 17, leather); c.Rect(34, 7, 40, 17, leather);
+            c.Rect(21, 17, 43, 38, steel);
+            c.Rect(21, 17, 43, 20, leather);
+            c.Rect(15, 22, 21, 36, steel); c.Rect(43, 22, 49, 36, steel);
+            c.Rect(15, 19, 21, 23, skin); c.Rect(43, 19, 49, 23, skin);
+            c.Ellipse(32, 45, 9, 9, skin);
+            c.Ellipse(32, 50, 10.5f, 8, steel);
+            c.Rect(22, 46, 42, 49, dark);
+            c.Rect(27, 43, 30, 46, eye); c.Rect(35, 43, 38, 46, eye);
+            c.Rect(51, 20, 54, 52, blade); c.Rect(52, 52, 53, 56, blade);
+            c.Rect(48, 22, 57, 25, gold); c.Rect(51, 16, 54, 22, leather);
             c.Outline(C(22, 20, 30));
             return c;
         }
 
         static Canvas DrawWarriorTunic()
         {
-            // pure white so it can be tinted blue / red at runtime ("one warrior, two colours")
             var c = new Canvas(64, 64);
             Color32 white = C(255, 255, 255);
-            c.Rect(26, 20, 38, 37, white);                 // tabard
-            c.Ellipse(18, 37, 5, 3, white);                // shoulder pads
+            c.Rect(26, 20, 38, 37, white);
+            c.Ellipse(18, 37, 5, 3, white);
             c.Ellipse(46, 37, 5, 3, white);
-            c.Rect(31, 49, 33, 56, white);                 // helmet plume
+            c.Rect(31, 49, 33, 56, white);
             c.Ellipse(32, 56, 4, 3, white);
             return c;
         }
@@ -160,9 +149,9 @@ namespace SeasonRush.EditorTools
             c.Ellipse(20, 26, 11, 9, cloud); c.Ellipse(32, 33, 15, 12, cloud); c.Ellipse(45, 26, 11, 9, cloud);
             c.Rect(14, 15, 50, 27, cloud);
             c.Ellipse(32, 19, 17, 5, shade);
-            c.Rect(24, 28, 29, 34, ink); c.Rect(36, 28, 41, 34, ink);                       // eyes
-            c.Rect(22, 35, 30, 37, ink); c.Rect(35, 36, 43, 38, ink);                       // angry brows
-            c.Rect(27, 20, 38, 23, C(70, 40, 90));                                          // mouth
+            c.Rect(24, 28, 29, 34, ink); c.Rect(36, 28, 41, 34, ink);
+            c.Rect(22, 35, 30, 37, ink); c.Rect(35, 36, 43, 38, ink);
+            c.Rect(27, 20, 38, 23, C(70, 40, 90));
             c.Outline(C(78, 90, 140));
             return c;
         }
@@ -171,14 +160,14 @@ namespace SeasonRush.EditorTools
         {
             var c = new Canvas(64, 64);
             Color32 trunk = C(122, 78, 45), bark = C(86, 52, 30), leaf = C(217, 130, 43), leaf2 = C(240, 168, 70), glow = C(255, 232, 90);
-            c.Rect(18, 4, 27, 10, trunk); c.Rect(37, 4, 46, 10, trunk);                     // root feet
-            c.Rect(22, 8, 42, 40, trunk);                                                    // trunk
+            c.Rect(18, 4, 27, 10, trunk); c.Rect(37, 4, 46, 10, trunk);
+            c.Rect(22, 8, 42, 40, trunk);
             c.Rect(26, 12, 28, 34, bark); c.Rect(36, 16, 38, 36, bark);
-            c.Rect(11, 26, 23, 30, trunk); c.Rect(41, 26, 53, 30, trunk);                    // arms
+            c.Rect(11, 26, 23, 30, trunk); c.Rect(41, 26, 53, 30, trunk);
             c.Rect(9, 30, 12, 37, trunk); c.Rect(52, 30, 55, 37, trunk);
             c.Ellipse(32, 47, 19, 12, leaf); c.Ellipse(22, 45, 9, 7, leaf2); c.Ellipse(43, 45, 9, 7, leaf2);
-            c.Rect(26, 26, 31, 32, glow); c.Rect(34, 26, 39, 32, glow);                     // glowing eyes
-            c.Rect(28, 17, 37, 21, C(40, 20, 10));                                          // mouth
+            c.Rect(26, 26, 31, 32, glow); c.Rect(34, 26, 39, 32, glow);
+            c.Rect(28, 17, 37, 21, C(40, 20, 10));
             c.Outline(C(45, 28, 18));
             return c;
         }
@@ -189,17 +178,15 @@ namespace SeasonRush.EditorTools
             Color32 white = C(244, 250, 255), shade = C(190, 210, 234), coal = C(30, 34, 46), stick = C(110, 74, 48), carrot = C(255, 140, 30);
             c.Ellipse(32, 16, 17, 14, white); c.Ellipse(32, 35, 12, 11, white); c.Ellipse(32, 51, 9, 8, white);
             c.Ellipse(38, 11, 8, 6, shade);
-            c.Rect(8, 34, 22, 37, stick); c.Rect(42, 34, 56, 37, stick);                    // stick arms
-            c.Rect(28, 51, 31, 55, coal); c.Rect(34, 51, 37, 55, coal);                     // eyes
-            c.Rect(27, 56, 31, 57, coal); c.Rect(34, 56, 38, 57, coal);                     // brows
-            c.Rect(32, 47, 41, 50, carrot);                                                  // nose
-            c.Rect(31, 38, 34, 41, coal); c.Rect(31, 31, 34, 34, coal);                     // buttons
-            c.Rect(28, 45, 36, 46, coal);                                                    // grumpy mouth
+            c.Rect(8, 34, 22, 37, stick); c.Rect(42, 34, 56, 37, stick);
+            c.Rect(28, 51, 31, 55, coal); c.Rect(34, 51, 37, 55, coal);
+            c.Rect(27, 56, 31, 57, coal); c.Rect(34, 56, 38, 57, coal);
+            c.Rect(32, 47, 41, 50, carrot);
+            c.Rect(31, 38, 34, 41, coal); c.Rect(31, 31, 34, 34, coal);
+            c.Rect(28, 45, 36, 46, coal);
             c.Outline(C(90, 120, 170));
             return c;
         }
-
-        // ----------------------------------------------------------------- winter environment
 
         static Canvas DrawPine()
         {
@@ -236,7 +223,7 @@ namespace SeasonRush.EditorTools
             Canvas c = DrawSnowGround();
             for (int y = 0; y < 128; y++)
             {
-                int cut = 2 + (int)(Hash(0, y / 2, 9) % 6);      // ragged right edge
+                int cut = 2 + (int)(Hash(0, y / 2, 9) % 6);
                 for (int x = 128 - cut; x < 128; x++) c.Set(x, y, C(0, 0, 0, 0));
             }
             return c;
@@ -248,10 +235,10 @@ namespace SeasonRush.EditorTools
             for (int y = 0; y < 128; y++)
                 for (int x = 0; x < 128; x++)
                 {
-                    int edge = 112 + Mathf.RoundToInt(4f * Mathf.Sin(x * 0.35f) + 3f * Mathf.Sin(x * 0.9f));   // texture y grows upward
+                    int edge = 112 + Mathf.RoundToInt(4f * Mathf.Sin(x * 0.35f) + 3f * Mathf.Sin(x * 0.9f));
                     uint h = Hash(x / 2, y / 2, 5) % 100;
                     Color32 col;
-                    if (y >= edge) col = y == edge ? C(190, 208, 232) : C(232, 243, 255);                     // snowy lip on top
+                    if (y >= edge) col = y == edge ? C(190, 208, 232) : C(232, 243, 255);
                     else
                     {
                         col = C(104, 128, 154);

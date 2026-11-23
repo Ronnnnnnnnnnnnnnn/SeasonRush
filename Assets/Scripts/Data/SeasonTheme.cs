@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SeasonRush
 {
-    /// <summary>A decoration or obstacle that can be placed on a season map.</summary>
     [Serializable]
     public class PropDef
     {
@@ -16,7 +15,6 @@ namespace SeasonRush
         public Color tint = Color.white;
     }
 
-    /// <summary>Where a prop is placed. Position is in arena plane units (0..ArenaSize).</summary>
     [Serializable]
     public struct PropPlacement
     {
@@ -25,7 +23,8 @@ namespace SeasonRush
         public bool flipX;
     }
 
-    /// <summary>One enemy type for a season (a season has a weak, a medium and a strong one).</summary>
+    public enum ArtFacing { Unset, Right, Left }
+
     [Serializable]
     public class EnemyDef
     {
@@ -35,6 +34,8 @@ namespace SeasonRush
         [Tooltip("Optional: an animated enemy prefab (picture + Animator). Used instead of Sprite / Frames. The Animator may have a Trigger 'Attack' " +
                  "(plays when the enemy hits) and a Trigger 'Die' (plays on a copy of the enemy when it is killed).")]
         public GameObject visualPrefab;
+        [Tooltip("Which way the enemy's pictures look when they are not mirrored. Unset = Right. Left = the game mirrors the picture while the enemy walks to the right.")]
+        public ArtFacing artFacing;
         [Tooltip("Optional animation: these pictures are shown one after the other (for example a cloud floating up and down). Needs 2 or more. Empty = just the Sprite above.")]
         public Sprite[] frames;
         [Tooltip("Pictures per second for Frames.")]
@@ -53,11 +54,6 @@ namespace SeasonRush
         public float radius = 0.4f;
     }
 
-    /// <summary>
-    /// Everything that makes one season different: look of the island, obstacle layout, spawn
-    /// points and the three enemy types. The Season Rush setup tool generates one of these per
-    /// season, and artists can tweak them directly in the Inspector.
-    /// </summary>
     [CreateAssetMenu(menuName = "Season Rush/Season Theme", fileName = "SeasonTheme")]
     public class SeasonTheme : ScriptableObject
     {
@@ -68,9 +64,9 @@ namespace SeasonRush
 
         [Header("Island materials (sprite-unlit materials using the tile textures)")]
         public Material groundMaterial;
-        public Material sideMaterial;      // grass tile with the ragged fringe on its right edge
-        public Material cliffMaterial;     // the dirt face shown on the two front sides of the island
-        public Material patchMaterial;     // sand / ice patch in the middle of the map
+        public Material sideMaterial;
+        public Material cliffMaterial;
+        public Material patchMaterial;
         public bool hasPatch = true;
         public Vector2 patchCenter = new Vector2(6f, 6f);
         public float patchRadius = 2.3f;
@@ -85,10 +81,6 @@ namespace SeasonRush
         [Header("Enemies (index = EnemyTier: weak, medium, strong)")]
         public EnemyDef[] enemies;
 
-        /// <summary>
-        /// A number that changes whenever something that shapes the map objects changes (materials, props, where they stand, the patch).
-        /// The baked maps in the scene remember it, so the game knows when a baked map no longer matches its theme.
-        /// </summary>
         public int ContentHash()
         {
             unchecked

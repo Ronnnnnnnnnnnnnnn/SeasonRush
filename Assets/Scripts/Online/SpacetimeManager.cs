@@ -15,17 +15,13 @@ namespace SeasonRush
         public static SpacetimeManager Instance { get; private set; }
 
         public ConnState State { get; private set; } = ConnState.Disabled;
-        /// <summary>Plain-language reason when State is Failed.</summary>
         public string Error { get; private set; } = "";
-        /// <summary>This player's database identity as 64 lowercase hex characters ("" until connected).</summary>
         public string IdentityHex { get; private set; } = "";
-        /// <summary>This player's profile row (null until it has arrived from the database).</summary>
         public ProfileInfo LocalProfile { get; private set; }
         public IReadOnlyList<ProfileInfo> Leaderboard => _leaderboard;
         public IReadOnlyList<MatchInfo> RecentMatches => _recent;
         public int QueueCount { get; private set; }
         public bool InQueue { get; private set; }
-        /// <summary>The newest pairing this player is part of (set once the database has found a rival).</summary>
         public PairingInfo CurrentPairing { get; private set; }
 
         DbConnection _conn;
@@ -40,7 +36,7 @@ namespace SeasonRush
         void Awake()
         {
             Instance = this;
-            State = ConnState.Disabled;      // becomes Connecting in Start() when a database is configured
+            State = ConnState.Disabled;
         }
 
         void Start()
@@ -51,19 +47,15 @@ namespace SeasonRush
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
-            try { _conn?.Disconnect(); } catch { /* shutting down */ }
+            try { _conn?.Disconnect(); } catch {  }
         }
 
         void Update()
         {
-            // the SDK delivers every callback from FrameTick, on the main thread
             _conn?.FrameTick();
             if (_dirty) Rebuild();
         }
 
-        // ------------------------------------------------------------------ connecting
-
-        /// <summary>Connects to the database. Safe to call repeatedly.</summary>
         public void Connect()
         {
             if (!SpacetimeSettings.Enabled) { State = ConnState.Disabled; return; }
@@ -73,8 +65,6 @@ namespace SeasonRush
             Error = "";
             _subscribed = false;
 
-            // A player with a saved name keeps the same database identity (and so the same stats) between launches.
-            // Guests and test runs get a fresh identity each time.
             bool persist = LocalPlayer.HasSavedName && string.IsNullOrEmpty(LocalPlayer.Override);
             _tokenKey = "sdb_token_" + SpacetimeSettings.Database + "_" + LocalPlayer.Name.ToLowerInvariant();
             string token = persist ? PlayerPrefs.GetString(_tokenKey, "") : "";
@@ -99,7 +89,7 @@ namespace SeasonRush
 
         public void Disconnect()
         {
-            try { _conn?.Disconnect(); } catch { /* already closed */ }
+            try { _conn?.Disconnect(); } catch {  }
             _conn = null;
             if (State != ConnState.Failed) State = ConnState.Disabled;
         }
@@ -108,8 +98,6 @@ namespace SeasonRush
         {
             IdentityHex = identity.ToString().ToLowerInvariant();
             if (LocalPlayer.HasSavedName && string.IsNullOrEmpty(LocalPlayer.Override)) PlayerPrefs.SetString(_tokenKey, token);
-            // State stays Connecting until the first data has arrived (see OnApplied below), so nothing is
-            // sent to the database before it knows who we are.
             Debug.Log("[DB] connected, identity " + IdentityHex.Substring(0, 12) + "...");
 
             conn.Db.Player.OnInsert += (ctx, row) => _dirty = true;
@@ -126,10 +114,10 @@ namespace SeasonRush
                 .OnApplied(ctx =>
                 {
                     _subscribed = true;
-                    State = ConnState.Connected;          // ready: the local copy of the data is filled
+                    State = ConnState.Connected;
                     _dirty = true;
                     Debug.Log("[DB] ready: " + conn.Db.Player.Count + " players, " + conn.Db.MatchResult.Count + " matches");
-                    PushName();                           // the database now has our name before any queue call
+                    PushName();
                 })
                 .OnError((ctx, ex) => Fail("Database subscription failed: " + ex.Message))
                 .SubscribeToAllTables();
@@ -158,9 +146,6 @@ namespace SeasonRush
             Debug.LogWarning("[DB] " + message);
         }
 
-        // ------------------------------------------------------------------ calls
-
-        /// <summary>Tells the database this player's display name (also called automatically after connecting).</summary>
         public void SetName(string name)
         {
             string clean = LocalPlayer.Clean(name);
@@ -172,7 +157,6 @@ namespace SeasonRush
 
         void PushName() => SetName(LocalPlayer.Name);
 
-        /// <summary>Enter the matchmaking queue. Pairings from before this call are ignored.</summary>
         public void JoinQueue()
         {
             if (State != ConnState.Connected || _conn == null) return;
@@ -189,21 +173,18 @@ namespace SeasonRush
             InQueue = false;
         }
 
-        /// <summary>Forget the current pairing (used when a match search ends).</summary>
         public void ClearPairing()
         {
             if (CurrentPairing != null) _ignoredPairings.Add(CurrentPairing.Id);
             CurrentPairing = null;
         }
 
-        /// <summary>The host announces how the guest can connect: "relay" or "ip:port".</summary>
         public void PublishHostAddress(string address)
         {
             if (State != ConnState.Connected || CurrentPairing == null) return;
             _conn.Reducers.PublishHostAddress(CurrentPairing.Id, address);
         }
 
-        /// <summary>The Netcode host stores the finished match. Identities are 64-character hex strings.</summary>
         public void ReportMatch(string matchCode, string blueHex, int blueScore, int blueKills, int blueDeaths,
                                 string redHex, int redScore, int redKills, int redDeaths, int winnerSlot)
         {
@@ -211,10 +192,8 @@ namespace SeasonRush
             _conn.Reducers.ReportMatch(matchCode ?? "",
                 Identity.FromHexString(blueHex), blueScore, blueKills, blueDeaths,
                 Identity.FromHexString(redHex), redScore, redKills, redDeaths, winnerSlot);
-            ClearPairing();                    // the code can only be used once; a rematch is stored without it
+            ClearPairing();
         }
-
-        // ------------------------------------------------------------------ local copy for the UI
 
         void IgnoreCurrentPairings()
         {
@@ -270,7 +249,6 @@ namespace SeasonRush
 
             QueueCount = (int)_conn.Db.QueueEntry.Count;
 
-            // the newest pairing for this player that we have not ignored
             Pairing newest = null;
             foreach (Pairing p in _conn.Db.Pairing.Iter())
             {

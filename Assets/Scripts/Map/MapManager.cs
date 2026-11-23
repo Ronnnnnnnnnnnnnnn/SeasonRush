@@ -28,12 +28,11 @@ namespace SeasonRush
             ApplyLayerRules();
 
             _cam = Camera.main;
-            if (arenaWalls == null) CreateWalls(transform);        // normally the walls are objects in the scene
+            if (arenaWalls == null) CreateWalls(transform);
 
             _roots = new GameObject[themes.Length];
             for (int i = 0; i < themes.Length; i++)
             {
-                // the map baked into the scene (Environment > Maps) is used while it still matches its theme; otherwise it is built here
                 GameObject baked = maps != null && i < maps.Length ? maps[i] : null;
                 var marker = baked != null ? baked.GetComponent<BakedMap>() : null;
                 if (marker != null && marker.themeHash == themes[i].ContentHash())
@@ -74,7 +73,6 @@ namespace SeasonRush
             Physics2D.IgnoreLayerCollision(enemy, enemy, true);
         }
 
-        /// <summary>The four invisible walls just outside the island (also built into the scene by the editor).</summary>
         public static GameObject CreateWalls(Transform parent)
         {
             float n = GameConfig.ArenaSize;
@@ -83,7 +81,6 @@ namespace SeasonRush
             int layer = LayerMask.NameToLayer(IsoMapBuilder.ObstacleLayerName);
             if (layer >= 0) walls.layer = layer;
 
-            // four thick boxes just outside the arena square, on the gameplay plane
             AddWall(walls, new Vector2(n * 0.5f, -1f), new Vector2(n + 4f, 2f), layer);
             AddWall(walls, new Vector2(n * 0.5f, n + 1f), new Vector2(n + 4f, 2f), layer);
             AddWall(walls, new Vector2(-1f, n * 0.5f), new Vector2(2f, n + 4f), layer);
@@ -124,7 +121,6 @@ namespace SeasonRush
             Vector2[] spawns = Theme(season).enemySpawns;
             if (spawns == null || spawns.Length == 0) return new Vector2(GameConfig.ArenaSize * 0.5f, GameConfig.ArenaSize * 0.5f);
 
-            // try a few random points first so spawns are not always the same, then fall back to the farthest one
             for (int attempt = 0; attempt < 6; attempt++)
             {
                 Vector2 candidate = spawns[Random.Range(0, spawns.Length)];
@@ -149,9 +145,9 @@ namespace SeasonRush
         {
             if (_cam == null) { _cam = Camera.main; if (_cam == null) return; }
             float n = GameConfig.ArenaSize;
-            float halfWidth = n * Iso.HalfW + 1.0f;             // diamond half width + margin
-            float top = n * 2f * Iso.HalfH + 2.1f;              // north corner + tall trees
-            float bottom = -2.3f;                               // south corner + cliff face
+            float halfWidth = n * Iso.HalfW + 1.0f;
+            float top = n * 2f * Iso.HalfH + 2.1f;
+            float bottom = -2.3f;
             float size = Mathf.Max((top - bottom) * 0.5f, halfWidth / Mathf.Max(0.5f, _cam.aspect));
             _cam.orthographic = true;
             _cam.orthographicSize = size;

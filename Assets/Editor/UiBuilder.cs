@@ -9,18 +9,6 @@ using UnityEngine.UI;
 
 namespace SeasonRush.EditorTools
 {
-    /// <summary>
-    /// Builds the whole user interface as a real Canvas in the scene Hierarchy (instead of drawing it from code):
-    ///
-    ///   UI (Canvas)
-    ///     MainMenu   Backdrop, Title, Tagline, HomePanel, ProfilePanel, LeaderboardPanel, LocalPanel, SearchingPanel
-    ///     HUD        LeaveSafeArea, MatchUi (WorldOverlays, SafeArea, Banner, LobbyPanel, Countdown, ResultPanel, DeathPanel, PausePanel)
-    ///     Controls   joystick and ATTACK button
-    ///   EventSystem
-    ///
-    /// The panels are switched on and off with SetActive: the navigation buttons do it themselves (look at their On Click list in the
-    /// Inspector), the ConnectionMenu / GameHud scripts do the rest. Run Season Rush > Create UI Canvas In Scene to rebuild it.
-    /// </summary>
     public static class UiBuilder
     {
         const string SpriteDir = "Assets/UI/Sprites";
@@ -30,7 +18,9 @@ namespace SeasonRush.EditorTools
         static Font _font;
         static Sprite _round, _disc, _ring;
 
+#if SEASON_RUSH_MENU
         [MenuItem("Season Rush/Create UI Canvas In Scene")]
+#endif
         public static void CreateFromMenu()
         {
             ConnectionMenu menu = Object.FindFirstObjectByType<ConnectionMenu>();
@@ -46,11 +36,8 @@ namespace SeasonRush.EditorTools
             EditorUtility.DisplayDialog("Season Rush", "The UI canvas is in the scene (Hierarchy: UI).\n\nSave the scene (Ctrl+S).", "OK");
         }
 
-        // ------------------------------------------------------------------ entry point
-
         public static void Build(ConnectionMenu menu, GameHud hud, VirtualControls controls)
         {
-            // replace an older canvas, keep (or create) the event system
             GameObject old = GameObject.Find("/UI");
             if (old != null) Object.DestroyImmediate(old);
 
@@ -67,7 +54,7 @@ namespace SeasonRush.EditorTools
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = 1f;                                  // the layout is made for a screen 1080 units high
+            scaler.matchWidthOrHeight = 1f;
 
             EnsureEventSystem();
 
@@ -77,11 +64,9 @@ namespace SeasonRush.EditorTools
             BuildHud(canvas.transform, menu, hud);
             BuildControls(canvas.transform, controls);
 
-            // look like the MenuStyle asset from the start (the ConnectionMenu keeps them in sync while the game runs)
             MenuStyle style = MenuStyle.Current;
             foreach (StyledElement element in canvas.GetComponentsInChildren<StyledElement>(true)) element.Apply(style);
 
-            // initial visibility: the main menu on its home screen; the HUD and the controls appear when a match starts
             menu.profilePanel.SetActive(false);
             menu.leaderboardPanel.SetActive(false);
             menu.localPanel.SetActive(false);
@@ -104,8 +89,6 @@ namespace SeasonRush.EditorTools
             module.AssignDefaultActions();
         }
 
-        // ------------------------------------------------------------------ main menu
-
         static void BuildMainMenu(Transform canvas, ConnectionMenu menu)
         {
             RectTransform root = Node("MainMenu", canvas, A.Full);
@@ -113,11 +96,10 @@ namespace SeasonRush.EditorTools
 
             Img("Backdrop", root, Color.white, A.Full, raycast: true).gameObject.AddComponent<StyledElement>().role = UiRole.Backdrop;
             Txt("Title", root, "SEASON RUSH", 64, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 100, 0, 90, bold: true, role: UiRole.LabelTitle, src: UiText.GameTitle);
-            Image logo = Img("TitleLogo", root, Color.white, A.TC, 0, 24, 440, 184);            // the picture of the game's name (MenuStyle > Title Image)
+            Image logo = Img("TitleLogo", root, Color.white, A.TC, 0, 24, 440, 184);
             logo.gameObject.AddComponent<StyledElement>().role = UiRole.LogoImage;
             Txt("Tagline", root, "", 20, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 958, 0, 36, role: UiRole.LabelText, src: UiText.Tagline);
 
-            // ---- home
             RectTransform home = Node("HomePanel", root, A.Full);
             menu.homePanel = home.gameObject;
             menu.homeDatabaseStatus = Txt("DatabaseStatus", home, "", 18, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 222, 0, 26, role: UiRole.LabelHint);
@@ -130,7 +112,6 @@ namespace SeasonRush.EditorTools
             menu.homeMessage = Txt("Message", home, "", 19, Color.white, TextAnchor.UpperCenter, A.TC, 0, 780, 600, 90, wrap: true, role: UiRole.LabelText);
             Txt("ControlsHelp", home, "Move: joystick / WASD / Arrows     Attack: button / Space / J", 18, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 1018, 0, 30, role: UiRole.LabelText);
 
-            // ---- profile
             RectTransform prof = PanelPicture(Img("ProfilePanel", root, Color.white, A.TC, 0, 250, 540, 700, round: true, raycast: true), UiPanelKind.Profile).rectTransform;
             menu.profilePanel = prof.gameObject;
             Txt("Title", prof, "YOUR PROFILE", 28, Color.white, TextAnchor.MiddleLeft, A.TL, 28, 16, 484, 40, role: UiRole.LabelHeading);
@@ -158,7 +139,6 @@ namespace SeasonRush.EditorTools
             menu.autoFindToggle = MakeToggle("AutoSearchToggle", prof, "Search automatically when the game opens", A.TL, 28, 568, 484, 34);
             Button profileBack = Btn("BackButton", prof, "BACK", UiRole.ButtonNormal, UiRole.LabelSmallButton, UiText.Back, A.TL, 150, 626, 240, 56, 28, UiSkinColor.Winter, UiSkinSize.Small);
 
-            // ---- leaderboard
             RectTransform board = PanelPicture(Img("LeaderboardPanel", root, Color.white, A.TC, 0, 250, 540, 700, round: true, raycast: true), UiPanelKind.Leaderboard).rectTransform;
             menu.leaderboardPanel = board.gameObject;
             Txt("Title", board, "LEADERBOARD", 28, Color.white, TextAnchor.MiddleLeft, A.TL, 28, 16, 484, 40, role: UiRole.LabelHeading);
@@ -192,7 +172,6 @@ namespace SeasonRush.EditorTools
                 menu.recentMatchRows[i] = Txt("Recent" + (i + 1), content, "", 17, Color.white, TextAnchor.MiddleLeft, A.TL, 28, 450 + 28 * i, 484, 26, role: UiRole.LabelText);
             Button boardBack = Btn("BackButton", board, "BACK", UiRole.ButtonNormal, UiRole.LabelSmallButton, UiText.Back, A.TL, 150, 626, 240, 56, 28, UiSkinColor.Winter, UiSkinSize.Small);
 
-            // ---- local network (host / join)
             RectTransform lan = PanelPicture(Img("LocalPanel", root, Color.white, A.TC, 0, 250, 620, 640, round: true, raycast: true), UiPanelKind.LocalNetwork).rectTransform;
             menu.localPanel = lan.gameObject;
             Txt("Title", lan, "LOCAL NETWORK", 30, Color.white, TextAnchor.MiddleCenter, A.TL, 30, 18, 560, 44, role: UiRole.LabelHeading);
@@ -208,7 +187,6 @@ namespace SeasonRush.EditorTools
             menu.localMessage = Txt("Message", lan, "", 19, Color.white, TextAnchor.UpperCenter, A.TL, 10, 506, 600, 40, wrap: true, role: UiRole.LabelText);
             menu.localBackButton = Btn("BackButton", lan, "BACK", UiRole.ButtonNormal, UiRole.LabelSmallButton, UiText.Back, A.TL, 190, 560, 240, 56, 28, UiSkinColor.Winter, UiSkinSize.Small);
 
-            // ---- searching for a random opponent
             RectTransform search = Node("SearchingPanel", root, A.Full);
             menu.searchingPanel = search.gameObject;
             PanelPicture(Img("Panel", search, Color.white, A.TC, 0, 250, 620, 640, round: true, raycast: true), UiPanelKind.LocalNetwork);
@@ -218,7 +196,6 @@ namespace SeasonRush.EditorTools
             Txt("Info", search, "You will be paired with the next player who presses PLAY.", 24, Color.white, TextAnchor.MiddleCenter, A.TC, 0, 560, 560, 110, wrap: true, role: UiRole.LabelText);
             Button searchCancel = Btn("CancelButton", search, "CANCEL", UiRole.ButtonCancel, UiRole.LabelButton, UiText.Cancel, A.TC, 0, 700, 300, 80, 28, UiSkinColor.Autumn, UiSkinSize.Medium);
 
-            // ---- what the buttons do (visible in each button's On Click list in the Inspector)
             Switch(profile, home, prof);
             Switch(leaderboard, home, board);
             Switch(local, home, lan);
@@ -233,7 +210,6 @@ namespace SeasonRush.EditorTools
             UnityEventTools.AddPersistentListener(searchCancel.onClick, menu.CancelConnection);
         }
 
-        /// <summary>A panel that takes its picture (wooden frame, beige inside) from the MenuStyle.</summary>
         static Image PanelPicture(Image image, UiPanelKind kind)
         {
             var styled = image.gameObject.AddComponent<StyledElement>();
@@ -242,31 +218,25 @@ namespace SeasonRush.EditorTools
             return image;
         }
 
-        /// <summary>The wooden line between two sections of a panel.</summary>
         static void Divider(Transform parent, float x, float y, float w)
         {
             Image line = Img("Divider", parent, Color.white, A.TL, x, y, w, 8);
             line.gameObject.AddComponent<StyledElement>().role = UiRole.Divider;
         }
 
-        /// <summary>A thin light line under a row of a list.</summary>
         static void RowLine(Transform parent, float x, float y, float w)
         {
             Img("RowLine", parent, new Color(0.86f, 0.78f, 0.64f, 0.9f), A.TL, x, y, w, 2);
         }
-
-        // ------------------------------------------------------------------ HUD
 
         static void BuildHud(Transform canvas, ConnectionMenu menu, GameHud hud)
         {
             RectTransform root = Node("HUD", canvas, A.Full);
             hud.hudRoot = root.gameObject;
 
-            // bottom right: who you are (HOST / CLIENT / ONLINE and how many players)
             RectTransform statusSafe = Node("StatusSafeArea", root, A.Full);
             menu.roleText = Light("RoleText", statusSafe, "", 18, Color.white, TextAnchor.MiddleRight, A.BR, 24, 12, 420, 36, heading: false);
 
-            // while the connection to the match is still being made: a message and a way back
             RectTransform connecting = Node("ConnectingPanel", root, A.Full);
             hud.connectingText = connecting.gameObject;
             Light("Text", connecting, "Connecting...", 48, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 460, 0, 80);
@@ -276,14 +246,12 @@ namespace SeasonRush.EditorTools
             RectTransform match = Node("MatchUi", root, A.Full);
             hud.matchUi = match.gameObject;
 
-            // world-anchored things: health bars, YOU, +points (a template each; the HUD clones them as needed)
             RectTransform overlays = Node("WorldOverlays", match, A.Full);
             hud.overlayRoot = overlays;
             hud.barTemplate = BuildBarTemplate(overlays);
             hud.labelTemplate = Light("LabelTemplate", overlays, "", 20, Color.white, TextAnchor.MiddleCenter, A.TLCentre, 0, 0, 160, 48);
             hud.labelTemplate.gameObject.SetActive(false);
 
-            // top bar, the two player boxes, PAUSE
             RectTransform safe = Node("SafeArea", match, A.Full);
             hud.safeAreas = new[] { statusSafe, safe };
 
@@ -299,7 +267,6 @@ namespace SeasonRush.EditorTools
 
             hud.controlsHint = Light("ControlsHint", safe, "Move: joystick / WASD / Arrows     Attack: button / Space / J", 17, new Color(1, 1, 1, 0.85f), TextAnchor.MiddleLeft, A.BL, 24, 8, 900, 28, heading: false).gameObject;
 
-            // season banner
             RectTransform banner = Node("Banner", match, A.Full);
             hud.banner = banner.gameObject.AddComponent<CanvasGroup>();
             hud.banner.blocksRaycasts = false;
@@ -308,7 +275,6 @@ namespace SeasonRush.EditorTools
             hud.bannerSub = Light("Subtitle", banner, "", 24, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 418, 0, 44, heading: false);
             banner.gameObject.SetActive(false);
 
-            // lobby
             RectTransform lobby = Node("LobbyPanel", match, A.Full);
             hud.lobbyPanel = lobby.gameObject;
             HudBox("Box", lobby, A.TC, 0, 370, 780, 290, UiPanelKind.LocalNetwork);
@@ -325,11 +291,9 @@ namespace SeasonRush.EditorTools
             UnityEventTools.AddPersistentListener(lobbyBack.onClick, hud.LobbyBack);
             lobby.gameObject.SetActive(false);
 
-            // countdown 3 2 1
             hud.countdownText = Light("Countdown", match, "3", 200, new Color(1f, 0.95f, 0.6f), TextAnchor.MiddleCenter, A.Wide, 0, 330, 0, 260);
             hud.countdownText.gameObject.SetActive(false);
 
-            // result screen
             RectTransform result = Node("ResultPanel", match, A.Full);
             hud.resultPanel = result.gameObject;
             Img("Dim", result, new Color(0, 0, 0, 0.65f), A.Full);
@@ -348,7 +312,6 @@ namespace SeasonRush.EditorTools
             hud.rematchWaiting = Light("WaitingForHost", result, "Waiting for the host to start a rematch...", 24, new Color(1, 1, 1, 0.9f), TextAnchor.MiddleCenter, A.TC, 0, 600, 1500, 40, heading: false);
             result.gameObject.SetActive(false);
 
-            // you were defeated
             RectTransform death = Node("DeathPanel", match, A.Full);
             hud.deathPanel = death.gameObject;
             Img("Tint", death, new Color(0.6f, 0f, 0f, 0.22f), A.Full);
@@ -356,7 +319,6 @@ namespace SeasonRush.EditorTools
             hud.deathSub = Light("Respawn", death, "", 28, Color.white, TextAnchor.MiddleCenter, A.Wide, 0, 500, 0, 50, heading: false);
             death.gameObject.SetActive(false);
 
-            // pause screen: the game is frozen; RESUME or SURRENDER (the rival wins)
             RectTransform pausePanel = Node("PausePanel", match, A.Full);
             hud.pausePanel = pausePanel.gameObject;
             Img("Dim", pausePanel, new Color(0, 0, 0, 0.55f), A.Full, raycast: true);
@@ -371,7 +333,6 @@ namespace SeasonRush.EditorTools
             Ink("Hint", pauseBox, "Surrender: your rival wins the match.   Esc: resume", 18, TextAnchor.MiddleCenter, A.Wide, 0, 430, 0, 32, heading: false);
             pausePanel.gameObject.SetActive(false);
 
-            // the rival paused: a short note, nothing to press
             RectTransform rivalPause = Node("PausedByRival", match, A.Full);
             hud.pausedByRival = rivalPause.gameObject;
             Img("Dim", rivalPause, new Color(0, 0, 0, 0.45f), A.Full, raycast: true);
@@ -381,7 +342,6 @@ namespace SeasonRush.EditorTools
             rivalPause.gameObject.SetActive(false);
         }
 
-        /// <summary>A box of the in-game screen: the wooden panel picture with the skin, a dark box without it.</summary>
         static Image HudBox(string name, Transform parent, A a, float x, float y, float w, float h, UiPanelKind kind)
         {
             Image box = Img(name, parent, new Color(0, 0, 0, 0.55f), a, x, y, w, h, round: true);
@@ -391,14 +351,12 @@ namespace SeasonRush.EditorTools
             return box;
         }
 
-        /// <summary>Text in the pixel font straight over the map (white, with a shadow).</summary>
         static Text Light(string name, Transform parent, string text, int size, Color colour, TextAnchor anchor, A a,
                           float x, float y, float w, float h, bool heading = true)
         {
             return Txt(name, parent, text, size, colour, anchor, a, x, y, w, h, shadow: true, role: heading ? UiRole.HudLight : UiRole.HudLightBody);
         }
 
-        /// <summary>Text on a HudBox: dark brown pixel font with the skin.</summary>
         static Text Ink(string name, Transform parent, string text, int size, TextAnchor anchor, A a,
                         float x, float y, float w, float h, bool heading = true)
         {
@@ -436,8 +394,6 @@ namespace SeasonRush.EditorTools
             return bar;
         }
 
-        // ------------------------------------------------------------------ on-screen controls
-
         static void BuildControls(Transform canvas, VirtualControls controls)
         {
             RectTransform root = Node("Controls", canvas, A.Full);
@@ -448,8 +404,6 @@ namespace SeasonRush.EditorTools
             controls.attackRing = Img("AttackRing", root, Color.white, A.TLCentre, 1700, 860, 200, 200, sprite: _ring);
             controls.attackLabel = Txt("AttackLabel", controls.attackRing.transform, "ATTACK", 30, Color.white, TextAnchor.MiddleCenter, A.Full, bold: true, role: UiRole.HudLight);
         }
-
-        // ------------------------------------------------------------------ small building blocks
 
         static RectTransform Node(string name, Transform parent, A a, float x = 0, float y = 0, float w = 0, float h = 0)
         {
@@ -577,16 +531,12 @@ namespace SeasonRush.EditorTools
             return toggle;
         }
 
-        /// <summary>A navigation button: switches one panel off and another on (SetActive), no code needed.</summary>
         static void Switch(Button button, Component hide, Component show)
         {
             UnityEventTools.AddBoolPersistentListener(button.onClick, hide.gameObject.SetActive, false);
             UnityEventTools.AddBoolPersistentListener(button.onClick, show.gameObject.SetActive, true);
         }
 
-        // ------------------------------------------------------------------ pictures
-
-        /// <summary>The soft disc / thin ring pictures of the joystick, saved once as sprite assets.</summary>
         static Sprite EnsureCircleSprite(string name, bool filled)
         {
             string path = $"{SpriteDir}/{name}.png";
@@ -601,10 +551,10 @@ namespace SeasonRush.EditorTools
             for (int y = 0; y < size; y++)
                 for (int x = 0; x < size; x++)
                 {
-                    float d = Mathf.Sqrt((x - c) * (x - c) + (y - c) * (y - c)) / c;       // 0 centre .. 1 edge
+                    float d = Mathf.Sqrt((x - c) * (x - c) + (y - c) * (y - c)) / c;
                     float alpha = filled
-                        ? Mathf.Clamp01((1f - d) * 18f)                                     // soft edge
-                        : Mathf.Clamp01(1f - Mathf.Abs(d - 0.93f) / 0.06f);                 // thin ring
+                        ? Mathf.Clamp01((1f - d) * 18f)
+                        : Mathf.Clamp01(1f - Mathf.Abs(d - 0.93f) / 0.06f);
                     px[y * size + x] = new Color32(255, 255, 255, (byte)(alpha * 255f));
                 }
             tex.SetPixels32(px);

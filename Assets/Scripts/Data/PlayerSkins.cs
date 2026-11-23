@@ -32,7 +32,6 @@ namespace SeasonRush
             }
         }
 
-        /// <summary>The picture for a player slot, or null when none is set (then the placeholder is used).</summary>
         public static Sprite For(int slot)
         {
             PlayerSkins skins = Instance;
@@ -40,7 +39,6 @@ namespace SeasonRush
             return skins.slotSprites[slot];
         }
 
-        /// <summary>The animated character prefab for a player slot, or null when none is set.</summary>
         public static GameObject PrefabFor(int slot)
         {
             PlayerSkins skins = Instance;
@@ -48,7 +46,6 @@ namespace SeasonRush
             return skins.slotPrefabs[slot];
         }
 
-        /// <summary>Which way the pictures look when they are not mirrored (see <see cref="artFacesLeft"/>).</summary>
         public static bool ArtFacesLeft
         {
             get { PlayerSkins skins = Instance; return skins == null || skins.artFacesLeft; }

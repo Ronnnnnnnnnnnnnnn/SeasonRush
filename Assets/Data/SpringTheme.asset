@@ -147,6 +147,7 @@ MonoBehaviour:
     tier: 0
     sprite: {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
     visualPrefab: {fileID: 6203442159743304588, guid: 5f2bb34348b77cc4b8c73ab23ed55f8e, type: 3}
+    artFacing: 2
     frames:
     - {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
     - {fileID: 21300000, guid: af58945e9582a4c4dbe72957c4c04457, type: 3}
@@ -164,6 +165,7 @@ MonoBehaviour:
     tier: 1
     sprite: {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
     visualPrefab: {fileID: 6203442159743304588, guid: 5f2bb34348b77cc4b8c73ab23ed55f8e, type: 3}
+    artFacing: 2
     frames:
     - {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
     - {fileID: 21300000, guid: af58945e9582a4c4dbe72957c4c04457, type: 3}
@@ -181,6 +183,7 @@ MonoBehaviour:
     tier: 2
     sprite: {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
     visualPrefab: {fileID: 6203442159743304588, guid: 5f2bb34348b77cc4b8c73ab23ed55f8e, type: 3}
+    artFacing: 2
     frames:
     - {fileID: 21300000, guid: 722c36fd583d96e4d81e61273adb9ad8, type: 3}
     - {fileID: 21300000, guid: af58945e9582a4c4dbe72957c4c04457, type: 3}
